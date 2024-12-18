@@ -64,3 +64,22 @@ void imprimirResultadoCedula(bool valido) {
         printf("Cedula no valida.\n");
     }
 }
+
+
+bool validarNombre(const std::string& nombre) {
+    std::regex regexNombre("^[A-Za-z]+$");
+
+    // Verificar si el nombre está vacío o tiene solo espacios
+    if (nombre.empty() || nombre.find_first_not_of(' ') == std::string::npos) {
+        std::cout << "Error: El nombre no puede estar vacío o contener solo espacios.\n";
+        return false;
+    }
+
+    // Verificar que el nombre cumpla con el patrón
+    if (!std::regex_match(nombre, regexNombre)) {
+        std::cout << "Error: El nombre solo debe contener letras y sin espacios adicionales.\n";
+        return false;
+    }
+
+    return true;
+}

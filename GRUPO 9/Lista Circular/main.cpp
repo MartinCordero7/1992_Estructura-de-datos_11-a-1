@@ -47,36 +47,61 @@ int main() {
 
         switch (opcion) {
             case 1: {
-                bool cedulaValida = false;
-                do {
-                    cout << "Ingrese su cedula: ";
-                    string cedulaInput;
-                    cin >> cedulaInput;
-                    if (cedulaInput.length() == 10 && validarCedula(cedulaInput)) {
-                        cedulaNumerica = stol(cedulaInput); // Convertir a número
-                        if (validarCedulaReal(cedulaNumerica)) {
-                            imprimirResultadoCedula(true);
-                            cedulaValida = true;
-                        } else {
-                            imprimirResultadoCedula(false);
-                        }
-                    } else {
-                        cout << "Ingrese una cedula valida (10 digitos)\n";
-                    }
-                } while (!cedulaValida);
+    bool cedulaValida = false;
+    do {
+        std::cout << "Ingrese su cédula: ";
+        std::string cedulaInput;
+        std::cin >> cedulaInput;
 
-                cout << "Ingrese el nombre: ";
-                cin.ignore(INT_MAX, '\n'); // Limpia el buffer antes de capturar texto
-                getline(cin, nombre);
-
-                cout << "Ingrese el apellido: ";
-                getline(cin, apellido);
-
-                lista.insertar(to_string(cedulaNumerica), nombre, apellido);
-                cout << "Persona registrada.\n";
-                break;
+        if (cedulaInput.length() == 10 && validarCedula(cedulaInput)) {
+            cedulaNumerica = stol(cedulaInput); // Convertir a número
+            if (validarCedulaReal(cedulaNumerica)) {
+                imprimirResultadoCedula(true);
+                cedulaValida = true;
+            } else {
+                imprimirResultadoCedula(false);
             }
+        } else {
+            std::cout << "Ingrese una cédula válida (10 dígitos)\n";
+        }
 
+        std::cin.clear();                      // Limpia errores previos de cin
+        std::cin.ignore(INT_MAX, '\n');        // Limpia cualquier entrada residual
+    } while (!cedulaValida);
+
+    std::string nombre, apellido;
+
+    // Solicitar y validar el nombre
+    do {
+        std::cout << "Ingrese el nombre: ";
+        std::getline(std::cin, nombre);
+
+        if (!validarNombre(nombre)) {
+            std::cout << "Error: Intente nuevamente.\n";
+        }
+
+        std::cin.clear();                      // Limpia errores previos de cin
+        std::cin.ignore(INT_MAX, '\n');        // Limpia cualquier entrada residual
+    } while (!validarNombre(nombre));
+
+    // Solicitar y validar el apellido
+    do {
+        std::cout << "Ingrese el apellido: ";
+        std::getline(std::cin, apellido);
+
+        if (!validarNombre(apellido)) {
+            std::cout << "Error: Intente nuevamente.\n";
+        }
+
+        std::cin.clear();                      // Limpia errores previos de cin
+        std::cin.ignore(INT_MAX, '\n');        // Limpia cualquier entrada residual
+    } while (!validarNombre(apellido));
+
+    // Insertar los datos en la lista
+    lista.insertar(std::to_string(cedulaNumerica), nombre, apellido);
+    std::cout << "Persona registrada.\n";
+    break;
+}
             case 2: {
                 cout << "Ingrese la cedula a buscar: ";
                 cin >> cedulaNumerica;

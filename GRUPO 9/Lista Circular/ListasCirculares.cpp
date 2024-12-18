@@ -6,6 +6,7 @@
  ***********************************************************************/
 #include "ListasCirculares.h"
 #include "Utilidades.h"
+#include "Validaciones.h"
 #include <iostream>
 #include <algorithm>
 
@@ -33,7 +34,19 @@ void ListaCircular::insertar(std::string cedula, std::string nombre, std::string
         return;
     }
 
-    // Normalizar nombre y apellido automáticamente
+    // Validar el nombre
+    while (!validarNombre(nombre)) {
+        std::cout << "Ingrese un nombre válido: ";
+        std::getline(std::cin, nombre);
+    }
+
+    // Validar el apellido
+    while (!validarNombre(apellido)) {
+        std::cout << "Ingrese un apellido válido: ";
+        std::getline(std::cin, apellido);
+    }
+
+    // Normalizar el nombre y apellido
     nombre = normalizarNombre(nombre);
     apellido = normalizarNombre(apellido);
 
