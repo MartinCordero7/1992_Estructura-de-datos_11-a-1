@@ -6,8 +6,10 @@
  ***********************************************************************/
 #pragma once
 #include "ListasCirculares.h"
+#include <string>
 
 class Ordenamiento {
 public:
     void ordenarPorCubetas(ListaCircular& lista);
+    void guardarEnArchivo(ListaCircular& lista, const std::string& nombreArchivo); // Declaración
 };

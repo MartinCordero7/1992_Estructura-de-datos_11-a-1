@@ -11,7 +11,31 @@
 #include <cctype>
 #include <vector>
 #include <sstream>
+#include <algorithm> // Para std::sort
+#include <fstream> // Para manejar archivos
 
+void Ordenamiento::guardarEnArchivo(ListaCircular& lista, const std::string& nombreArchivo) {
+    std::ofstream archivo(nombreArchivo, std::ios::out);
+    if (!archivo.is_open()) {
+        std::cout << "Error al abrir el archivo: " << nombreArchivo << "\n";
+        return;
+    }
+
+    Nodo* actual = lista.getPrimero();
+    if (actual == nullptr) {
+        archivo << "NULL\n";
+    } else {
+        do {
+            archivo << actual->getCedula() << ","
+                    << actual->getNombre() << ","
+                    << actual->getApellido() << "\n";
+            actual = actual->getSiguiente();
+        } while (actual != lista.getPrimero());
+    }
+
+    archivo.close();
+    std::cout << "Datos guardados en " << nombreArchivo << "\n";
+}
 
 void Ordenamiento::ordenarPorCubetas(ListaCircular& lista) {
     Nodo* actual = lista.getPrimero();
@@ -19,6 +43,9 @@ void Ordenamiento::ordenarPorCubetas(ListaCircular& lista) {
         std::cout << "La lista está vacía. No hay nada que ordenar.\n";
         return;
     }
+
+    // Guardar la lista actual en personas.txt
+    guardarEnArchivo(lista, "personas.txt");
 
     // Paso 1: Crear archivos temporales (cubetas)
     std::vector<std::ofstream> cubetas(26);
@@ -65,8 +92,11 @@ void Ordenamiento::ordenarPorCubetas(ListaCircular& lista) {
         }
 
         cubeta.close();
-        // remove(nombreArchivo.c_str()); // Comentar para no borrar los archivos
+        // remove(nombreArchivo.c_str()); // Comentar si deseas conservar las cubetas
     }
+
+    // Guardar los datos ordenados en personas_ordenadas.txt
+    guardarEnArchivo(lista, "personas_ordenadas.txt");
 
     std::cout << "Nombres ordenados correctamente usando cubetas (archivos).\n";
 }

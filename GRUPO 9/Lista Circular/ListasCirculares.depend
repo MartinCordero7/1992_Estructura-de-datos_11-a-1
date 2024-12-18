@@ -281,7 +281,7 @@
 	<regex>
 	<stdio.h>
 
-1734523887 source:c:\users\jerson\documents\codeblocks\listascircularesaux\ordenamiento.cpp
+1734524623 source:c:\users\jerson\documents\codeblocks\listascircularesaux\ordenamiento.cpp
 	"Ordenamiento.h"
 	"ListasCirculares.h"
 	<fstream>
@@ -289,11 +289,13 @@
 	<cctype>
 	<vector>
 	<sstream>
+	<fstream>
 
-1734522918 c:\users\jerson\documents\codeblocks\listascircularesaux\ordenamiento.h
+1734524284 c:\users\jerson\documents\codeblocks\listascircularesaux\ordenamiento.h
 	"ListasCirculares.h"
+	<string>
 
-1734523129 source:c:\users\jerson\documents\codeblocks\listascircularesaux\main.cpp
+1734524622 source:c:\users\jerson\documents\codeblocks\listascircularesaux\main.cpp
 	"ListasCirculares.h"
 	"Validaciones.h"
 	"Ordenamiento.h"

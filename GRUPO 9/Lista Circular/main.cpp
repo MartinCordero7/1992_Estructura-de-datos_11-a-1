@@ -144,13 +144,16 @@ int main() {
             }
 
             case 6: {
-            std::cout << "Ordenando los nombres usando el método de cubetas...\n";
-            ordenamiento.ordenarPorCubetas(lista);
-            std::cout << "Lista ordenada:\n";
-            lista.mostrar();
-            break;
-        }
+    std::cout << "Guardando la lista original en personas.txt...\n";
+    ordenamiento.guardarEnArchivo(lista, "personas.txt");
 
+    std::cout << "Ordenando los nombres usando el método de cubetas...\n";
+    ordenamiento.ordenarPorCubetas(lista);
+
+    std::cout << "Lista ordenada:\n";
+    lista.mostrar();
+    break;
+}
 
             case 7:
                 cout << "Saliendo del programa...\n";
