@@ -1,3 +1,9 @@
+/***********************************************************************
+ * Module:  Ordenamiento.cpp
+ * Author:  Erika Guayanay, Jerson Llumiquinga M, Maycol Celi.
+ * Date: 17/12/2024
+ * University: Universidad de las Fuerzas Armadas - ESPE
+ ***********************************************************************/
 #include "Ordenamiento.h"
 #include "json.hpp"
 #include <fstream>

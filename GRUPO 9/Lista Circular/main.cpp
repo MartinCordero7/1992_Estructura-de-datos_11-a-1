@@ -1,8 +1,8 @@
 /***********************************************************************
  * Module:  main.cpp
- * Author:  Maycol Celi
- * Date: 27/11/2024
- * Purpose: Lista de Personas con Listas Circulares.
+ * Author:  Erika Guayanay, Jerson Llumiquinga M, Maycol Celi.
+ * Date: 17/12/2024
+ * Purpose: Metodo de Ordenamiento Externo para lista circular con el método (Distribution sort)
  * University: Universidad de las Fuerzas Armadas - ESPE
  ***********************************************************************/
 #include "ListasCirculares.h"
