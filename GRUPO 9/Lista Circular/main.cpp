@@ -23,6 +23,7 @@ void limpiarConsola() {
 int main() {
     ListaCircular lista;
     Ordenamiento ordenamiento; // Instancia de la clase Ordenamiento
+    ordenamiento.ordenarPorCubetas(lista);
     string nombre, apellido;
     long int cedulaNumerica;
     char caracter;
@@ -143,10 +144,13 @@ int main() {
             }
 
             case 6: {
-            std::cout << "Ordenando los nombres de A a Z...\n";
-            ordenamiento.ordenarNombresExterno(lista, "datos.json");
+            std::cout << "Ordenando los nombres usando el método de cubetas...\n";
+            ordenamiento.ordenarPorCubetas(lista);
+            std::cout << "Lista ordenada:\n";
+            lista.mostrar();
             break;
-            }
+        }
+
 
             case 7:
                 cout << "Saliendo del programa...\n";

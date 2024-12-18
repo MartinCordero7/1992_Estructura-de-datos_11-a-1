@@ -248,3 +248,55 @@
 	<algorithm>
 	<cctype>
 
+1734506330 source:c:\users\jerson\documents\codeblocks\listascircularesaux\listascirculares.cpp
+	"ListasCirculares.h"
+	"Utilidades.h"
+	"Validaciones.h"
+	<iostream>
+	<algorithm>
+
+1734505753 c:\users\jerson\documents\codeblocks\listascircularesaux\listascirculares.h
+	"Nodo.h"
+
+1734505822 c:\users\jerson\documents\codeblocks\listascircularesaux\nodo.h
+	<iostream>
+	<string>
+
+1734505788 c:\users\jerson\documents\codeblocks\listascircularesaux\utilidades.h
+	<string>
+	<algorithm>
+	<cctype>
+
+1734506368 c:\users\jerson\documents\codeblocks\listascircularesaux\validaciones.h
+	<string>
+	<regex>
+	<iostream>
+
+1734505801 source:c:\users\jerson\documents\codeblocks\listascircularesaux\nodo.cpp
+	"Nodo.h"
+
+1734506661 source:c:\users\jerson\documents\codeblocks\listascircularesaux\validaciones.cpp
+	"Validaciones.h"
+	<iostream>
+	<regex>
+	<stdio.h>
+
+1734523887 source:c:\users\jerson\documents\codeblocks\listascircularesaux\ordenamiento.cpp
+	"Ordenamiento.h"
+	"ListasCirculares.h"
+	<fstream>
+	<iostream>
+	<cctype>
+	<vector>
+	<sstream>
+
+1734522918 c:\users\jerson\documents\codeblocks\listascircularesaux\ordenamiento.h
+	"ListasCirculares.h"
+
+1734523129 source:c:\users\jerson\documents\codeblocks\listascircularesaux\main.cpp
+	"ListasCirculares.h"
+	"Validaciones.h"
+	"Ordenamiento.h"
+	<iostream>
+	<string>
+
