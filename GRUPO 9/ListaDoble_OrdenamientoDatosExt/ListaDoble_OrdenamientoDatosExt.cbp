@@ -32,6 +32,14 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="ListasDoble.cpp" />
+		<Unit filename="ListasDoble.h" />
+		<Unit filename="MetodoOrdenamientoExterno.cpp" />
+		<Unit filename="MetodoOrdenamientoExterno.h" />
+		<Unit filename="Nodo.cpp" />
+		<Unit filename="Nodo.h" />
+		<Unit filename="Validaciones.cpp" />
+		<Unit filename="Validaciones.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />

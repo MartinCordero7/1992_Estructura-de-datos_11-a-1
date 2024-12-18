@@ -54,7 +54,7 @@ int main()
         cedula = capturarCedula();
 
         if (!validarCedulaReal(cedula)) {
-        cout << "Cédula invalida. Intente de nuevo.\n";
+        cout << "Cedula invalida. Intente de nuevo.\n";
         continue;
         }
 
@@ -217,14 +217,13 @@ int main()
             Nodo* personaEncontrada = listaPrincipal.buscar(cedula);
             if (personaEncontrada == nullptr)
             {
-                cout << "Error: La cedula no existe en el archivo.\n";
                 break;
             }
 
             cout << "Ingrese caracter a cifrar: ";
             caracter= capturarUnaLetra();
 
-            cout << "Ingrese desplazamiento: ";
+            cout << "\nIngrese desplazamiento: ";
             desplazamiento=validarNumero1a25();
 
             listaPrincipal.cifrarCaracter(cedula, caracter, desplazamiento, listaAuxiliar);

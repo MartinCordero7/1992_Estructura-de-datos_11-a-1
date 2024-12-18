@@ -26,7 +26,7 @@ bool validarCedulaReal(const string& cedula) {
 
     for (char c : cedula) {
         if (!isdigit(c)) {
-            cout << "Error: La c�dula debe contener solo n�meros.\n";
+            cout << "Error: La cedula debe contener solo n�meros.\n";
             return false;
         }
     }
@@ -34,7 +34,7 @@ bool validarCedulaReal(const string& cedula) {
     // Algoritmo de validaci�n ecuatoriano
     int provincia = stoi(cedula.substr(0, 2));
     if (provincia < 1 || provincia > 24) {
-        cout << "Error: La c�dula tiene un c�digo de provincia inv�lido.\n";
+        cout << "Error: La cedula tiene un codigo de provincia invalido.\n";
         return false;
     }
 
@@ -54,7 +54,7 @@ bool validarCedulaReal(const string& cedula) {
     int calculado = decenaSuperior - suma;
 
     if (calculado != digitoVerificador) {
-        cout << "Error: La cedula no es v�lida.\n";
+       // cout << "Error: La cedula no es valida.\n";
         return false;
     }
 

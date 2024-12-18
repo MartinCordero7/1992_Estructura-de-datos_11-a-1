@@ -74,7 +74,8 @@ Nodo* ListaDoble::buscar(string cedula) {
         if (archivoCedula == cedula) {
             archivo.close();
             Nodo* nodo = new Nodo(archivoCedula, nombre, apellido);  // Crear nodo con los datos encontrados
-            cout << "¡Persona encontrada! Cédula: " << archivoCedula << endl;
+            cout << "Persona encontrada" << endl;
+            cout << "Cedula: " << archivoCedula << endl;
             cout << "Nombre: " << nombre << endl;
             cout << "Apellido: " << apellido << endl;
             return nodo;
@@ -94,7 +95,7 @@ bool ListaDoble::eliminar(string cedula)
     }
 
     if (temp == nullptr) {
-        cout << "Persona con cédula " << cedula << " no encontrada.\n";
+        cout << "Persona con cedula " << cedula << " no encontrada.\n";
         return false;
     }
 
@@ -156,10 +157,9 @@ bool ListaDoble::eliminar(string cedula)
     if (encontrado) {
         remove("personas.txt");
         rename("personas_temp.txt", "personas.txt");
-        cout << "Persona eliminada exitosamente del archivo.\n";
         return true;
     } else {
-        cout << "No se encontró la persona en el archivo.\n";
+        cout << "No se encontro la persona en el archivo.\n";
         return false;
     }
 }
@@ -318,7 +318,7 @@ void ListaDoble::mostrar() {
     {
         cout << "\nCedula: " << temp->getCedula()
              << "\nNombre: " << temp->getNombre()
-             << "\nApellido: " << temp->getApellido() << " -> ";
+             << "\nApellido: " << temp->getApellido() << " ->\n";
         temp = temp->getSiguiente();
     }
 }
