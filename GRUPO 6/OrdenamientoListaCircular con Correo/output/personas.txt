@@ -1,0 +1,4 @@
+Chris;Mateo;Bonifaz;1720136918;cmbonifaz@espe.edu.ec;12/12/2012
+Chris;Mateo;Bonifaz;1724122427;cmbonifaz1@espe.edu.ec;12/12/2012
+Christian;Marcelo;Bonifaz;1850598010;cmbonifaz2@espe.edu.ec;12/12/2012
+Mateo;Calderon;Calderon;1102964960;mccalderon@espe.edu.ec;12/12/2012
