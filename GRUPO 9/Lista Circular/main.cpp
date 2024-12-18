@@ -49,13 +49,12 @@ int main() {
         switch (opcion) {
             case 1: {
     bool cedulaValida = false;
+    std::string cedulaInput;
     do {
-        std::cout << "Ingrese su cédula: ";
-        std::string cedulaInput;
+        std::cout << "Ingrese su cedula: ";
         std::cin >> cedulaInput;
-
         if (cedulaInput.length() == 10 && validarCedula(cedulaInput)) {
-            cedulaNumerica = stol(cedulaInput); // Convertir a número
+            long int cedulaNumerica = stol(cedulaInput); // Convertir a número
             if (validarCedulaReal(cedulaNumerica)) {
                 imprimirResultadoCedula(true);
                 cedulaValida = true;
@@ -63,43 +62,29 @@ int main() {
                 imprimirResultadoCedula(false);
             }
         } else {
-            std::cout << "Ingrese una cédula válida (10 dígitos)\n";
+            std::cout << "Ingrese una cedula valida (Solo numeros y 10 dígitos).\n";
         }
-
-        std::cin.clear();                      // Limpia errores previos de cin
-        std::cin.ignore(INT_MAX, '\n');        // Limpia cualquier entrada residual
     } while (!cedulaValida);
+
+    // Limpiar el búfer antes de usar getline
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     std::string nombre, apellido;
 
-    // Solicitar y validar el nombre
+    // Solicitar el nombre
     do {
         std::cout << "Ingrese el nombre: ";
         std::getline(std::cin, nombre);
-
-        if (!validarNombre(nombre)) {
-            std::cout << "Error: Intente nuevamente.\n";
-        }
-
-        std::cin.clear();                      // Limpia errores previos de cin
-        std::cin.ignore(INT_MAX, '\n');        // Limpia cualquier entrada residual
     } while (!validarNombre(nombre));
 
-    // Solicitar y validar el apellido
+    // Solicitar el apellido
     do {
         std::cout << "Ingrese el apellido: ";
         std::getline(std::cin, apellido);
-
-        if (!validarNombre(apellido)) {
-            std::cout << "Error: Intente nuevamente.\n";
-        }
-
-        std::cin.clear();                      // Limpia errores previos de cin
-        std::cin.ignore(INT_MAX, '\n');        // Limpia cualquier entrada residual
     } while (!validarNombre(apellido));
 
-    // Insertar los datos en la lista
-    lista.insertar(std::to_string(cedulaNumerica), nombre, apellido);
+    // Insertar la persona en la lista
+    lista.insertar(cedulaInput, nombre, apellido);
     std::cout << "Persona registrada.\n";
     break;
 }
@@ -147,7 +132,7 @@ int main() {
     std::cout << "Guardando la lista original en personas.txt...\n";
     ordenamiento.guardarEnArchivo(lista, "personas.txt");
 
-    std::cout << "Ordenando los nombres usando el método de cubetas...\n";
+    std::cout << "Ordenando los nombres...\n";
     ordenamiento.ordenarPorCubetas(lista);
 
     std::cout << "Lista ordenada:\n";
@@ -160,11 +145,11 @@ int main() {
                 break;
 
             default:
-                cout << "Opción no válida. Seleccione una opción del menú.\n";
+                cout << "Opcion no valida. Seleccione una opción del menu (1-7).\n";
         }
 
         if (opcion != 7) {
-            cout << "\nPresione Enter para regresar al menú...";
+            cout << "\nPresione Enter para regresar al menu.";
             cin.ignore(INT_MAX, '\n');
             cin.get();
         }
