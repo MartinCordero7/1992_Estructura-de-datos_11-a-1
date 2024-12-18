@@ -71,7 +71,7 @@ bool validarNombre(const std::string& nombre) {
 
     // Verificar si el nombre está vacío o tiene solo espacios
     if (nombre.empty() || nombre.find_first_not_of(' ') == std::string::npos) {
-        std::cout << "Error: El nombre no puede estar vacío o contener solo espacios.\n";
+        std::cout << "Error: El nombre no puede estar vacio o contener solo espacios.\n";
         return false;
     }
 

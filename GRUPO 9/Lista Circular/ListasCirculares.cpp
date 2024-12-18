@@ -29,20 +29,20 @@ bool ListaCircular::validarCedulaUnica(string cedula) {
 void ListaCircular::insertar(std::string cedula, std::string nombre, std::string apellido, bool mostrarMensaje) {
     if (!validarCedulaUnica(cedula)) {
         if (mostrarMensaje) {
-            std::cout << "Error: La cédula ya existe en la lista.\n";
+            std::cout << "ERROR: La cedula ya existe en la lista.\n";
         }
         return;
     }
 
     // Validar el nombre
     while (!validarNombre(nombre)) {
-        std::cout << "Ingrese un nombre válido: ";
+        std::cout << "ERROR: Ingrese un nombre valido: ";
         std::getline(std::cin, nombre);
     }
 
     // Validar el apellido
     while (!validarNombre(apellido)) {
-        std::cout << "Ingrese un apellido válido: ";
+        std::cout << "ERROR: Ingrese un apellido valido: ";
         std::getline(std::cin, apellido);
     }
 
@@ -62,7 +62,7 @@ void ListaCircular::insertar(std::string cedula, std::string nombre, std::string
     }
 
     if (mostrarMensaje) {
-        std::cout << "Persona ingresada correctamente.\n";
+        std::cout << "Persona registrada correctamente.\n";
     }
 }
 
@@ -82,7 +82,7 @@ Nodo* ListaCircular::buscar(string cedula) {
 
 bool ListaCircular::eliminar(string cedula) {
     if (primero == nullptr) {
-        cout << "La lista está vacía.\n";
+        cout << "La lista esta vacia.\n";
         return false;
     }
 
@@ -100,7 +100,7 @@ bool ListaCircular::eliminar(string cedula) {
     } while (actual != primero);
 
     if (!encontrado) {
-        cout << "Cédula no encontrada.\n";
+        cout << "Cedula no encontrada.\n";
         return false;
     }
 
@@ -132,7 +132,7 @@ void ListaCircular::mostrar() {
     }
 
     do {
-        std::cout << "<Cédula: " << actual->getCedula()
+        std::cout << "<Cedula: " << actual->getCedula()
                   << ", Nombre: " << actual->getNombre()
                   << ", Apellido: " << actual->getApellido() << ">\n"; // Salto de línea aquí
         actual = actual->getSiguiente();
@@ -144,7 +144,7 @@ void ListaCircular::mostrar() {
 void ListaCircular::eliminarCaracter(std::string cedula, char caracter) {
     Nodo* actual = buscar(cedula);
     if (actual == nullptr) {
-        std::cout << "Cédula no encontrada.\n";
+        std::cout << "Cedula no encontrada.\n";
         return;
     }
 
@@ -158,7 +158,7 @@ void ListaCircular::eliminarCaracter(std::string cedula, char caracter) {
     actual->setNombre(normalizarNombre(nuevoNombre));
     actual->setApellido(normalizarNombre(nuevoApellido));
 
-    std::cout << "Carácter eliminado correctamente.\n";
+    std::cout << "Caracter eliminado correctamente.\n";
 }
 
 

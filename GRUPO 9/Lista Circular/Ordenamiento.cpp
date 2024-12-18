@@ -40,7 +40,7 @@ void Ordenamiento::guardarEnArchivo(ListaCircular& lista, const std::string& nom
 void Ordenamiento::ordenarPorCubetas(ListaCircular& lista) {
     Nodo* actual = lista.getPrimero();
     if (actual == nullptr) {
-        std::cout << "La lista está vacía. No hay nada que ordenar.\n";
+        std::cout << "La lista esta vacia. No hay nada que ordenar.\n";
         return;
     }
 
@@ -101,5 +101,5 @@ void Ordenamiento::ordenarPorCubetas(ListaCircular& lista) {
     // Guardar los datos ordenados en personas_ordenadas.txt
     guardarEnArchivo(lista, "personas_ordenadas.txt");
 
-    std::cout << "Nombres ordenados correctamente usando cubetas (archivos).\n";
+    std::cout << "Nombres ordenados correctamente usando (archivos).\n";
 }
