@@ -44,15 +44,8 @@ void Ordenamiento::ordenarPorCubetas(ListaCircular& lista) {
         return;
     }
 
-    // Guardar la lista actual en personas.txt
-    guardarEnArchivo(lista, "personas.txt");
-
     // Paso 1: Crear archivos temporales (cubetas)
-    std::vector<std::ofstream> cubetas(26);
-    for (int i = 0; i < 26; ++i) {
-        std::string nombreArchivo = "cubeta_" + std::string(1, 'A' + i) + ".txt";
-        cubetas[i].open(nombreArchivo, std::ios::out);
-    }
+    std::vector<std::vector<std::string>> cubetas(26);
 
     // Paso 2: Distribuir los nodos en las cubetas
     do {
@@ -61,38 +54,48 @@ void Ordenamiento::ordenarPorCubetas(ListaCircular& lista) {
         int indice = primeraLetra - 'A';
 
         if (indice >= 0 && indice < 26) {
-            cubetas[indice] << actual->getCedula() << ","
-                            << actual->getNombre() << ","
-                            << actual->getApellido() << "\n";
+            // Guardamos los datos como una sola cadena en formato "nombre,apellido,cedula"
+            std::string datos = actual->getNombre() + "," + actual->getApellido() + "," + actual->getCedula();
+            cubetas[indice].push_back(datos);
         }
 
         actual = actual->getSiguiente();
     } while (actual != lista.getPrimero());
 
+    // Paso 3: Ordenar los datos dentro de cada cubeta
     for (auto& cubeta : cubetas) {
-        cubeta.close();
+        std::sort(cubeta.begin(), cubeta.end(), [](const std::string& a, const std::string& b) {
+            // Extraer nombres y apellidos de las cadenas "nombre,apellido,cedula"
+            size_t coma1_a = a.find(',');
+            size_t coma2_a = a.find(',', coma1_a + 1);
+            size_t coma1_b = b.find(',');
+            size_t coma2_b = b.find(',', coma1_b + 1);
+
+            std::string nombreA = a.substr(0, coma1_a);
+            std::string apellidoA = a.substr(coma1_a + 1, coma2_a - coma1_a - 1);
+            std::string nombreB = b.substr(0, coma1_b);
+            std::string apellidoB = b.substr(coma1_b + 1, coma2_b - coma1_b - 1);
+
+            if (nombreA == nombreB) {
+                return apellidoA < apellidoB; // Si los nombres son iguales, ordenar por apellido
+            }
+            return nombreA < nombreB; // Ordenar por nombre
+        });
     }
 
-    // Paso 3: Leer y reconstruir la lista circular
+    // Paso 4: Reconstruir la lista circular desde las cubetas
     lista = ListaCircular();
-    for (int i = 0; i < 26; ++i) {
-        std::string nombreArchivo = "cubeta_" + std::string(1, 'A' + i) + ".txt";
-        std::ifstream cubeta(nombreArchivo, std::ios::in);
+    for (const auto& cubeta : cubetas) {
+        for (const auto& datos : cubeta) {
+            size_t coma1 = datos.find(',');
+            size_t coma2 = datos.find(',', coma1 + 1);
 
-        std::string linea;
-        while (std::getline(cubeta, linea)) {
-            std::istringstream stream(linea);
-            std::string cedula, nombre, apellido;
-
-            std::getline(stream, cedula, ',');
-            std::getline(stream, nombre, ',');
-            std::getline(stream, apellido, ',');
+            std::string nombre = datos.substr(0, coma1);
+            std::string apellido = datos.substr(coma1 + 1, coma2 - coma1 - 1);
+            std::string cedula = datos.substr(coma2 + 1);
 
             lista.insertar(cedula, nombre, apellido, false);
         }
-
-        cubeta.close();
-        // remove(nombreArchivo.c_str()); // Comentar si deseas conservar las cubetas
     }
 
     // Guardar los datos ordenados en personas_ordenadas.txt
