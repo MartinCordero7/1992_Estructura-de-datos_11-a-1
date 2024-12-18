@@ -1,0 +1,35 @@
+# depslib dependency file v1.0
+1734504272 source:c:\users\jerson\documents\codeblocks\listascirculares\listascirculares.cpp
+	"ListasCirculares.h"
+	<iostream>
+	<algorithm>
+
+1734504649 c:\users\jerson\documents\codeblocks\listascirculares\listascirculares.h
+	"Nodo.h"
+
+1734504272 c:\users\jerson\documents\codeblocks\listascirculares\nodo.h
+	<iostream>
+	<string>
+
+1734504529 source:c:\users\jerson\documents\codeblocks\listascirculares\main.cpp
+	"ListasCirculares.h"
+	"Validaciones.h"
+	"Ordenamiento.h"
+	<iostream>
+	<string>
+
+1734504272 c:\users\jerson\documents\codeblocks\listascirculares\validaciones.h
+	<string>
+
+1734504272 source:c:\users\jerson\documents\codeblocks\listascirculares\nodo.cpp
+	"Nodo.h"
+
+1734504272 source:c:\users\jerson\documents\codeblocks\listascirculares\validaciones.cpp
+	"Validaciones.h"
+	<iostream>
+	<regex>
+	<stdio.h>
+
+1734504402 c:\users\jerson\documents\codeblocks\listascirculares\ordenamiento.h
+	"ListasCirculares.h"
+
