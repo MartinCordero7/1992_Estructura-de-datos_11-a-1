@@ -73,7 +73,29 @@ void MetodoOrdenamientoExterno::ordenarArchivo(const string& nombreArchivo) {
     }
     archivo.close();
 
-    sort(datos.begin(), datos.end());
+    // Función de comparación personalizada para ordenar por nombre y luego por apellido
+    sort(datos.begin(), datos.end(), [](const string& a, const string& b) {
+        stringstream ssA(a), ssB(b);
+        string cedulaA, nombreA, apellidoA;
+        string cedulaB, nombreB, apellidoB;
+
+        // Extraer los datos de la línea para ambos registros
+        getline(ssA, cedulaA, ',');
+        getline(ssA, nombreA, ',');
+        getline(ssA, apellidoA);
+
+        getline(ssB, cedulaB, ',');
+        getline(ssB, nombreB, ',');
+        getline(ssB, apellidoB);
+
+        // Primero comparar por nombre
+        if (nombreA != nombreB) {
+            return nombreA < nombreB;
+        }
+
+        // Si los nombres son iguales, comparar por apellido
+        return apellidoA < apellidoB;
+    });
 
     ofstream archivoSalida(nombreArchivo);
     for (const auto& dato : datos) {
@@ -81,6 +103,7 @@ void MetodoOrdenamientoExterno::ordenarArchivo(const string& nombreArchivo) {
     }
     archivoSalida.close();
 }
+
 
 void MetodoOrdenamientoExterno::fusionarArchivos(const vector<string>& archivosCubetas, const string& archivoFinal) {
     ofstream archivoSalida(archivoFinal);
