@@ -9,6 +9,7 @@
 #include "Validaciones.h"
 #include "MetodoOrdenamientoExterno.h"
 #include <iostream>
+#include <fstream>
 #include <cstdlib> // Para system("cls") o system("clear")
 using namespace std;
 
