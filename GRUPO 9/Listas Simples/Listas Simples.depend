@@ -1,0 +1,55 @@
+# depslib dependency file v1.0
+1734497509 source:c:\users\admin\desktop\espe\pregraso s2 2024\estructura de datos\listas simples\main.cpp
+	"Lista_Simple.h"
+	"MetodoOrdenamientoExterno.h"
+	"Validaciones.h"
+	<iostream>
+	<cstdlib>
+
+1734497661 c:\users\admin\desktop\espe\pregraso s2 2024\estructura de datos\listas simples\lista_simple.h
+	"Nodo.h"
+	<string>
+	<vector>
+
+1734497661 c:\users\admin\desktop\espe\pregraso s2 2024\estructura de datos\listas simples\nodo.h
+	<string>
+
+1734497661 c:\users\admin\desktop\espe\pregraso s2 2024\estructura de datos\listas simples\validaciones.h
+	<string>
+
+1734497661 source:c:\users\admin\desktop\espe\pregraso s2 2024\estructura de datos\listas simples\nodo.cpp
+	"Nodo.h"
+
+1734497661 source:c:\users\admin\desktop\espe\pregraso s2 2024\estructura de datos\listas simples\validaciones.cpp
+	"Validaciones.h"
+	<iostream>
+	<string>
+	<conio.h>
+	<cctype>
+	<set>
+	<limits>
+	<fstream>
+
+1734497509 source:c:\users\admin\desktop\espe\pregraso s2 2024\estructura de datos\listas simples\lista_simple.cpp
+	"Lista_Simple.h"
+	<iostream>
+	<string>
+	<algorithm>
+	<cctype>
+	<vector>
+	<sstream>
+	<fstream>
+
+1734497661 c:\users\admin\desktop\espe\pregraso s2 2024\estructura de datos\listas simples\metodoordenamientoexterno.h
+	<string>
+	<vector>
+
+1734497661 source:c:\users\admin\desktop\espe\pregraso s2 2024\estructura de datos\listas simples\metodoordenamientoexterno.cpp
+	"MetodoOrdenamientoExterno.h"
+	<iostream>
+	<fstream>
+	<sstream>
+	<algorithm>
+	<vector>
+	<string>
+
