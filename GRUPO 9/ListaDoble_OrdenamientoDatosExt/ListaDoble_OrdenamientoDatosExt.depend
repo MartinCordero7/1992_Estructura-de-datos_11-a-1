@@ -1,0 +1,56 @@
+# depslib dependency file v1.0
+1734509425 source:c:\users\primario\documents\codeblocks_vanne\listadoble_ordenamientodatosext\nodo.cpp
+	"Nodo.h"
+
+1734509440 c:\users\primario\documents\codeblocks_vanne\listadoble_ordenamientodatosext\nodo.h
+	<iostream>
+	<string>
+
+1734509641 source:c:\users\primario\documents\codeblocks_vanne\listadoble_ordenamientodatosext\validaciones.cpp
+	"Validaciones.h"
+	<iostream>
+	<string>
+	<cctype>
+	<set>
+	<fstream>
+	<conio.h>
+	<limits>
+
+1734506202 c:\users\primario\documents\codeblocks_vanne\listadoble_ordenamientodatosext\validaciones.h
+	<string>
+
+1734508982 source:c:\users\primario\documents\codeblocks_vanne\listadoble_ordenamientodatosext\main.cpp
+	"ListasDoble.h"
+	"Validaciones.h"
+	"MetodoOrdenamientoExterno.h"
+	<iostream>
+	<cstdlib>
+
+1734509402 c:\users\primario\documents\codeblocks_vanne\listadoble_ordenamientodatosext\listasdoble.h
+	"Nodo.h"
+	<string>
+	<vector>
+
+1734510335 source:c:\users\primario\documents\codeblocks_vanne\listadoble_ordenamientodatosext\listasdoble.cpp
+	"ListasDoble.h"
+	<iostream>
+	<algorithm>
+	<string>
+	<fstream>
+	<sstream>
+	<cctype>
+	<vector>
+
+1734504089 c:\users\primario\documents\codeblocks_vanne\listadoble_ordenamientodatosext\metodoordenamientoexterno.h
+	<string>
+	<vector>
+
+1734504048 source:c:\users\primario\documents\codeblocks_vanne\listadoble_ordenamientodatosext\metodoordenamientoexterno.cpp
+	"MetodoOrdenamientoExterno.h"
+	<iostream>
+	<fstream>
+	<sstream>
+	<algorithm>
+	<vector>
+	<string>
+

@@ -1,9 +1,10 @@
 # depslib dependency file v1.0
-1734497509 source:c:\users\admin\desktop\espe\pregraso s2 2024\estructura de datos\listas simples\main.cpp
+1734524528 source:c:\users\admin\desktop\espe\pregraso s2 2024\estructura de datos\listas simples\main.cpp
 	"Lista_Simple.h"
 	"MetodoOrdenamientoExterno.h"
 	"Validaciones.h"
 	<iostream>
+	<fstream>
 	<cstdlib>
 
 1734497661 c:\users\admin\desktop\espe\pregraso s2 2024\estructura de datos\listas simples\lista_simple.h
@@ -44,7 +45,7 @@
 	<string>
 	<vector>
 
-1734498514 source:c:\users\admin\desktop\espe\pregraso s2 2024\estructura de datos\listas simples\metodoordenamientoexterno.cpp
+1734524378 source:c:\users\admin\desktop\espe\pregraso s2 2024\estructura de datos\listas simples\metodoordenamientoexterno.cpp
 	"MetodoOrdenamientoExterno.h"
 	<iostream>
 	<fstream>

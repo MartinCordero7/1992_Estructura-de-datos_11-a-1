@@ -9,6 +9,7 @@
 #include "MetodoOrdenamientoExterno.h"
 #include "Validaciones.h"
 #include <iostream>
+#include <fstream>
 #include <cstdlib> // Para system("cls") o system("clear")
 
 using namespace std;
@@ -242,22 +243,52 @@ int main()
 
         case 8:   // Ordenar lista por nombre (Distribución Sort)
         {
+            // Verificar si el archivo 'personas.txt' existe y no está vacío
+            ifstream archivoEntrada("personas.txt");
+            if (!archivoEntrada.is_open())
+            {
+                cout << "El archivo 'personas.txt' no existe o no se puede abrir.\n";
+                break;
+            }
+
+            archivoEntrada.seekg(0, ios::end);  // Mover el cursor al final del archivo
+            if (archivoEntrada.tellg() == 0)   // Si la posición es 0, el archivo está vacío
+            {
+                cout << "El archivo 'personas.txt' está vacío. No hay datos para procesar.\n";
+                archivoEntrada.close();
+                break;
+            }
+            archivoEntrada.close();  // Cerrar el archivo si pasó las validaciones
+
             vector<string> archivosCubetas;
             metodoOrdenamiento.distribuirDatos("personas.txt", archivosCubetas);  // Distribuir los datos en cubetas
+
             for (const auto& archivo : archivosCubetas)
             {
                 metodoOrdenamiento.ordenarArchivo(archivo);  // Ordenar cada cubeta
             }
             metodoOrdenamiento.fusionarArchivos(archivosCubetas, "personas_ordenadas.txt");  // Fusionar los archivos
             cout << "La lista ha sido ordenada y guardada en 'personas_ordenadas.txt'.\n";
+
             break;
         }
 
         case 9:   // Mostrar archivo de distribución ordenado
         {
+            // Intentar abrir el archivo para verificar si existe y no está vacío
+            ifstream archivoEntrada("personas_ordenadas.txt");
+            if (!archivoEntrada.is_open() || archivoEntrada.peek() == EOF)
+            {
+                cout << "El archivo 'personas_ordenadas.txt' no existe o esta vacio. No hay datos para mostrar.\n";
+                break;
+            }
+
+            // Si el archivo es válido, mostrar su contenido
             metodoOrdenamiento.mostrarArchivo("personas_ordenadas.txt");
+            archivoEntrada.close();
             break;
         }
+
 
         case 10:   // Salir
         {
