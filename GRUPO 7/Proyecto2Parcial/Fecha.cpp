@@ -16,7 +16,7 @@ Fecha::Fecha(std::time_t tiempo)
     : tiempo(tiempo)
 {
 }
-time_t Fecha::getTiempo() const
+const time_t& Fecha::getTiempo() const
 {
     return tiempo;
 }
@@ -33,7 +33,7 @@ void Fecha::setTiempo(int day, int month, int year)
     tiempo = mktime(&datetime);
 }
 
-void Fecha::setTiempo(std::time_t nuevoTiempo)
+void Fecha::setTiempo(const std::time_t& nuevoTiempo)
 {
     tiempo = nuevoTiempo;
 }

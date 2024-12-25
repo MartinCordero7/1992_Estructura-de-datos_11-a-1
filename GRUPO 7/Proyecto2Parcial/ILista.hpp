@@ -27,13 +27,51 @@ public:
     virtual bool eliminar(const std::string& id, std::function<const std::string& (const T&)> identifierGetter) = 0;
     virtual void eliminarPos(int posicion) = 0;
 
-    virtual void mostrar(const std::string& = " => ") const = 0;
+    virtual void mostrar(const std::string& = " =-= ") const = 0;
 
     virtual int contar() const = 0;
+
+    template <typename U>
+    static int buscar(const ILista& lista, const U& id, std::function<const U& (const T&)> identifierGetter);
+    template <typename U>
+    static bool eliminar(ILista& lista, const U& id, std::function<const U& (const T&)> identifierGetter);
 
 };
 
 template<typename T>
 inline ILista<T>::~ILista()
 {
+}
+
+template<typename T>
+template<typename U>
+inline int ILista<T>::buscar(const ILista& lista, const U& id, std::function<const U& (const T&)> identifierGetter)
+{
+    int n = lista.contar();
+    int i = 0;
+    for (i; i < n; i++)
+    {
+        if (identifierGetter(lista.conseguirDato(i)) == id)
+            return i;
+    }
+    return i;
+
+
+}
+
+template<typename T>
+template<typename U>
+inline bool ILista<T>::eliminar(ILista& lista, const U& id, std::function<const U& (const T&)> identifierGetter)
+{
+    int n = lista.contar();
+    int i = 0;
+    for (i; i < n; i++)
+    {
+        if (identifierGetter(lista.conseguirDato(i)) == id)
+        {
+            lista.eliminarPos(i);
+            return true;
+        }
+    }
+    return false;
 }

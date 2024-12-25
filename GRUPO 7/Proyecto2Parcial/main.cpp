@@ -1,6 +1,7 @@
 #include "ILista.hpp"
 #include "ListaSimple.hpp"
 #include "ListaDoble.hpp"
+#include "ListaCircular.hpp"
 #include "Sort.hpp"
 #include "Libro.hpp"
 #include "Autor.hpp"
@@ -65,7 +66,7 @@ int main()
 {
     ILista<Libro>* listaLibros = new ListaSimple<Libro>();
     ILista<Autor>* listaAutores = new ListaSimple<Autor>();
-    
+
 
     cargar(listaLibros, listaAutores, ".");
 
@@ -110,7 +111,8 @@ int main()
     const std::string menuListas =
         "1. Libros\n"
         "2. Autores\n"
-        "3. Salida\n";
+        "3. Cambiar Lista\n"
+        "4. Salida\n";
 
     const std::string menuOpLibros =
         "1. Insertar\n"
@@ -130,17 +132,36 @@ int main()
         "5. Guardar\n"
         "6. Volver\n";
 
+    const std::string menuCambio =
+        "1. Lista Simple\n"
+        "2. Lista Doble\n"
+        "3. Lista Circular\n"
+        "4. Cancelar\n";
+
     const std::string menuOrdenarLibros =
         "1. ID\n"
         "2. Titulo\n"
         "3. Autor\n"
         "4. Fecha\n"
         "5. Cancelar\n";
+    
+    const std::string menuMetodo =
+        "1. Burbuja\n"
+        "2. QuickSort\n"
+        "3. ShellSort\n"
+        "4. Insercion\n"
+        "5. Distribucion\n"
+        "6. Radix\n"
+        "7. MergeSort\n"
+        "8. MezclaDirecta\n"
+        "9. MezclaNatural\n"
+        "10. Cancelar\n";
+
 
     /////////////////////// FUNCIÓN LAMBDA QUE IMPRIME UN MENÚ ////////////////////////
     // Resalta el elemento seleccionado
     ///////////////////////////////////////////////////////////////////////////////////
-    auto imprimirMenu = [](std::string menu, int eleccion)
+    auto imprimirMenu = [](const std::string& menu, int eleccion)
         {
             std::stringstream ss(menu);
             std::string s;
@@ -205,23 +226,104 @@ int main()
             case KEY_ENTER:
                 return true;
                 break;
-            }
+
+            default:
+                if (entrada > '0' && entrada < eleccionMax + '0' + 1)
+                {
+                    eleccion = entrada - '0';
+                    // return true;     // Remover comentario para que entre inmediatamente en la opción
+                }
+                }
             return false;
         };
+
+    // ENUM PARA LA FUNCIÓN LAMBDA
+    enum eleccionSort { SORT_BURBUJA = 1, SORT_QUICKSORT, SORT_SHELLSORT, SORT_INSERCION, SORT_DISTRIBUCION, SORT_RADIX, SORT_MERGESORT, SORT_MEZCLA_DIRECTA, SORT_MEZCLA_NATURAL, SORT_CANCELAR };
+    /////////////////////// FUNCIÓN LAMBDA QUE MUESTRA UN MENÚ PARA ELEGIR MÉTODO DE SORTING ////////////////////////
+    // la entrada se realiza mediante las flechas arriba (aumentar), abajo (disminuir) y el botón enter
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    auto elegirMetodo = [&imprimirMenu, &menuMetodo, &procesarEntrada]<typename T, typename U>(ILista<T>*lista, std::function<const U & (const T&)> attributeGetter)
+    {
+        int eleccion = 1;
+        char entrada;
+        bool salir;
+
+        do
+        {
+            system(CLEAR_COMMAND);
+            std::cout << "============ ELEGIR MÉTODO ============" << std::endl;
+            imprimirMenu(menuMetodo, eleccion);
+            entrada = getch();
+            system("clear");
+            std::cout << attributeGetter(lista->conseguirDato(0));
+
+            salir = procesarEntrada(eleccion, entrada, SORT_CANCELAR);
+
+            if (salir)
+            {
+                if (eleccion != SORT_CANCELAR)
+                {
+                    switch (eleccion)
+                    {
+                    case SORT_BURBUJA:
+                        Sort::bubbleSortObj(*lista, attributeGetter);
+                        break;
+                    case SORT_QUICKSORT:
+                        std::cout << "NO IMPLEMENTADO" << std::endl;
+                        break;
+                    case SORT_SHELLSORT:
+                        std::cout << "NO IMPLEMENTADO" << std::endl;
+                        break;
+                    case SORT_INSERCION:
+                        std::cout << "NO IMPLEMENTADO" << std::endl;
+                        break;
+                    case SORT_DISTRIBUCION:
+                        std::cout << "NO IMPLEMENTADO" << std::endl;
+                        break;
+                    case SORT_RADIX:
+                        std::cout << "NO IMPLEMENTADO" << std::endl;
+                        break;
+                    case SORT_MERGESORT:
+                        std::cout << "NO IMPLEMENTADO" << std::endl;
+                        break;
+                    case SORT_MEZCLA_DIRECTA:
+                        std::cout << "NO IMPLEMENTADO" << std::endl;
+                        break;
+                    case SORT_MEZCLA_NATURAL:
+                        std::cout << "NO IMPLEMENTADO" << std::endl;
+                        break;
+
+                    default:
+                        break;
+                    }
+                    std::cout << "LISTA ORDENADA " << std::endl;
+                    getch();
+
+                }
+                else
+                {
+                    std::cout << "NO ORDENADO" << std::endl;
+                    getch();
+                }
+            }
+
+        } while (!salir);
+    };
 
     /////////////////////// DECLARACIÓN DE ENUMERACIONES ////////////////////////
     // No son necesarias, pero hacen que el código sea más legible (no ha sido
     // suficiente), especialmente cuando existen varios submenús.
     /////////////////////////////////////////////////////////////////////////////
-    enum eleccionListas { LIBROS = 1, AUTORES, SALIR };
+    enum eleccionListas { LIBROS = 1, AUTORES, CAMBIAR_LISTA, SALIR };
     enum eleccionOpLibros { INSERTAR_LIBROS = 1, BUSCAR_LIBROS, ELIMINAR_LIBROS, MOSTRAR_LIBROS, GUARDAR_LIBROS, FILTRAR_LIBROS, ORDENAR_LIBROS, SALIR_LIBROS };
     enum eleccionOpAutores { INSERTAR_AUTORES = 1, BUSCAR_AUTORES, ELIMINAR_AUTORES, MOSTRAR_AUTORES, GUARDAR_AUTORES, SALIR_AUTORES };
+    enum eleccionCambio { LISTA_SIMPLE = 1, LISTA_DOBLE, LISTA_CIRCULAR, CANCELAR_CAMBIO };
 
     /////////////////////// FUNCIÓN LAMBDA QUE OPERA SOBRE LA LISTA DE AUTORES ////////////////////////
     // Es sólo un switch
     // Va primero porque las operaciones en libros necesita acceder a las de autores
     //////////////////////////////////////////////////////////////////////////////////////////////////
-    auto operarAutores = [&menuOpLibros, listaLibros, listaAutores](int eleccion)
+    auto operarAutores = [&menuOpLibros, &listaLibros, &listaAutores](int eleccion)
         {
             std::string cedula;
 
@@ -238,8 +340,8 @@ int main()
                 std::cout << "Ingrese el cedula del autor a insertar (0 para cancelar): ";
                 cedula = Validaciones::leerCedula();
                 std::cout << std::endl;
-
-                if (listaAutores->buscar(cedula, conseguirIdAutor))
+                
+                if (ILista<Autor>::buscar(*listaAutores, cedula, conseguirIdAutor))
                 {
                     std::cout << "El cedula ya existe en la lista";
                     getch();
@@ -312,12 +414,17 @@ int main()
                             }
 
                             aux2 = aux2->getSiguiente();
+                            if (aux2 == listaLibros->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
+                                aux2 = NULL;
+
                         }
 
                         aux = aux->getSiguiente();
+                        if (aux == punteroAutor->libros.getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
+                            aux = NULL;
                     }
 
-                    listaAutores->eliminar(cedula, conseguirIdAutor);
+                    ILista<Autor>::eliminar(*listaAutores, cedula, conseguirIdAutor);
                     std::cout << "El autor con numero " << cedula << " ha sido eliminado de la lista";
                 }
                 else
@@ -353,7 +460,7 @@ int main()
     // La lista de autores también está capturada, para la asignación de autores
     //////////////////////////////////////////////////////////////////////////////////////////////////
     
-    auto operarLibros = [&menuOpLibros, &menuOrdenarLibros, &operarAutores, imprimirMenu, procesarEntrada, listaLibros, listaAutores](int eleccion)
+    auto operarLibros = [&](int eleccion)
         {
             std::string id;
 
@@ -369,8 +476,8 @@ int main()
                 std::cout << "Ingrese el id del libro a insertar (0 para cancelar): ";
                 id = Validaciones::leerNumero();
                 std::cout << std::endl;
-
-                if (listaLibros->buscar(id, conseguirIdLibro))
+                
+                if (ILista<Libro>::buscar(*listaLibros, id, conseguirIdLibro))
                 {
                     std::cout << "El id ya existe en la lista";
                     getch();
@@ -424,6 +531,8 @@ int main()
                     {
                         std::cout << aux->getDato() << std::endl;
                         aux = aux->getSiguiente();
+                        if (aux == listaAutores->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
+                            aux = NULL;
                     }
 
                     std::cout << "\033[u";
@@ -465,6 +574,8 @@ int main()
                                 break;  // si lo encuentra deja de iterar
                             }
                             aux = aux->getSiguiente();
+                            if (aux == listaAutores->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
+                                aux = NULL;
                         }
                         // si no lo encuentra (aux ha llegado a null sin encontrar coincidencias)
                         if (aux == NULL)
@@ -494,8 +605,8 @@ int main()
                 std::cout << "Ingrese el numero del libro a buscar: ";
                 id = Validaciones::leerNumero();
                 std::cout << std::endl;
-
-                if (listaLibros->buscar(id, conseguirIdLibro))
+                
+                if (ILista<Libro>::buscar(*listaLibros, id, conseguirIdLibro))
                     std::cout << "El libro con numero " << id << " se encuentra en la lista";
                 else
                     std::cout << "El libro con numero " << id << " NO se encuentra en la lista";
@@ -510,7 +621,7 @@ int main()
                 if (punteroLibro)
                 {
                     punteroLibro->getAutor()->libros.eliminar(punteroLibro);
-                    listaLibros->eliminar(id, conseguirIdLibro);
+                    ILista<Libro>::eliminar(*listaLibros, id, conseguirIdLibro);
                     std::cout << "El libro con numero " << id << " ha sido eliminado de la lista";
                 }
                 else
@@ -565,7 +676,7 @@ int main()
 
                 ListaSimple<Libro> listaRango;
 
-                auto librosEnRango = [&listaRango, listaLibros](std::time_t anioInicio, std::time_t anioFin)
+                auto librosEnRango = [&listaRango, &listaLibros](std::time_t anioInicio, std::time_t anioFin)
                     {
                         Nodo<Libro>* aux = listaLibros->getCabeza();
                         while (aux != NULL)
@@ -576,6 +687,8 @@ int main()
                                 listaRango.insertarACola(aux->dato);
                             }
                             aux = aux->getSiguiente();
+                            if (aux == listaLibros->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
+                                aux = NULL;
                         }
                     };
 
@@ -595,7 +708,7 @@ int main()
                 do
                 {
                     system(CLEAR_COMMAND);
-                    std::cout << "============ LISTA LIBROS ============" << std::endl;
+                    std::cout << "============ POR MIEMBRO ============" << std::endl;
                     imprimirMenu(menuOrdenarLibros, eleccion);
                     entrada = getch();
 
@@ -606,16 +719,16 @@ int main()
                         switch (eleccion)
                         {
                         case ID:
-                            Sort::bubbleSortObj(*listaLibros, ((std::function<const std::string& (const Libro&)>) [](const Libro& l) { return l.getId(); }));
+                            elegirMetodo(listaLibros, (std::function<const std::string& (const Libro&)>)[](const Libro& l) -> const std::string& { return l.getId(); });
                             break;
                         case TITULO:
-                            Sort::bubbleSortObj(*listaLibros, ((std::function<const std::string& (const Libro&)>) [](const Libro& l) {return l.getTitulo();}));
+                            elegirMetodo(listaLibros, (std::function<const std::string & (const Libro&)>)[](const Libro& l) -> const std::string& {return l.getTitulo();});
                             break;
                         case AUTOR:
-                            Sort::bubbleSortObj(*listaLibros, ((std::function<const std::string& (const Libro&)>) [](const Libro& l) {return l.getAutor()->getId();}));
+                            elegirMetodo(listaLibros, (std::function<const std::string & (const Libro&)>)[](const Libro& l) -> const std::string& {return l.getAutor()->getId();});
                             break;
                         case FECHA:
-                            Sort::bubbleSortObj(*listaLibros, ((std::function<const std::time_t& (const Libro&)>) [](const Libro& l) {return l.getFecha().getTiempo();}));
+                            elegirMetodo(listaLibros, (std::function<const std::time_t & (const Libro&)>)[](const Libro& l) -> const std::time_t& {return l.getFecha().getTiempo();});
                             break;
                         default:
                             break;
@@ -637,18 +750,19 @@ int main()
         };
 
     /*****************************************************************/
-    /*///////////////////////////////////////////////////////////////*/
-    /*////////////////////// LÓGICA PRINCIPAL ///////////////////////*/
-    /*///////////////////////////////////////////////////////////////*/
+    /*███████████████████████████████████████████████████████████████*/
+    /*////////////////////██ LÓGICA PRINCIPAL ██/////////////////////*/
+    /*███████████████████████████████████████████████████████████████*/
     /*v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v*/
 
+    int listaActual = LISTA_SIMPLE;
     int eleccion = 1;
     int entrada;
     bool salir = false;
     do
     {
         system(CLEAR_COMMAND);
-        std::cout << "============ LISTAS DOBLES ============" << std::endl;
+        std::cout << "============ LISTAS ============" << std::endl;
         imprimirMenu(menuListas, eleccion);
         entrada = getch();
 
@@ -705,6 +819,63 @@ int main()
                         }
 
                     } while (!salir2);
+                    break;
+                case CAMBIAR_LISTA:
+                    do
+                    {
+                        system(CLEAR_COMMAND);
+                        std::cout << "============ ELEGIR LISTA ============" << std::endl;
+                        imprimirMenu(menuCambio, eleccion2);
+                        entrada = getch();
+
+                        salir2 = procesarEntrada(eleccion2, entrada, CANCELAR_CAMBIO);
+
+                        if (salir2 && eleccion2 != CANCELAR_CAMBIO)
+                        {
+                            if (listaActual != eleccion2)
+                            {
+
+                                guardar(listaLibros, listaAutores, "temp");
+                                delete listaLibros;
+                                delete listaAutores;
+
+                                switch (eleccion2)
+                                {
+                                case LISTA_SIMPLE:
+                                    listaLibros = new ListaSimple<Libro>();
+                                    listaAutores = new ListaSimple<Autor>();
+                                    cargar(listaLibros, listaAutores, "temp");
+                                    listaActual = LISTA_SIMPLE;
+                                    break;
+                                case LISTA_DOBLE:
+                                    listaLibros = new ListaDoble<Libro>();
+                                    listaAutores = new ListaDoble<Autor>();
+                                    cargar(listaLibros, listaAutores, "temp");
+                                    listaActual = LISTA_DOBLE;
+                                    break;
+                                case LISTA_CIRCULAR:
+                                    listaLibros = new ListaCircular<Libro>();
+                                    listaAutores = new ListaCircular<Autor>();
+                                    cargar(listaLibros, listaAutores, "temp");
+                                    listaActual = LISTA_CIRCULAR;
+                                    break;
+                                default:
+                                    break;
+                                }
+
+                                std::filesystem::remove_all("temp");
+                                std::cout << "LISTA CAMBIADA";
+                                getch();
+                            }
+                            else
+                            {
+                                std::cout << "LA LISTA ACTUAL YA ES DE ESE TIPO";
+                                getch();
+                            }
+                        }
+
+                    } while (!salir2);
+
                     break;
                 case SALIR:
                     salir = true;
@@ -794,7 +965,6 @@ void guardar(ILista<Libro>* listaLibros, ILista<Autor>* listaAutores, std::strin
     std::ofstream archivoLibros(directorio + '/' + "libros.txt");
 
     Nodo<Libro>* aux = listaLibros->getCabeza();
-
     while (aux != NULL)
     {
         archivoLibros << aux->getDato().getId() << ","
@@ -804,6 +974,8 @@ void guardar(ILista<Libro>* listaLibros, ILista<Autor>* listaAutores, std::strin
             << std::endl;
 
         aux = aux->getSiguiente();
+        if (aux == listaLibros->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
+            aux = NULL;
     }
     archivoLibros.close();
 
@@ -821,6 +993,8 @@ void guardar(ILista<Libro>* listaLibros, ILista<Autor>* listaAutores, std::strin
             << std::endl;
 
         aux2 = aux2->getSiguiente();
+        if (aux2 == listaAutores->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
+            aux2 = NULL;
     }
 
     archivoAutores.close();
@@ -852,6 +1026,8 @@ Autor* punteroAutorEnLista(std::string id, ILista<Autor>* listaAutores)
             return &(aux->dato);
 
         aux = aux->getSiguiente();
+        if (aux == listaAutores->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
+            aux = NULL;
     }
 
     return (Autor*)nullptr;
@@ -866,6 +1042,8 @@ Libro* punteroLibroEnLista(std::string id, ILista<Libro>* listaLibros)
             return &(aux->dato);
 
         aux = aux->getSiguiente();
+        if (aux == listaLibros->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
+            aux = NULL;
     }
 
     return (Libro*)nullptr;
