@@ -384,6 +384,17 @@ int main()
                 listaAutores->insertarACola(Autor(cedula, nombre, nombre2, apellido));
                 break;
             }
+            case BUSCAR_AUTORES:
+                std::cout << "Ingrese el numero del libro a buscar: ";
+                cedula = Validaciones::leerNumero();
+                std::cout << std::endl;
+
+                if (ILista<Autor>::buscar(*listaAutores, cedula, conseguirIdAutor) != listaLibros->contar())
+                    std::cout << "El libro con numero " << cedula << " se encuentra en la lista" << std::endl;
+                else
+                    std::cout << "El libro con numero " << cedula << " NO se encuentra en la lista" << std::endl;
+                getch();
+                break;
             case ELIMINAR_AUTORES:
             {
                 std::cout << "Ingrese el cedula del autor a eliminar: ";
@@ -584,9 +595,9 @@ int main()
                 std::cout << std::endl;
                 
                 if (ILista<Libro>::buscar(*listaLibros, id, conseguirIdLibro) != listaLibros->contar())
-                    std::cout << "El libro con numero " << id << " se encuentra en la lista";
+                    std::cout << "El libro con numero " << id << " se encuentra en la lista" << std::endl;
                 else
-                    std::cout << "El libro con numero " << id << " NO se encuentra en la lista";
+                    std::cout << "El libro con numero " << id << " NO se encuentra en la lista" << std::endl;
                 getch();
                 break;
             case ELIMINAR_LIBROS:

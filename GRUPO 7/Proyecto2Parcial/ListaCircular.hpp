@@ -25,12 +25,10 @@ public:
     void intercambiar(int pos1, int pos2) override;
 
     int buscar(const T& dato) const override;
-    int buscar(const std::string& id, std::function<const std::string& (const T&)> identifierGetter) const;
     const T& conseguirDato(int posicion) const override;
     Nodo<T>* conseguirNodo(int posicion) const override;
 
     bool eliminar(const T& dato) override;
-    bool eliminar(const std::string& id, std::function<const std::string& (const T&)> identifierGetter);
     void eliminarPos(int posicion) override;
 
     int contar() const override;
@@ -225,25 +223,6 @@ inline int ListaCircular<T>::buscar(const T& dato) const
 }
 
 template<typename T>
-inline int ListaCircular<T>::buscar(const std::string& id, std::function<const std::string& (const T&)> identifierGetter) const
-{
-    Nodo<T>* aux = cabeza;
-
-    if (aux != NULL)
-    {
-        do
-        {
-            if (identifierGetter(aux->dato) == id)
-                return true;
-
-            aux = aux->siguiente;
-        } while (aux != NULL);
-    }
-
-    return false;
-}
-
-template<typename T>
 inline const T& ListaCircular<T>::conseguirDato(int posicion) const
 {
     return conseguirNodo(posicion)->dato;
@@ -271,35 +250,6 @@ inline bool ListaCircular<T>::eliminar(const T& dato)
         do
         {
             if (aux->dato == dato)
-            {
-                if (aux == cabeza)
-                    cabeza = aux->siguiente;
-                else
-                    aux->anterior->siguiente = aux->siguiente;
-
-                aux->siguiente->anterior = aux->anterior;
-
-                delete aux;
-                return true;
-            }
-
-            aux = aux->siguiente;
-        } while (aux != NULL);
-    }
-
-    return false;
-}
-
-template<typename T>
-inline bool ListaCircular<T>::eliminar(const std::string& id, std::function<const std::string& (const T&)> identifierGetter)
-{
-    Nodo<T>* aux = cabeza;
-
-    if (aux != NULL)
-    {
-        do
-        {
-            if (identifierGetter(aux->dato) == id)
             {
                 if (aux == cabeza)
                     cabeza = aux->siguiente;

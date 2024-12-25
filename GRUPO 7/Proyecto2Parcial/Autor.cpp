@@ -61,7 +61,7 @@ std::ostream& operator<<(std::ostream& os, const Autor& autor)
         aux = aux->getSiguiente();
     }
 
-    os << "\b)";
+    os << "\b)" << std::endl;
 
     return os;
 }

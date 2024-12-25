@@ -25,13 +25,10 @@ public:
     void intercambiar(int pos1, int pos2) override;
 
     int buscar(const T& dato) const override;
-    
-    int buscar(const std::string& id, std::function<const std::string& (const T&)> identifierGetter) const;
     const T& conseguirDato(int posicion) const override;
     Nodo<T>* conseguirNodo(int posicion) const override;
 
     bool eliminar(const T& dato);
-    bool eliminar(const std::string& id, std::function<const std::string& (const T&)> identifierGetter);
     void eliminarPos(int posicion);
 
     int contar() const;
@@ -219,22 +216,6 @@ inline int ListaSimple<T>::buscar(const T& dato) const
 }
 
 template<typename T>
-inline int ListaSimple<T>::buscar(const std::string& id, std::function<const std::string& (const T&)> identifierGetter) const
-{
-    Nodo<T>* aux = cabeza;
-
-    while (aux != NULL)
-    {
-        if (identifierGetter(aux->dato) == id)
-            return true;
-
-        aux = aux->siguiente;
-    }
-
-    return false;
-}
-
-template<typename T>
 inline const T& ListaSimple<T>::conseguirDato(int posicion) const
 {
     return conseguirNodo(posicion)->dato;
@@ -260,32 +241,6 @@ inline bool ListaSimple<T>::eliminar(const T& dato)
     while (aux != NULL)
     {
         if (aux->dato == dato)
-        {
-            if (aux == cabeza)
-                cabeza = aux->siguiente;
-            else
-                anterior->siguiente = aux->siguiente;
-
-            delete aux;
-            return true;
-        }
-
-        anterior = aux;
-        aux = aux->siguiente;
-    }
-
-    return false;
-}
-
-template<typename T>
-inline bool ListaSimple<T>::eliminar(const std::string& id, std::function<const std::string& (const T&)> identifierGetter)
-{
-    Nodo<T>* aux = cabeza;
-    Nodo<T>* anterior = NULL;
-
-    while (aux != NULL)
-    {
-        if (identifierGetter(aux->dato) == id)
         {
             if (aux == cabeza)
                 cabeza = aux->siguiente;
