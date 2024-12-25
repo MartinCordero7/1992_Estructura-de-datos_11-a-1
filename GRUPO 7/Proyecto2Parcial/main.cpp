@@ -255,7 +255,6 @@ int main()
             imprimirMenu(menuMetodo, eleccion);
             entrada = getch();
             system("clear");
-            std::cout << attributeGetter(lista->conseguirDato(0));
 
             salir = procesarEntrada(eleccion, entrada, SORT_CANCELAR);
 
@@ -341,7 +340,7 @@ int main()
                 cedula = Validaciones::leerCedula();
                 std::cout << std::endl;
                 
-                if (ILista<Autor>::buscar(*listaAutores, cedula, conseguirIdAutor))
+                if (ILista<Autor>::buscar(*listaAutores, cedula, conseguirIdAutor) != listaAutores->contar())
                 {
                     std::cout << "El cedula ya existe en la lista";
                     getch();
@@ -401,27 +400,19 @@ int main()
                 Autor* punteroAutor = punteroAutorEnLista(cedula, listaAutores);
                 if (punteroAutor)
                 {
-                    Nodo<Libro*>* aux = punteroAutor->libros.getCabeza();
-                    while (aux != NULL)
+                    int nLibrosAutor = punteroAutor->libros.contar();
+                    int nLibrosTotal = listaLibros->contar();
+                    
+                    for (int i = 0; i < nLibrosAutor; i++)
                     {
-                        Nodo<Libro>* aux2 = listaLibros->getCabeza();
-                        while (aux2 != NULL)
+                        for (int j = 0; j < nLibrosTotal; j++)
                         {
-                            if (aux->dato == &(aux2->dato))
+                            if (punteroAutor->libros.conseguirDato(i) == &(listaLibros->conseguirDato(j)))
                             {
-                                listaLibros->eliminar(aux2->getDato());
+                                listaLibros->eliminarPos(j);
                                 break;
                             }
-
-                            aux2 = aux2->getSiguiente();
-                            if (aux2 == listaLibros->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
-                                aux2 = NULL;
-
                         }
-
-                        aux = aux->getSiguiente();
-                        if (aux == punteroAutor->libros.getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
-                            aux = NULL;
                     }
 
                     ILista<Autor>::eliminar(*listaAutores, cedula, conseguirIdAutor);
@@ -477,7 +468,7 @@ int main()
                 id = Validaciones::leerNumero();
                 std::cout << std::endl;
                 
-                if (ILista<Libro>::buscar(*listaLibros, id, conseguirIdLibro))
+                if (ILista<Libro>::buscar(*listaLibros, id, conseguirIdLibro) != listaLibros->contar())
                 {
                     std::cout << "El id ya existe en la lista";
                     getch();
@@ -526,13 +517,10 @@ int main()
                 {
                     std::cout << "\033[u\033[J" << std::endl << std::endl;
 
-                    Nodo<Autor>* aux = listaAutores->getCabeza();
-                    while (aux != NULL)
+                    int n = listaAutores->contar();
+                    for (int i = 0; i < n; i++)
                     {
-                        std::cout << aux->getDato() << std::endl;
-                        aux = aux->getSiguiente();
-                        if (aux == listaAutores->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
-                            aux = NULL;
+                        std::cout << listaAutores->conseguirDato(i) << std::endl;
                     }
 
                     std::cout << "\033[u";
@@ -564,21 +552,10 @@ int main()
                             return; // sale de la función lambda
                         }
 
-
-                        Nodo<Autor>* aux = listaAutores->getCabeza();
-                        while (aux != NULL) // itera por cada elemento la lista de autores
-                        {
-                            if (aux->getDato().getId() == idAutor)  // comprueba que el elemento coincide con el campo ingresado
-                            {
-                                punteroAutorAEnlazar = &(aux->dato);
-                                break;  // si lo encuentra deja de iterar
-                            }
-                            aux = aux->getSiguiente();
-                            if (aux == listaAutores->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
-                                aux = NULL;
-                        }
-                        // si no lo encuentra (aux ha llegado a null sin encontrar coincidencias)
-                        if (aux == NULL)
+                        punteroAutorAEnlazar = punteroAutorEnLista(idAutor, listaAutores);
+                        
+                        // si no lo encuentra (punteroAutorAEnlazar es NULL)
+                        if (punteroAutorAEnlazar == NULL)
                         {
                             std::cout << "El id ingresado no se encuentra en la lista, desea añadir un autor? (Y/n): ";
                             char c = getch();
@@ -606,7 +583,7 @@ int main()
                 id = Validaciones::leerNumero();
                 std::cout << std::endl;
                 
-                if (ILista<Libro>::buscar(*listaLibros, id, conseguirIdLibro))
+                if (ILista<Libro>::buscar(*listaLibros, id, conseguirIdLibro) != listaLibros->contar())
                     std::cout << "El libro con numero " << id << " se encuentra en la lista";
                 else
                     std::cout << "El libro con numero " << id << " NO se encuentra en la lista";
@@ -678,17 +655,14 @@ int main()
 
                 auto librosEnRango = [&listaRango, &listaLibros](std::time_t anioInicio, std::time_t anioFin)
                     {
-                        Nodo<Libro>* aux = listaLibros->getCabeza();
-                        while (aux != NULL)
+                        int n = listaLibros->contar();
+                        for (int i = 0; i < n; i++)
                         {
-                            std::time_t tiempoLibro = aux->dato.getFecha().getTiempo();
+                            std::time_t tiempoLibro = listaLibros->conseguirDato(i).getFecha().getTiempo();
                             if (tiempoLibro > anioInicio && tiempoLibro < anioFin)
                             {
-                                listaRango.insertarACola(aux->dato);
+                                listaRango.insertarACola(listaLibros->conseguirDato(i));
                             }
-                            aux = aux->getSiguiente();
-                            if (aux == listaLibros->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
-                                aux = NULL;
                         }
                     };
 
@@ -964,37 +938,31 @@ void guardar(ILista<Libro>* listaLibros, ILista<Autor>* listaAutores, std::strin
     // GUARDA LIBROS AL ARCHIVO
     std::ofstream archivoLibros(directorio + '/' + "libros.txt");
 
-    Nodo<Libro>* aux = listaLibros->getCabeza();
-    while (aux != NULL)
+    int nL = listaLibros->contar();
+    for (int i = 0; i < nL; i++)
     {
-        archivoLibros << aux->getDato().getId() << ","
-            << aux->getDato().getTitulo() << ","
-            << aux->getDato().getAutor()->getId() << ","
-            << aux->getDato().getFecha().getTiempo()
+        const Libro & l = listaLibros->conseguirDato(i);
+        archivoLibros << l.getId() << ","
+            << l.getTitulo() << ","
+            << l.getAutor()->getId() << ","
+            << l.getFecha().getTiempo()
             << std::endl;
-
-        aux = aux->getSiguiente();
-        if (aux == listaLibros->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
-            aux = NULL;
     }
+
     archivoLibros.close();
 
     // GUARDA AUTORES AL LIBRO
     std::ofstream archivoAutores(directorio + '/' + "autores.txt");
 
-    Nodo<Autor>* aux2 = listaAutores->getCabeza();
-
-    while (aux2 != NULL)
+    int nA = listaAutores->contar();
+    for (int i = 0; i < nA; i++)
     {
-        archivoAutores << aux2->getDato().getId() << ","
-            << aux2->getDato().getNombre() << ","
-            << aux2->getDato().getNombre2() << ","
-            << aux2->getDato().getApellido()
+        const Autor& a = listaAutores->conseguirDato(i);
+        archivoAutores << a.getId() << ","
+            << a.getNombre() << ","
+            << a.getNombre2() << ","
+            << a.getApellido()
             << std::endl;
-
-        aux2 = aux2->getSiguiente();
-        if (aux2 == listaAutores->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
-            aux2 = NULL;
     }
 
     archivoAutores.close();
@@ -1019,15 +987,12 @@ void guardar(ILista<Libro>* listaLibros, ILista<Autor>* listaAutores, std::strin
 
 Autor* punteroAutorEnLista(std::string id, ILista<Autor>* listaAutores)
 {
-    Nodo<Autor>* aux = listaAutores->getCabeza();
-    while (aux != NULL)
-    {
-        if (aux->getDato().getId() == id)
-            return &(aux->dato);
 
-        aux = aux->getSiguiente();
-        if (aux == listaAutores->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
-            aux = NULL;
+    int n = listaAutores->contar();
+    for (int i = 0; i < n; i++)     // itera por cada elemento la lista de autores
+    {
+        if (listaAutores->conseguirDato(i).getId() == id)  // comprueba que el elemento coincide con el campo ingresado
+            return &(listaAutores->conseguirNodo(i)->dato);     // TODO: PENSAR EN ALGO MEJOR PARA NO USAR conseguirNodo()
     }
 
     return (Autor*)nullptr;
@@ -1035,15 +1000,11 @@ Autor* punteroAutorEnLista(std::string id, ILista<Autor>* listaAutores)
 
 Libro* punteroLibroEnLista(std::string id, ILista<Libro>* listaLibros)
 {
-    Nodo<Libro>* aux = listaLibros->getCabeza();
-    while (aux != NULL)
+    int n = listaLibros->contar();
+    for (int i = 0; i < n; i++)
     {
-        if (aux->getDato().getId() == id)
-            return &(aux->dato);
-
-        aux = aux->getSiguiente();
-        if (aux == listaLibros->getCabeza())    // PARA QUE EL BUCLE FUNCIONE CON LISTAS CIRCULARES
-            aux = NULL;
+        if (listaLibros->conseguirDato(i).getId() == id)
+            return &(listaLibros->conseguirNodo(i)->dato);
     }
 
     return (Libro*)nullptr;
