@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <sstream>
 #include <stdio.h>
+#include <iomanip>
 #include <functional>
 
 //// GETCH ////
@@ -44,6 +45,9 @@ int getch()
 //// DEFINICIONES ////
 #define KEY_UP 72
 #define KEY_DOWN 80
+#define KEY_LEFT 75
+#define KEY_RIGHT 77
+#define KEY_ESCAPE 27
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define KEY_ENTER 13
@@ -93,7 +97,7 @@ int main()
         std::cout << std::endl << std::endl << "\033[1;34mLa aplicación no se ha cerrado apropiadamente en la última sesión, ¿Desea restaurar los cambios sin guardar? (Y/n): \033[0m";
         char opcion = tolower(getch());
 
-        if (opcion == 'y' || opcion == '\n' || opcion == '\r')
+        if (opcion != 'n')
         {
             delete listaLibros;
             delete listaAutores;
@@ -112,7 +116,8 @@ int main()
         "1. Libros\n"
         "2. Autores\n"
         "3. Cambiar Lista\n"
-        "4. Salida\n";
+        "4. Backup\n"
+        "5. Salida\n";
 
     const std::string menuOpLibros =
         "1. Insertar\n"
@@ -183,29 +188,36 @@ int main()
         {
             //
         // PARA LINUX, se procesan 3 caracteres al presionar las flechas: '\033', '[' y una letra
-            if (entrada == '\033')
-            {
-                getch(); // lee el '['
-                entrada = getch(); // lee la letra
-                switch (entrada)
-                {
-                case 'A':   // KEY_UP
-                    entrada = KEY_UP;
-                    break;
-                case 'B':   // KEY_DOWN
-                    entrada = KEY_DOWN;
-                    break;
-                case 'C':   // KEY_LEFT
-                    break;
-                case 'D':   // KEY_RIGHT
-                    break;
 
-                default:
-                    break;
+            if (entrada == KEY_ESCAPE)
+            {                
+                char nextInput = getch();
+
+                if (nextInput == KEY_ESCAPE)
+                {
+                    entrada = KEY_ESCAPE;
+                }
+                else
+                {
+                    switch (getch())
+                    {
+                    case 'A':   // KEY_UP
+                        entrada = KEY_UP;
+                        break;
+                    case 'B':   // KEY_DOWN
+                        entrada = KEY_DOWN;
+                        break;
+                    case 'C':   // KEY_LEFT
+                        break;  // no cambia, entrada permanece en KEY_ESCAPE
+                    case 'D':   // KEY_RIGHT
+                        entrada = KEY_ENTER;
+                        break;
+
+                    default:
+                        break;
+                    }
                 }
             }
-            // FIN PARA LINUX
-            //
 
             switch (entrada)
             {
@@ -221,11 +233,18 @@ int main()
                     eleccion = 1;
                 else
                     eleccion++;
-
                 break;
+            
+            case KEY_RIGHT:
             case KEY_ENTER:
                 return true;
                 break;
+            case KEY_LEFT:
+            case KEY_ESCAPE:
+                eleccion = eleccionMax;
+                return true;
+                break;
+
 
             default:
                 if (entrada > '0' && entrada < eleccionMax + '0' + 1)
@@ -313,7 +332,7 @@ int main()
     // No son necesarias, pero hacen que el código sea más legible (no ha sido
     // suficiente), especialmente cuando existen varios submenús.
     /////////////////////////////////////////////////////////////////////////////
-    enum eleccionListas { LIBROS = 1, AUTORES, CAMBIAR_LISTA, SALIR };
+    enum eleccionListas { LIBROS = 1, AUTORES, CAMBIAR_LISTA, BACKUP, SALIR };
     enum eleccionOpLibros { INSERTAR_LIBROS = 1, BUSCAR_LIBROS, ELIMINAR_LIBROS, MOSTRAR_LIBROS, GUARDAR_LIBROS, FILTRAR_LIBROS, ORDENAR_LIBROS, SALIR_LIBROS };
     enum eleccionOpAutores { INSERTAR_AUTORES = 1, BUSCAR_AUTORES, ELIMINAR_AUTORES, MOSTRAR_AUTORES, GUARDAR_AUTORES, SALIR_AUTORES };
     enum eleccionCambio { LISTA_SIMPLE = 1, LISTA_DOBLE, LISTA_CIRCULAR, CANCELAR_CAMBIO };
@@ -569,9 +588,9 @@ int main()
                         if (punteroAutorAEnlazar == NULL)
                         {
                             std::cout << "El id ingresado no se encuentra en la lista, desea añadir un autor? (Y/n): ";
-                            char c = getch();
+                            char c = tolower(getch());
                             std::cout << std::endl;
-                            if (c == '\n' || c == '\r' || tolower(c) == 'y')
+                            if (c != 'n')
                             {
                                 operarAutores(INSERTAR_AUTORES);    // llama la función para insertar autores
 
@@ -862,6 +881,103 @@ int main()
                     } while (!salir2);
 
                     break;
+                case BACKUP:
+                {
+                    ListaSimple<std::string> listaBackup;
+                    
+                    int cant = 0;
+                    for (const auto& entry : std::filesystem::directory_iterator("./backup"))
+                    {
+                        listaBackup.insertarACola(entry.path().string());
+                        cant++;
+                    }
+
+                    std::function<time_t(const std::string&)> conseguirTiempo = [](const std::string& s)
+                        {
+                            std::stringstream ssTiempo(s.substr(9));
+                            struct std::tm structTiempo;
+
+                            ssTiempo >> std::get_time(&structTiempo, "%a %b %d %H.%M.%S %G");
+
+                            return mktime(&structTiempo);
+                        };
+                    Sort::bubbleSortObj(listaBackup, conseguirTiempo, false);
+
+                    std::string stringBackups;
+                    
+                    for (int i = 0; i < cant; i++)
+                    {
+                        stringBackups.append(listaBackup.conseguirDato(i) + '\n');
+                    }
+                    cant++; // +1 para la opción de cancelar
+                    stringBackups.append("CANCELAR");
+
+                    do
+                    {
+                        system(CLEAR_COMMAND);
+                        std::cout << "============ ELEGIR BACKUP ============" << std::endl;
+                        imprimirMenu(stringBackups, eleccion2);
+                        entrada = getch();
+
+                        salir2 = procesarEntrada(eleccion2, entrada, cant);
+
+                        if (salir2)
+                        {
+                            if (eleccion2 != cant)  // cant es CANCELAR
+                            {
+                                std::string dirBackup = listaBackup.conseguirDato(eleccion2 - 1); // -1 porque el índice comienza en 0
+                                ListaSimple<Libro> listaLibrosTemp;
+                                ListaSimple<Autor> listaAutoresTemp;
+                                cargar(&listaLibrosTemp, &listaAutoresTemp, dirBackup);
+
+                                std::cout << "Lista de Libros actual: " << std::endl;
+                                listaLibros->mostrar();
+                                std::cout << std::endl << "\033[1;30mLista de Libros de " << dirBackup << std::endl;
+                                listaLibrosTemp.mostrar();
+
+                                std::cout << "\033[0m" << std::endl << std::endl;
+
+                                std::cout << "Lista de Autores actual: " << std::endl;
+                                listaAutores->mostrar();
+                                std::cout << std::endl << "\033[1;30mLista de Autores de " << dirBackup << std::endl;
+                                listaAutoresTemp.mostrar();
+
+                                std::cout << std::endl << std::endl << "\033[0;4mSi carga ahora los datos actuales serán borrados, desea continuar?\033[0m (y/N): ";
+
+                                char opcion = tolower(getch());
+                                if (opcion == 'y')
+                                {
+                                    delete listaLibros;
+                                    delete listaAutores;
+                                    listaLibros = new ListaSimple<Libro>();
+                                    listaAutores = new ListaSimple<Autor>();
+
+                                    cargar(listaLibros, listaAutores, dirBackup);
+
+                                    guardar(listaLibros, listaAutores, "unsaved");
+
+                                    std::cout << std::endl << "DATOS RESTAURADOS" << std::endl;
+                                }
+                                else
+                                {
+                                    std::cout << std::endl << "NO SE HA CAMBIADO" << std::endl;
+                                }
+
+                            }
+                            else
+                            {
+                                std::cout << std::endl << "NO SE HA CAMBIADO" << std::endl;
+                            }
+
+                        }
+
+                    } while (!salir2);
+
+
+                    
+                    getch();
+                    break;
+                }
                 case SALIR:
                     salir = true;
                     break;

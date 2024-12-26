@@ -5,14 +5,14 @@
 namespace Sort
 {
     template<typename T, typename U>
-    void bubbleSortObj(ILista<T>& lista, std::function<const U& (const T&)> atributeGetter);
+    void bubbleSortObj(ILista<T>& lista, std::function<U (const T&)> atributeGetter, bool creciente = true);
 
     template<typename T>
-    void bubbleSort(ILista<T>& lista);
+    void bubbleSort(ILista<T>& lista, bool creciente = true);
 }
 
 template<typename T, typename U>
-void Sort::bubbleSortObj(ILista<T>& lista, std::function<const U& (const T&)> atributeGetter)
+void Sort::bubbleSortObj(ILista<T>& lista, std::function<U (const T&)> atributeGetter, bool creciente)
 {
     int n = lista.contar();
     bool haCambiado = false;
@@ -21,10 +21,21 @@ void Sort::bubbleSortObj(ILista<T>& lista, std::function<const U& (const T&)> at
     {
         for (int j = 0; j < n - i; j++)
         {
-            if (atributeGetter(lista.conseguirDato(j)) > atributeGetter(lista.conseguirDato(j + 1)))
+            if (creciente)
             {
-                lista.intercambiar(j, j + 1);
-                haCambiado = true;
+                if (atributeGetter(lista.conseguirDato(j)) > atributeGetter(lista.conseguirDato(j + 1)))
+                {
+                    lista.intercambiar(j, j + 1);
+                    haCambiado = true;
+                }
+            }
+            else
+            {
+                if (atributeGetter(lista.conseguirDato(j)) < atributeGetter(lista.conseguirDato(j + 1)))
+                {
+                    lista.intercambiar(j, j + 1);
+                    haCambiado = true;
+                }
             }
         }
 
@@ -34,7 +45,7 @@ void Sort::bubbleSortObj(ILista<T>& lista, std::function<const U& (const T&)> at
 }
 
 template<typename T>
-void Sort::bubbleSort(ILista<T>& lista)
+void Sort::bubbleSort(ILista<T>& lista, bool creciente)
 {
     int n = lista.contar();
     bool haCambiado = false;
@@ -43,10 +54,21 @@ void Sort::bubbleSort(ILista<T>& lista)
     {
         for (int j = 0; j < n - i; j++)
         {
-            if (lista.conseguirDato(j) > lista.conseguirDato(j + 1))
+            if (creciente)
             {
-                lista.intercambiar(j, j + 1);
-                haCambiado = true;
+                if (lista.conseguirDato(j) > lista.conseguirDato(j + 1))
+                {
+                    lista.intercambiar(j, j + 1);
+                    haCambiado = true;
+                }
+            }
+            else
+            {
+                if (lista.conseguirDato(j) < lista.conseguirDato(j + 1))
+                {
+                    lista.intercambiar(j, j + 1);
+                    haCambiado = true;
+                }
             }
         }
 
