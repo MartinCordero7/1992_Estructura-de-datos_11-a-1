@@ -29,6 +29,8 @@ public:
 
     virtual int contar() const = 0;
 
+    virtual void executarEnLista(std::function<void(T)> funcion) = 0;
+
     template <typename U>
     static int buscar(const ILista& lista, const U& id, std::function<const U& (const T&)> identifierGetter);
     template <typename U>

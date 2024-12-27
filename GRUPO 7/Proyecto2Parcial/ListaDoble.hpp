@@ -36,7 +36,7 @@ public:
 
     void mostrar(const std::string& separador = " <=> ") const override;
 
-    void executarEnLista(void(*funcion)(T&));
+    void executarEnLista(std::function<void(T)> funcion) override;
 };
 
 template<typename T>
@@ -321,7 +321,7 @@ inline void ListaDoble<T>::mostrar(const std::string& separador) const
 }
 
 template<typename T>
-inline void ListaDoble<T>::executarEnLista(void(*funcion)(T&))
+inline void ListaDoble<T>::executarEnLista(std::function<void(T)> funcion)
 {
     Nodo<T>* aux = cabeza;
 

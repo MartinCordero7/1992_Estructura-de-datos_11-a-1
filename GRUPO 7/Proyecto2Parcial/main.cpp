@@ -207,11 +207,11 @@ int main()
                     case 'B':   // KEY_DOWN
                         entrada = KEY_DOWN;
                         break;
-                    case 'C':   // KEY_LEFT
-                        break;  // no cambia, entrada permanece en KEY_ESCAPE
-                    case 'D':   // KEY_RIGHT
+                    case 'C':   // KEY_RIGHT
                         entrada = KEY_ENTER;
-                        break;
+                        break;  
+                    case 'D':   // KEY_LEFT
+                        break;  // no cambia, entrada permanece en KEY_ESCAPE
 
                     default:
                         break;
@@ -252,7 +252,7 @@ int main()
                     eleccion = entrada - '0';
                     // return true;     // Remover comentario para que entre inmediatamente en la opción
                 }
-                }
+            }
             return false;
         };
 
@@ -963,19 +963,12 @@ int main()
                                     std::cout << std::endl << "NO SE HA CAMBIADO" << std::endl;
                                 }
 
+                                getch();
                             }
-                            else
-                            {
-                                std::cout << std::endl << "NO SE HA CAMBIADO" << std::endl;
-                            }
-
                         }
 
                     } while (!salir2);
 
-
-                    
-                    getch();
                     break;
                 }
                 case SALIR:
@@ -1096,7 +1089,11 @@ void guardar(ILista<Libro>* listaLibros, ILista<Autor>* listaAutores, std::strin
 
     if (backup)
     {
-        time_t tiempo = time(NULL);
+        std::time_t tiempo = time(NULL);
+        {
+            /* data */
+        };
+        
         std::string nombreCarpeta(ctime(&tiempo));
         nombreCarpeta.pop_back();   // elimina el salto de línea
         std::replace(nombreCarpeta.begin(), nombreCarpeta.end(), ':', '.');

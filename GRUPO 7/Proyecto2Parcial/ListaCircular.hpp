@@ -35,7 +35,7 @@ public:
 
     void mostrar(const std::string& separador = " <=> ") const override;
 
-    void executarEnLista(void(*funcion)(T&));
+    void executarEnLista(std::function<void(T)> funcion) override;
 };
 
 template<typename T>
@@ -322,7 +322,7 @@ inline void ListaCircular<T>::mostrar(const std::string& separador) const
 }
 
 template<typename T>
-inline void ListaCircular<T>::executarEnLista(void(*funcion)(T&))
+inline void ListaCircular<T>::executarEnLista(std::function<void(T)> funcion)
 {
     Nodo<T>* aux = cabeza;
 

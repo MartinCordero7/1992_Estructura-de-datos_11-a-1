@@ -35,7 +35,7 @@ public:
 
     void mostrar(const std::string& separador = " => ") const;
 
-    void executarEnLista(void(*funcion)(T));
+    void executarEnLista(std::function<void(T)> funcion) override;
 };
 
 template<typename T>
@@ -48,7 +48,7 @@ template<typename T>
 inline ListaSimple<T>::ListaSimple(const ListaSimple& otraLista)
     : cabeza(NULL)
 {
-    Nodo<T>*aux = otraLista.getCabeza();
+    Nodo<T>* aux = otraLista.getCabeza();
     while (aux != NULL)
     {
         insertarACola(aux->getDato());
@@ -58,7 +58,7 @@ inline ListaSimple<T>::ListaSimple(const ListaSimple& otraLista)
 
 template<typename T>
 inline ListaSimple<T>::ListaSimple(std::initializer_list<T> valoresIniciales)
-    : cabeza (NULL)
+    : cabeza(NULL)
 {
     for (auto valor : valoresIniciales)
         insertarACola(valor);
@@ -307,7 +307,7 @@ inline void ListaSimple<T>::mostrar(const std::string& separador) const
 }
 
 template<typename T>
-inline void ListaSimple<T>::executarEnLista(void(*funcion)(T))
+inline void ListaSimple<T>::executarEnLista(std::function<void(T)> funcion)
 {
     Nodo<T>* aux = cabeza;
 
