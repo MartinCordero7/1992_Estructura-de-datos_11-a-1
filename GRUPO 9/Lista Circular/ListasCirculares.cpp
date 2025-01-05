@@ -142,6 +142,32 @@ void ListaCircular::mostrar() {
     std::cout << "(Regresa al inicio)\n";
 }
 
+void ListaCircular::cargarDesdeArchivo(const std::string& archivo) {
+    std::ifstream inFile(archivo);
+
+    if (!inFile.is_open()) {
+        std::cout << "No se pudo abrir el archivo " << archivo << ".\n";
+        return;
+    }
+
+    std::string linea;
+    while (std::getline(inFile, linea)) {
+        std::istringstream stream(linea);
+        std::string cedula, nombre, apellido;
+
+        // Separar la línea por comas
+        std::getline(stream, cedula, ',');
+        std::getline(stream, nombre, ',');
+        std::getline(stream, apellido, ',');
+
+        // Insertar los datos en la lista circular
+        insertar(cedula, nombre, apellido);
+    }
+
+    inFile.close();
+    std::cout << "Datos cargados desde " << archivo << " correctamente.\n";
+}
+
 void ListaCircular::mostrarListaAuxiliar(const std::string& archivo) {
     std::ifstream inFile(archivo);
 
@@ -186,6 +212,12 @@ void ListaCircular::cifrarCaracter(const std::string& cedula, char caracter, int
         return;
     }
 
+    // Mostrar datos de la persona encontrada
+    std::cout << "--Persona encontrada--\n";
+    std::cout << "Cedula: " << persona->getCedula() << "\n";
+    std::cout << "Nombre: " << persona->getNombre() << "\n";
+    std::cout << "Apellido: " << persona->getApellido() << "\n";
+
     // Cifrar el carácter en el nombre
     std::string nombre = persona->getNombre();
     for (char& c : nombre) {
@@ -200,9 +232,13 @@ void ListaCircular::cifrarCaracter(const std::string& cedula, char caracter, int
     // Actualizar el nombre cifrado
     persona->setNombre(nombre);
 
+    // Registrar la última cédula modificada
+    ultimaCedulaModificada = cedula;
+
     // Mostrar mensaje de éxito
     std::cout << "Caracter cifrado correctamente con desplazamiento " << desplazamiento << ".\n";
 }
+
 
 void ListaCircular::mostrarArchivoOrdenado(const std::string& archivo) {
     std::ifstream inFile(archivo);
@@ -221,6 +257,22 @@ void ListaCircular::mostrarArchivoOrdenado(const std::string& archivo) {
     inFile.close();
 }
 
+void ListaCircular::mostrarAuxiliar() {
+    if (ultimaCedulaModificada.empty()) {
+        std::cout << "No hay registros modificados.\n";
+        return;
+    }
+
+    Nodo* persona = buscar(ultimaCedulaModificada);
+    if (!persona) {
+        std::cout << "El registro modificado no existe en la lista.\n";
+        return;
+    }
+
+    std::cout << "Lista auxiliar:\n";
+    std::cout << persona->getCedula() << "," << persona->getNombre() << "," << persona->getApellido() << " ->\n";
+    std::cout << "NULL\n";
+}
 
 
 

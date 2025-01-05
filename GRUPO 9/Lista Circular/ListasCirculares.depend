@@ -303,7 +303,7 @@
 	<iostream>
 	<string>
 
-1736102850 source:c:\users\jerson\documents\codeblocks\listascircularesaux_v1.0.1\listascirculares.cpp
+1736103334 source:c:\users\jerson\documents\codeblocks\listascircularesaux_v1.0.1\listascirculares.cpp
 	"ListasCirculares.h"
 	"Utilidades.h"
 	"Validaciones.h"
@@ -311,7 +311,7 @@
 	<fstream>
 	<algorithm>
 
-1736102998 c:\users\jerson\documents\codeblocks\listascircularesaux_v1.0.1\listascirculares.h
+1736103776 c:\users\jerson\documents\codeblocks\listascircularesaux_v1.0.1\listascirculares.h
 	"Nodo.h"
 
 1734505822 c:\users\jerson\documents\codeblocks\listascircularesaux_v1.0.1\nodo.h
@@ -328,11 +328,12 @@
 	<regex>
 	<iostream>
 
-1736101385 source:c:\users\jerson\documents\codeblocks\listascircularesaux_v1.0.1\main.cpp
+1736103467 source:c:\users\jerson\documents\codeblocks\listascircularesaux_v1.0.1\main.cpp
 	"ListasCirculares.h"
 	"Validaciones.h"
 	"Ordenamiento.h"
 	<iostream>
+	<fstream>
 	<string>
 
 1734524284 c:\users\jerson\documents\codeblocks\listascircularesaux_v1.0.1\ordenamiento.h

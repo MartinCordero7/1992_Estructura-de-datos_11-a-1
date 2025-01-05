@@ -13,6 +13,7 @@ class ListaCircular {
 private:
     Nodo* primero;
     Nodo* ultimo;
+    std::string ultimaCedulaModificada;
 public:
     ListaCircular();
     void insertar(string cedula, string nombre, string apellido, bool mostrarMensaje = true);
@@ -23,8 +24,10 @@ public:
     bool validarCedulaUnica(string);
     void normalizarLista();
     void cifrarCaracter(const std::string& cedula, char caracter, int desplazamiento);
+    void cargarDesdeArchivo(const std::string& archivo);
     void mostrarListaAuxiliar(const std::string& archivo);
     void mostrarArchivoOrdenado(const std::string& archivo);
+    void mostrarAuxiliar();
 
     // Métodos para acceder y modificar los punteros
     Nodo* getPrimero() const { return primero; }

@@ -24,6 +24,7 @@ int main() {
     ListaCircular lista;
     Ordenamiento ordenamiento; // Instancia de la clase Ordenamiento
     ordenamiento.ordenarPorCubetas(lista);
+    lista.cargarDesdeArchivo("personas.txt");
     string nombre, apellido;
     long int cedulaNumerica;
     char caracter;
@@ -88,7 +89,6 @@ int main() {
 
     // Insertar la persona en la lista
     lista.insertar(cedulaInput, nombre, apellido);
-    std::cout << "Persona registrada.\n";
     break;
 }
             case 2: {
@@ -195,10 +195,9 @@ case 7: {
     std::cout << "Datos guardados en lista_auxiliar.txt\n";
     break;
 }
-            case 8: {
-    std::cout << "Lista auxiliar:\n";
-                lista.mostrarListaAuxiliar("lista_auxiliar.txt");
-                break;
+           case 8: {
+    lista.mostrarAuxiliar();
+    break;
 }
 
 case 9: {
