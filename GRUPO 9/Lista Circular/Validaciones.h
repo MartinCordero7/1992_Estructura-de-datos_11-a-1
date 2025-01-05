@@ -16,3 +16,4 @@ long int ingresarCedulaNumerica();              // Permite ingresar una cédula 
 bool validarCedulaReal(long int cedula);        // Valida si una cédula es real (según cálculo).
 void imprimirResultadoCedula(bool valido);      // Imprime el resultado de la validación.
 bool validarNombre(const std::string& nombre);
+std::string leerSoloNumeros();

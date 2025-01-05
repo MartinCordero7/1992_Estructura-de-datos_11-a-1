@@ -41,7 +41,7 @@ int main() {
         cout << "6. Ordenar nombres (A-Z)\n";
         cout << "7. Cifrar un caracter\n";
         cout << "8. Mostrar Lista Auxiliar\n";
-        cout << "9. Mostrar archivo de distribución ordenado.\n";
+        cout << "9. Mostrar archivo de distribucion ordenado.\n";
         cout << "10. Salir\n";
         cout << "Seleccione una opcion: ";
         cin >> opcion;
@@ -51,12 +51,14 @@ int main() {
         cin.ignore(INT_MAX, '\n');
 
         switch (opcion) {
-            case 1: {
+case 1: {
     bool cedulaValida = false;
     std::string cedulaInput;
+
     do {
         std::cout << "Ingrese su cedula: ";
-        std::cin >> cedulaInput;
+        cedulaInput = leerSoloNumeros(); // Capturamos directamente con leerSoloNumeros()
+
         if (cedulaInput.length() == 10 && validarCedula(cedulaInput)) {
             long int cedulaNumerica = stol(cedulaInput); // Convertir a número
             if (validarCedulaReal(cedulaNumerica)) {
@@ -66,7 +68,7 @@ int main() {
                 imprimirResultadoCedula(false);
             }
         } else {
-            std::cout << "Ingrese una cedula valida (Solo numeros y 10 dígitos).\n";
+            std::cout << "Ingrese una cedula válida (Solo números y 10 dígitos).\n";
         }
     } while (!cedulaValida);
 
@@ -91,31 +93,33 @@ int main() {
     lista.insertar(cedulaInput, nombre, apellido);
     break;
 }
+
             case 2: {
-                cout << "Ingrese la cedula a buscar: ";
-                cin >> cedulaNumerica;
-                Nodo* encontrado = lista.buscar(to_string(cedulaNumerica));
-                if (encontrado != nullptr) {
-                    cout << "Persona encontrada: <Cedula: " << encontrado->getCedula()
-                         << ", Nombre: " << encontrado->getNombre()
-                         << ", Apellido: " << encontrado->getApellido() << ">\n";
-                } else {
-                    cout << "Persona no encontrada.\n";
-                }
-                break;
-            }
+    std::cout << "Ingrese la cedula a buscar: ";
+    std::string cedula = leerSoloNumeros(); // Captura directamente la cédula como cadena numérica
+
+    Nodo* encontrado = lista.buscar(cedula); // Usamos la cédula como string
+    if (encontrado != nullptr) {
+        std::cout << "Persona encontrada: <Cedula: " << encontrado->getCedula()
+                  << ", Nombre: " << encontrado->getNombre()
+                  << ", Apellido: " << encontrado->getApellido() << ">\n";
+    } else {
+        std::cout << "Persona no encontrada.\n";
+    }
+    break;
+}
 
             case 3: {
-                cout << "Ingrese cedula a eliminar: ";
-                cin >> cedulaNumerica;
-                if (lista.eliminar(to_string(cedulaNumerica))) {
-                    cout << "Persona eliminada correctamente.\n";
-                } else {
-                    cout << "Persona no encontrada.\n";
-                }
-                break;
-            }
+    std::cout << "Ingrese cedula a eliminar: ";
+    std::string cedula = leerSoloNumeros(); // Capturamos directamente la cédula como string
 
+    if (lista.eliminar(cedula)) { // Usamos la cédula directamente como string
+        std::cout << "Persona eliminada correctamente.\n";
+    } else {
+        std::cout << "Persona no encontrada.\n";
+    }
+    break;
+}
             case 4: {
                 cout << "\nLista de personas:\n";
                 lista.mostrar();
@@ -145,8 +149,7 @@ int main() {
 
 case 7: {
     std::cout << "Ingrese cedula para cifrar: ";
-    std::string cedula;
-    std::cin >> cedula;
+    std::string cedula = leerSoloNumeros();
 
     Nodo* persona = lista.buscar(cedula);
     if (!persona) {
@@ -154,13 +157,13 @@ case 7: {
         break;
     }
 
-    // Mostrar datos de la persona encontrada inmediatamente
+    // Mostrar datos de la persona encontrada
     std::cout << "--Persona encontrada--\n";
     std::cout << "Cedula: " << persona->getCedula() << "\n";
     std::cout << "Nombre: " << persona->getNombre() << "\n";
     std::cout << "Apellido: " << persona->getApellido() << "\n";
 
-    // Validar "Ingrese caracter a cifrar"
+    // Validar carácter a cifrar
     char caracter;
     while (true) {
         std::cout << "Ingrese caracter a cifrar: ";
@@ -168,25 +171,24 @@ case 7: {
         if (isalpha(caracter)) {
             break; // Es una letra válida
         }
-        std::cout << "Error: Por favor ingrese un caracter alfabetico (una letra).\n";
+        std::cout << "Error: Por favor ingrese un carácter alfabetico (una letra).\n";
     }
 
-    // Validar "Ingrese el desplazamiento"
-    int desplazamiento;
-    while (true) {
+    // Validar desplazamiento como número entero
+    std::string desplazamientoStr;
+    int desplazamiento = 0;
+    do {
         std::cout << "Ingrese el desplazamiento: ";
-        std::cin >> desplazamiento;
-
-        if (std::cin.fail()) { // Si la entrada no es un número
-            std::cin.clear();  // Limpia el estado de error
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignora lo que queda en el buffer
-            std::cout << "Error: Por favor ingrese un numero entero.\n";
-        } else {
-            break; // Entrada válida
+        desplazamientoStr = leerSoloNumeros();
+        try {
+            desplazamiento = std::stoi(desplazamientoStr);
+            break; // Conversión exitosa
+        } catch (...) {
+            std::cout << "Error: Por favor ingrese un número valido para el desplazamiento.\n";
         }
-    }
+    } while (true);
 
-    // Cifrar el carácter en el nombre
+    // Cifrar el carácter
     lista.cifrarCaracter(cedula, caracter, desplazamiento);
 
     // Actualizar archivo auxiliar
@@ -201,7 +203,7 @@ case 7: {
 }
 
 case 9: {
-    std::cout << "Archivo de distribución ordenado:\n";
+    std::cout << "Archivo de distribucion ordenado:\n";
     lista.mostrarArchivoOrdenado("personas_ordenadas.txt"); // Ajusta el nombre del archivo si es diferente
     break;
 }

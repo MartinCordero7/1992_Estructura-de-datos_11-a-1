@@ -7,6 +7,7 @@
 #include "Validaciones.h"
 #include <iostream>
 #include <regex>
+#include <conio.h>
 #include <stdio.h>
 #define dim 10
 
@@ -82,4 +83,23 @@ bool validarNombre(const std::string& nombre) {
     }
 
     return true;
+}
+
+std::string leerSoloNumeros() {
+    std::string input;
+    char ch;
+    while (true) {
+        ch = _getch(); // Captura el carácter ingresado
+        if (isdigit(ch)) { // Solo números
+            std::cout << ch; // Muestra el carácter en pantalla
+            input += ch;     // Lo agrega al string
+        } else if (ch == '\r') { // Enter
+            std::cout << std::endl;
+            break;
+        } else if (ch == '\b' && !input.empty()) { // Backspace
+            std::cout << "\b \b"; // Borra el último carácter en la consola
+            input.pop_back();     // Borra el último carácter del string
+        }
+    }
+    return input;
 }
