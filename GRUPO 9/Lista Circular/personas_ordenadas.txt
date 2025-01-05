@@ -1,5 +1,2 @@
-1754473773,Bibi,Cholawtf
-1702561570,Jerson,Diaz
-2100935929,Jerson,Llumiquinga
-0400717690,Luis,Llumiquinga
-1709587230,Patricia,Moreno
+2100935929,Jeuson,Llumiquinga
+0400717690,Lwis,Llumiquinga

@@ -8,6 +8,7 @@
 #include "Utilidades.h"
 #include "Validaciones.h"
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 
 ListaCircular::ListaCircular() : primero(nullptr), ultimo(nullptr) {}
@@ -141,6 +142,23 @@ void ListaCircular::mostrar() {
     std::cout << "(Regresa al inicio)\n";
 }
 
+void ListaCircular::mostrarListaAuxiliar(const std::string& archivo) {
+    std::ifstream inFile(archivo);
+
+    if (!inFile.is_open()) {
+        std::cout << "No se pudo abrir el archivo " << archivo << ".\n";
+        return;
+    }
+
+    std::string linea;
+    while (std::getline(inFile, linea)) {
+        std::cout << linea << " ->\n";
+    }
+
+    std::cout << "NULL\n";
+    inFile.close();
+}
+
 void ListaCircular::eliminarCaracter(std::string cedula, char caracter) {
     Nodo* actual = buscar(cedula);
     if (actual == nullptr) {
@@ -160,5 +178,49 @@ void ListaCircular::eliminarCaracter(std::string cedula, char caracter) {
 
     std::cout << "Caracter eliminado correctamente.\n";
 }
+
+void ListaCircular::cifrarCaracter(const std::string& cedula, char caracter, int desplazamiento) {
+    Nodo* persona = buscar(cedula); // Buscar persona por cédula
+    if (!persona) {
+        std::cout << "Persona no encontrada.\n";
+        return;
+    }
+
+    // Cifrar el carácter en el nombre
+    std::string nombre = persona->getNombre();
+    for (char& c : nombre) {
+        if (tolower(c) == tolower(caracter)) { // Compara ignorando mayúsculas
+            if (isalpha(c)) { // Asegura que sea una letra
+                char base = islower(c) ? 'a' : 'A'; // Determina si es minúscula o mayúscula
+                c = base + (c - base + desplazamiento) % 26; // Calcula el nuevo carácter cifrado
+            }
+        }
+    }
+
+    // Actualizar el nombre cifrado
+    persona->setNombre(nombre);
+
+    // Mostrar mensaje de éxito
+    std::cout << "Caracter cifrado correctamente con desplazamiento " << desplazamiento << ".\n";
+}
+
+void ListaCircular::mostrarArchivoOrdenado(const std::string& archivo) {
+    std::ifstream inFile(archivo);
+
+    if (!inFile.is_open()) {
+        std::cout << "No se pudo abrir el archivo " << archivo << ".\n";
+        return;
+    }
+
+    std::string linea;
+    while (std::getline(inFile, linea)) {
+        std::cout << linea << " ->\n";
+    }
+
+    std::cout << "NULL\n";
+    inFile.close();
+}
+
+
 
 
