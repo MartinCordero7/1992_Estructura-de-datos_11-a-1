@@ -62,8 +62,11 @@ void Libro::setFecha(const Fecha& otraFecha)
 std::string Libro::toString() const {
     std::ostringstream oss;
     time_t tiempo = fecha.getTiempo();
+    std::string tiempoStr = ctime(&tiempo);
+    tiempoStr.pop_back();
+    
     oss << "Id: " << id << ", Título: " << titulo << ", Autor: " << autor->getNombre() << " " << autor->getApellido()
-        << ", Año: " << ctime(&(tiempo));
+        << ", Año: " << tiempoStr;
     return oss.str();
 }
 

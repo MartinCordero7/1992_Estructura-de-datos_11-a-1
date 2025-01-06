@@ -24,14 +24,21 @@ private:
 public:
     T dato;
 public:
+    Nodo();
     Nodo(const T& dato);
     const T& getDato() const;
     Nodo<T>* getAnterior() const;
     Nodo<T>* getSiguiente() const;
-    void setDato(const T& dato);
+    void setDato(const T& nuevoDato);
     void setAnterior(Nodo<T>* nuevoAnterior);
     void setSiguiente(Nodo<T>* nuevoSiguiente);
 };
+
+template<typename T>
+inline Nodo<T>::Nodo()
+    : anterior(NULL), siguiente(NULL)
+{
+}
 
 template<typename T>
 inline Nodo<T>::Nodo(const T& dato)

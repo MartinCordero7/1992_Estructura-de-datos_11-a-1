@@ -6,6 +6,7 @@
 #include "Libro.hpp"
 #include "Autor.hpp"
 #include "Validaciones.hpp"
+#include "ArbolBinario.hpp"
 #include <iostream>
 #include <fstream>
 #include <filesystem>
@@ -62,6 +63,9 @@ int getch()
 void cargar(ILista<Libro>* ListaLibros, ILista<Autor>* listaAutores, std::string directorio = ".");
 void guardar(ILista<Libro>* listaLibros, ILista<Autor>* listaAutores, std::string directorio = ".", bool backup = false);
 
+template <typename T, typename U>
+int busquedaBinaria(const int& k, ILista<T>& lista, std::function<U(const T&)> attributeGetter);
+
 // FUNCION PARA CONSEGUIR EL PUNTERO DE UN LIBRO/AUTOR EXISTENTE USANDO SU ID
 Autor* punteroAutorEnLista(std::string cedula, ILista<Autor>* listaAutores);
 Libro* punteroLibroEnLista(std::string id, ILista<Libro>* listaLibros);
@@ -83,16 +87,16 @@ int main()
         cargar(&listaLibrosTemp, &listaAutoresTemp, "unsaved");
 
         std::cout << "Lista de Libros guardada: " << std::endl;
-        listaLibros->mostrar();
+        listaLibros->mostrar(" =>\n ");
         std::cout << std::endl << "\033[1;30mLista de Libros sin guardar recuperada:" << std::endl;
-        listaLibrosTemp.mostrar();
+        listaLibrosTemp.mostrar(" =>\n ");
 
         std::cout << "\033[0m" << std::endl << std::endl;
         
         std::cout << "Lista de Autores guardada: " << std::endl;
-        listaAutores->mostrar();
+        listaAutores->mostrar(" =>\n ");
         std::cout << std::endl << "\033[1;30mLista de Autores sin guardar recuperada:" << std::endl;
-        listaAutoresTemp.mostrar();
+        listaAutoresTemp.mostrar(" =>\n ");
 
         std::cout << std::endl << std::endl << "\033[1;34mLa aplicación no se ha cerrado apropiadamente en la última sesión, ¿Desea restaurar los cambios sin guardar? (Y/n): \033[0m";
         char opcion = tolower(getch());
@@ -127,7 +131,8 @@ int main()
         "5. Guardar\n"
         "6. Filtrar\n"
         "7. Ordenar Libros\n"
-        "8. Volver\n";
+        "8. Enviar a Arbol\n"
+        "9. Volver\n";
 
     const std::string menuOpAutores =
         "1. Insertar\n"
@@ -135,6 +140,7 @@ int main()
         "3. Eliminar\n"
         "4. Mostrar\n"
         "5. Guardar\n"
+        "6. Enviar a Arbol\n"
         "6. Volver\n";
 
     const std::string menuCambio =
@@ -143,24 +149,23 @@ int main()
         "3. Lista Circular\n"
         "4. Cancelar\n";
 
-    const std::string menuOrdenarLibros =
+    const std::string menuAtributosLibros =
         "1. ID\n"
         "2. Titulo\n"
         "3. Autor\n"
         "4. Fecha\n"
         "5. Cancelar\n";
+
+    const std::string menuAtributosAutores =
+        "1. ID\n"
+        "2. Nombre\n"
+        "3. Nombre 2\n"
+        "3. Apellido\n"
+        "5. Cancelar\n";
     
-    const std::string menuMetodo =
-        "1. Burbuja\n"
-        "2. QuickSort\n"
-        "3. ShellSort\n"
-        "4. Insercion\n"
-        "5. Distribucion\n"
-        "6. Radix\n"
-        "7. MergeSort\n"
-        "8. MezclaDirecta\n"
-        "9. MezclaNatural\n"
-        "10. Cancelar\n";
+    const std::string menuArbol =
+        "1. Arbol Binario de Busqueda\n"
+        ". Cancelar\n";
 
 
     /////////////////////// FUNCIÓN LAMBDA QUE IMPRIME UN MENÚ ////////////////////////
@@ -256,12 +261,23 @@ int main()
             return false;
         };
 
-    // ENUM PARA LA FUNCIÓN LAMBDA
+   
+    /////////////////////// DECLARACIÓN DE ENUMERACIONES ////////////////////////
+    // No son necesarias, pero hacen que el código sea más legible (no ha sido
+    // suficiente), especialmente cuando existen varios submenús.
+    /////////////////////////////////////////////////////////////////////////////
+    enum eleccionListas { LIBROS = 1, AUTORES, CAMBIAR_LISTA, BACKUP, SALIR };
+    enum eleccionOpLibros { LIBROS_INSERTAR = 1, LIBROS_BUSCAR, LIBROS_ELIMINAR, LIBROS_MOSTRAR, LIBROS_GUARDAR, LIBROS_FILTRAR, LIBROS_ORDENAR, LIBROS_ARBOL, SALIR_LIBROS };
+    enum eleccionOpAutores { AUTORES_INSERTAR = 1, AUTORES_BUSCAR, AUTORES_ELIMINAR, AUTORES_MOSTRAR, AUTORES_GUARDAR, AUTORES_ARBOL, AUTORES_SALIR };
     enum eleccionSort { SORT_BURBUJA = 1, SORT_QUICKSORT, SORT_SHELLSORT, SORT_INSERCION, SORT_DISTRIBUCION, SORT_RADIX, SORT_MERGESORT, SORT_MEZCLA_DIRECTA, SORT_MEZCLA_NATURAL, SORT_CANCELAR };
+    enum eleccionArbol { ARBOL_BINARIO_BUSQUEDA = 1, ARBOL_CANCELAR };
+    enum eleccionCambio { LISTA_SIMPLE = 1, LISTA_DOBLE, LISTA_CIRCULAR, CANCELAR_CAMBIO };
+
     /////////////////////// FUNCIÓN LAMBDA QUE MUESTRA UN MENÚ PARA ELEGIR MÉTODO DE SORTING ////////////////////////
+    // - Usado en operarLibros
     // la entrada se realiza mediante las flechas arriba (aumentar), abajo (disminuir) y el botón enter
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    auto elegirMetodo = [&imprimirMenu, &menuMetodo, &procesarEntrada]<typename T, typename U>(ILista<T>*lista, std::function<const U & (const T&)> attributeGetter)
+    auto elegirMetodoSort = [&imprimirMenu, &menuArbol, &procesarEntrada]<typename T, typename U>(ILista<T>* lista, std::function<const U& (const T&)> attributeGetter)
     {
         int eleccion = 1;
         char entrada;
@@ -271,9 +287,9 @@ int main()
         {
             system(CLEAR_COMMAND);
             std::cout << "============ ELEGIR MÉTODO ============" << std::endl;
-            imprimirMenu(menuMetodo, eleccion);
+            imprimirMenu(menuArbol, eleccion);
             entrada = getch();
-            system("clear");
+            system(CLEAR_COMMAND);  // borrar esta línea?
 
             salir = procesarEntrada(eleccion, entrada, SORT_CANCELAR);
 
@@ -328,20 +344,70 @@ int main()
         } while (!salir);
     };
 
-    /////////////////////// DECLARACIÓN DE ENUMERACIONES ////////////////////////
-    // No son necesarias, pero hacen que el código sea más legible (no ha sido
-    // suficiente), especialmente cuando existen varios submenús.
-    /////////////////////////////////////////////////////////////////////////////
-    enum eleccionListas { LIBROS = 1, AUTORES, CAMBIAR_LISTA, BACKUP, SALIR };
-    enum eleccionOpLibros { INSERTAR_LIBROS = 1, BUSCAR_LIBROS, ELIMINAR_LIBROS, MOSTRAR_LIBROS, GUARDAR_LIBROS, FILTRAR_LIBROS, ORDENAR_LIBROS, SALIR_LIBROS };
-    enum eleccionOpAutores { INSERTAR_AUTORES = 1, BUSCAR_AUTORES, ELIMINAR_AUTORES, MOSTRAR_AUTORES, GUARDAR_AUTORES, SALIR_AUTORES };
-    enum eleccionCambio { LISTA_SIMPLE = 1, LISTA_DOBLE, LISTA_CIRCULAR, CANCELAR_CAMBIO };
+    /////////////////////// FUNCIÓN LAMBDA QUE MUESTRA UN MENÚ PARA ELEGIR ÁRBOL ////////////////////////
+    // - Usado en operarLibros
+    // la entrada se realiza mediante las flechas arriba (aumentar), abajo (disminuir) y el botón enter
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    auto elegirArbol = [&imprimirMenu, &menuArbol, &procesarEntrada]<typename T, typename U>(ILista<T>* lista, std::function<const U& (const T&)> attributeGetter)
+    {
+        int eleccion = 1;
+        char entrada;
+        bool salir;
+
+        do
+        {
+            system(CLEAR_COMMAND);
+            std::cout << "============ ELEGIR MÉTODO ============" << std::endl;
+            imprimirMenu(menuArbol, eleccion);
+            entrada = getch();
+            system(CLEAR_COMMAND);  // borrar esta línea?
+
+            salir = procesarEntrada(eleccion, entrada, ARBOL_CANCELAR);
+
+            if (salir)
+            {
+                if (eleccion != SORT_CANCELAR)
+                {
+                    switch (eleccion)
+                    {
+                    case ARBOL_BINARIO_BUSQUEDA:
+                    {
+                        ArbolBinario<T> arbol;
+
+                        int n = lista->contar();
+                        for (int i = 0; i < n; i++)
+                        {
+                            ArbolBinario<T>::insertar(arbol, lista->conseguirDato(i), attributeGetter);
+                        }
+                        arbol.mostrar();
+                        break;
+                    }
+                        /* case SORT_QUICKSORT:
+                        std::cout << "NO IMPLEMENTADO" << std::endl;
+                        break; */
+
+                    default:
+                        break;
+                    }
+                    //std::cout << "LISTA ORDENADA " << std::endl;
+                    getch();
+
+                }
+                else
+                {
+                    //std::cout << "NO ORDENADO" << std::endl;
+                    //getch();
+                }
+            }
+
+        } while (!salir);
+    };
 
     /////////////////////// FUNCIÓN LAMBDA QUE OPERA SOBRE LA LISTA DE AUTORES ////////////////////////
     // Es sólo un switch
     // Va primero porque las operaciones en libros necesita acceder a las de autores
     //////////////////////////////////////////////////////////////////////////////////////////////////
-    auto operarAutores = [&menuOpLibros, &listaLibros, &listaAutores](int eleccion)
+    auto operarAutores = [&](int eleccion)
         {
             std::string cedula;
 
@@ -353,7 +419,7 @@ int main()
 
             switch (eleccion)
             {
-            case INSERTAR_AUTORES:
+            case AUTORES_INSERTAR:
             {
                 std::cout << "Ingrese el cedula del autor a insertar (0 para cancelar): ";
                 cedula = Validaciones::leerCedula();
@@ -403,7 +469,7 @@ int main()
                 listaAutores->insertarACola(Autor(cedula, nombre, nombre2, apellido));
                 break;
             }
-            case BUSCAR_AUTORES:
+            case AUTORES_BUSCAR:
                 std::cout << "Ingrese el numero del libro a buscar: ";
                 cedula = Validaciones::leerNumero();
                 std::cout << std::endl;
@@ -414,7 +480,7 @@ int main()
                     std::cout << "El libro con numero " << cedula << " NO se encuentra en la lista" << std::endl;
                 getch();
                 break;
-            case ELIMINAR_AUTORES:
+            case AUTORES_ELIMINAR:
             {
                 std::cout << "Ingrese el cedula del autor a eliminar: ";
                 cedula = Validaciones::leerCedula();
@@ -454,18 +520,59 @@ int main()
                 getch();
                 break;
             }
-            case MOSTRAR_AUTORES:
+            case AUTORES_MOSTRAR:
                 std::cout << std::endl;
-                listaAutores->mostrar();
+                listaAutores->mostrar(" =-=\n ");
                 std::cout << std::endl;
                 getch();
                 break;
-            case GUARDAR_AUTORES:
+            case AUTORES_GUARDAR:
             {
                 guardar(listaLibros, listaAutores, ".", 1);
                 break;
             }
-            case SALIR_AUTORES:
+            case AUTORES_ARBOL:
+            {
+                enum atributosAutores { ID = 1, NOMBRE, NOMBRE2, APELLIDO, CANCELAR };
+                int eleccion = 1;
+                char entrada;
+                bool salir;
+
+                do
+                {
+                    system(CLEAR_COMMAND);
+                    std::cout << "============ MIEMBRO DE ORDEN ============" << std::endl;
+                    imprimirMenu(menuAtributosAutores, eleccion);
+                    entrada = getch();
+
+                    salir = procesarEntrada(eleccion, entrada, CANCELAR);
+
+                    if (salir && eleccion != CANCELAR)
+                    {
+                        switch (eleccion)
+                        {
+                        case ID:
+                            elegirArbol(listaAutores, (std::function<const std::string & (const Autor&)>)[](const Autor& a) -> const std::string& { return a.getId(); });
+                            break;
+                        case NOMBRE:
+                            elegirArbol(listaAutores, (std::function<const std::string & (const Autor&)>)[](const Autor& a) -> const std::string& {return a.getNombre();});
+                            break;
+                        case NOMBRE2:
+                            elegirArbol(listaAutores, (std::function<const std::string & (const Autor&)>)[](const Autor& a) -> const std::string& {return a.getNombre2();});
+                            break;
+                        case APELLIDO:
+                            elegirArbol(listaAutores, (std::function<const std::string & (const Autor&)>)[](const Autor& a) -> const std::string& {return a.getApellido();});
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+
+                } while (!salir);
+
+                break;
+            }
+            case AUTORES_SALIR:
                 std::cout << "Saliendo..." << std::endl;
                 break;
             default:
@@ -492,7 +599,7 @@ int main()
 
             switch (eleccion)
             {
-            case INSERTAR_LIBROS:
+            case LIBROS_INSERTAR:
             {
                 std::cout << "Ingrese el id del libro a insertar (0 para cancelar): ";
                 id = Validaciones::leerNumero();
@@ -568,7 +675,7 @@ int main()
 
                     if (idAutor.empty())    // si el campo del autor se ha dejado vacío
                     {
-                        operarAutores(INSERTAR_AUTORES);    // llama la función para insertar un nuevo autor
+                        operarAutores(AUTORES_INSERTAR);    // llama la función para insertar un nuevo autor
                         
                         if (punteroAutorEnCola != &(listaAutores->getCola()->dato)) // comprueba que un nuevo autor sí haya sido insertado
                             punteroAutorAEnlazar = &(listaAutores->getCola()->dato);    // si es así, se lo asigna a punteroAutor
@@ -592,7 +699,7 @@ int main()
                             std::cout << std::endl;
                             if (c != 'n')
                             {
-                                operarAutores(INSERTAR_AUTORES);    // llama la función para insertar autores
+                                operarAutores(AUTORES_INSERTAR);    // llama la función para insertar autores
 
                                 if (punteroAutorEnCola != &(listaAutores->getCola()->dato)) // comprueba que un nuevo autor sí haya sido insertado
                                     punteroAutorAEnlazar = &(listaAutores->getCola()->dato);
@@ -608,7 +715,7 @@ int main()
                                 
                 break;
             }
-            case BUSCAR_LIBROS:
+            case LIBROS_BUSCAR:
                 std::cout << "Ingrese el numero del libro a buscar: ";
                 id = Validaciones::leerNumero();
                 std::cout << std::endl;
@@ -619,7 +726,7 @@ int main()
                     std::cout << "El libro con numero " << id << " NO se encuentra en la lista" << std::endl;
                 getch();
                 break;
-            case ELIMINAR_LIBROS:
+            case LIBROS_ELIMINAR:
             {
                 std::cout << "Ingrese el numero del libro a eliminar: ";
                 id = Validaciones::leerNumero();
@@ -637,18 +744,18 @@ int main()
                 getch();
                 break;
             }
-            case MOSTRAR_LIBROS:
+            case LIBROS_MOSTRAR:
                 std::cout << std::endl;
-                listaLibros->mostrar();
+                listaLibros->mostrar(" =-=\n ");
                 std::cout << std::endl;
                 getch();
                 break;
-            case GUARDAR_LIBROS:
+            case LIBROS_GUARDAR:
             {
                 guardar(listaLibros, listaAutores, ".", 1);
                 break;
             }
-            case FILTRAR_LIBROS:
+            case LIBROS_FILTRAR:
             {
                 std::time_t anioInicio, anioFin;
                 struct tm anioInicioStruct, anioFinStruct;
@@ -697,14 +804,14 @@ int main()
                     };
 
                 librosEnRango(anioInicio, anioFin);
-                listaRango.mostrar();
+                listaRango.mostrar(" =>\n ");
 
                 getch();
                 break;
             }
-            case ORDENAR_LIBROS:
+            case LIBROS_ORDENAR:
             {
-                enum eleccionOrdenarLibro {ID = 1, TITULO, AUTOR, FECHA, CANCELAR};
+                enum atributosLibros { ID = 1, TITULO, AUTOR, FECHA, CANCELAR };
                 int eleccion = 1;
                 char entrada;
                 bool salir;
@@ -713,7 +820,7 @@ int main()
                 {
                     system(CLEAR_COMMAND);
                     std::cout << "============ POR MIEMBRO ============" << std::endl;
-                    imprimirMenu(menuOrdenarLibros, eleccion);
+                    imprimirMenu(menuAtributosLibros, eleccion);
                     entrada = getch();
 
                     salir = procesarEntrada(eleccion, entrada, CANCELAR);
@@ -723,16 +830,57 @@ int main()
                         switch (eleccion)
                         {
                         case ID:
-                            elegirMetodo(listaLibros, (std::function<const std::string& (const Libro&)>)[](const Libro& l) -> const std::string& { return l.getId(); });
+                            elegirMetodoSort(listaLibros, (std::function<const std::string& (const Libro&)>)[](const Libro& l) -> const std::string& { return l.getId(); });
                             break;
                         case TITULO:
-                            elegirMetodo(listaLibros, (std::function<const std::string & (const Libro&)>)[](const Libro& l) -> const std::string& {return l.getTitulo();});
+                            elegirMetodoSort(listaLibros, (std::function<const std::string & (const Libro&)>)[](const Libro& l) -> const std::string& {return l.getTitulo();});
                             break;
                         case AUTOR:
-                            elegirMetodo(listaLibros, (std::function<const std::string & (const Libro&)>)[](const Libro& l) -> const std::string& {return l.getAutor()->getId();});
+                            elegirMetodoSort(listaLibros, (std::function<const std::string & (const Libro&)>)[](const Libro& l) -> const std::string& {return l.getAutor()->getId();});
                             break;
                         case FECHA:
-                            elegirMetodo(listaLibros, (std::function<const std::time_t & (const Libro&)>)[](const Libro& l) -> const std::time_t& {return l.getFecha().getTiempo();});
+                            elegirMetodoSort(listaLibros, (std::function<const std::time_t & (const Libro&)>)[](const Libro& l) -> const std::time_t& {return l.getFecha().getTiempo();});
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+
+                } while (!salir);
+
+                break;
+            }
+            case LIBROS_ARBOL:
+            {
+                enum atributosLibros { ID = 1, TITULO, AUTOR, FECHA, CANCELAR };
+                int eleccion = 1;
+                char entrada;
+                bool salir;
+
+                do
+                {
+                    system(CLEAR_COMMAND);
+                    std::cout << "============ MIEMBRO DE ORDEN ============" << std::endl;
+                    imprimirMenu(menuAtributosLibros, eleccion);
+                    entrada = getch();
+
+                    salir = procesarEntrada(eleccion, entrada, CANCELAR);
+
+                    if (salir && eleccion != CANCELAR)
+                    {
+                        switch (eleccion)
+                        {
+                        case ID:
+                            elegirArbol(listaLibros, (std::function<const std::string & (const Libro&)>)[](const Libro& l) -> const std::string& { return l.getId(); });
+                            break;
+                        case TITULO:
+                            elegirArbol(listaLibros, (std::function<const std::string & (const Libro&)>)[](const Libro& l) -> const std::string& {return l.getTitulo();});
+                            break;
+                        case AUTOR:
+                            elegirArbol(listaLibros, (std::function<const std::string & (const Libro&)>)[](const Libro& l) -> const std::string& {return l.getAutor()->getId();});
+                            break;
+                        case FECHA:
+                            elegirArbol(listaLibros, (std::function<const std::time_t & (const Libro&)>)[](const Libro& l) -> const std::time_t& {return l.getFecha().getTiempo();});
                             break;
                         default:
                             break;
@@ -788,10 +936,10 @@ int main()
                         {
                             operarLibros(eleccion2);
 
-                            if (eleccion2 == GUARDAR_LIBROS)
+                            if (eleccion2 == LIBROS_GUARDAR)
                                 std::filesystem::remove_all("unsaved");
 
-                            if (eleccion2 == INSERTAR_LIBROS || eleccion2 == ELIMINAR_LIBROS)
+                            if (eleccion2 == LIBROS_INSERTAR || eleccion2 == LIBROS_ELIMINAR)
                                 guardar(listaLibros, listaAutores, "unsaved");
 
                             if (eleccion2 == SALIR_LIBROS)
@@ -808,17 +956,17 @@ int main()
                         imprimirMenu(menuOpAutores, eleccion2);
                         entrada = getch();
 
-                        if (procesarEntrada(eleccion2, entrada, SALIR_AUTORES))
+                        if (procesarEntrada(eleccion2, entrada, AUTORES_SALIR))
                         {
                             operarAutores(eleccion2);
 
-                            if (eleccion2 == GUARDAR_AUTORES)
+                            if (eleccion2 == AUTORES_GUARDAR)
                                 std::filesystem::remove_all("unsaved");
 
-                            if (eleccion2 == INSERTAR_AUTORES || eleccion2 == ELIMINAR_AUTORES)
+                            if (eleccion2 == AUTORES_INSERTAR || eleccion2 == AUTORES_ELIMINAR)
                                 guardar(listaLibros, listaAutores, "unsaved");
 
-                            if (eleccion2 == SALIR_AUTORES)
+                            if (eleccion2 == AUTORES_SALIR)
                                 salir2 = true;
                         }
 
@@ -931,16 +1079,16 @@ int main()
                                 cargar(&listaLibrosTemp, &listaAutoresTemp, dirBackup);
 
                                 std::cout << "Lista de Libros actual: " << std::endl;
-                                listaLibros->mostrar();
+                                listaLibros->mostrar(" =-=\n ");
                                 std::cout << std::endl << "\033[1;30mLista de Libros de " << dirBackup << std::endl;
-                                listaLibrosTemp.mostrar();
+                                listaLibrosTemp.mostrar(" =>\n ");
 
                                 std::cout << "\033[0m" << std::endl << std::endl;
 
                                 std::cout << "Lista de Autores actual: " << std::endl;
-                                listaAutores->mostrar();
+                                listaAutores->mostrar(" =-=\n ");
                                 std::cout << std::endl << "\033[1;30mLista de Autores de " << dirBackup << std::endl;
-                                listaAutoresTemp.mostrar();
+                                listaAutoresTemp.mostrar(" =>\n ");
 
                                 std::cout << std::endl << std::endl << "\033[0;4mSi carga ahora los datos actuales serán borrados, desea continuar?\033[0m (y/N): ";
 
@@ -1133,3 +1281,29 @@ Libro* punteroLibroEnLista(std::string id, ILista<Libro>* listaLibros)
 
     return (Libro*)nullptr;
 };
+
+template<typename T, typename U>
+int busquedaBinaria(const U& k, ILista<T>& lista, std::function<U(const T&)> attributeGetter)
+{
+    int n = lista.contar();
+    int nActual = n / 2;
+
+    while (k != attributeGetter(lista.conseguirDato(nActual)))
+    {
+        if (nActual / 2 == nActual)
+        {
+            nActual = -1;
+            break;
+        }
+
+        if (k < attributeGetter(lista.conseguirDato(nActual)))
+        {
+            nActual /= 2;
+        }
+        else
+        {
+            nActual = nActual * 3 / 2;
+        }
+    }
+    return nActual;
+}
