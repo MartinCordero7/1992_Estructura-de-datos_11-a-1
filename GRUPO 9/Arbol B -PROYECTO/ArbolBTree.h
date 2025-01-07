@@ -1,3 +1,13 @@
+/********************************************************************************************
+ *            UNIVERSIDAD DE LAS FUERZAS ARMADAS ESPE                                       *
+ * Proposito:                      Archivo principal de proyecto                            *
+ * Autor:                          Erika Guayanay, Maycol Celi, Jerson Llumiquinga          *
+ * Fecha de creacion:              01/12/2024                                               *
+ * Fecha de modificacion:          01/01/2025                                               *
+ * Materia:                        Estructura de datos                                      *
+ * NRC :                           1992                                                     *
+ ********************************************************************************************/
+
 #ifndef ARBOLBTREE_H
 #define ARBOLBTREE_H
 
@@ -14,7 +24,6 @@ private:
 
     void insertarEnNodo(NodoBTree* nodo, const Libro& libro);
     void dividirNodo(NodoBTree* nodo, int i);
-    NodoBTree* buscarEnNodo(NodoBTree* nodo, const std::string& isbn);
     Libro obtenerPredecesor(NodoBTree* nodo, int i);
     Libro obtenerSucesor(NodoBTree* nodo, int i);
     void fusionarNodos(NodoBTree* nodo, int i);
@@ -23,8 +32,6 @@ private:
 public:
     ArbolBTree(int t);
     void insertar(const Libro& libro);
-    NodoBTree* buscarPorIsbn(const std::string& isbn);
-    NodoBTree* buscar(const std::string& titulo);
     void eliminar(const std::string& titulo);
     void imprimirLibros();
     NodoBTree* buscarLibroPorIsbn(const std::string& isbn);
@@ -33,6 +40,7 @@ public:
     void cargarLibrosDesdeArchivo();
     void crearBackup(const std::string& nombreArchivo);
     int getT() const; // Getter for t
+    bool verificarArchivoLibros();
 };
 
 #endif // ARBOLBTREE_H
