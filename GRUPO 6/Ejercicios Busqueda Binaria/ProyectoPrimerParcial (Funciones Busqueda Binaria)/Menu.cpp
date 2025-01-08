@@ -11,6 +11,7 @@
 
 #include "Menu.h"
 #include "BackupManager.cpp"
+#include "FuncionesBusquedaBinaria.cpp"
 #include <iostream>
 #include "Validaciones.cpp" 
 #include <conio.h> 
@@ -65,6 +66,7 @@ void mostrarMenu(ListaCircularDoble& lista) {
         "Crear backup",
         "Restaurar backup",
         "Buscar por rango",
+        "Buscar por prefijo (Búsqueda Binaria)",
         "Salir"
     };
     int seleccion = 0;
@@ -211,8 +213,13 @@ void mostrarMenu(ListaCircularDoble& lista) {
 
                 cout << "Registros encontrados entre " << anioInicio << " y " << anioFin << ":\n";
                 buscarPorRango(ruta, anioInicio, anioFin);
-
-            
+            }else if (opciones[seleccion] == "Buscar por prefijo (Búsqueda Binaria)") {
+                string prefijo;
+                do {
+                    cout << "\nIngrese el prefijo del título a buscar: ";
+                    getline(cin, prefijo);
+                } while (!Validaciones::validarTitulo(prefijo,"Prefijo"));
+                FuncionesBusquedaBinaria::buscarPorPrefijo(lista, prefijo);
             }else if (opciones[seleccion] == "Salir") {
                 break;
             }

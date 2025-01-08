@@ -29,6 +29,7 @@ private:
     string archivoLibros = "libros.txt";  // Archivo donde se guardarán los libros
     bool evitarGuardar = false;           // Bandera para controlar el guardado
 public:
+    Nodo* getCabeza() const { return cabeza; }
     // Agregar libro
     void agregarLibro(const Libro& libro);
     // Imprimir todos los libros
