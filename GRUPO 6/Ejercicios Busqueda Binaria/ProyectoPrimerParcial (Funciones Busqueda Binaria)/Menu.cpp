@@ -67,6 +67,7 @@ void mostrarMenu(ListaCircularDoble& lista) {
         "Restaurar backup",
         "Buscar por rango",
         "Buscar por prefijo (Búsqueda Binaria)",
+        "Buscar por sufijo (Búsqueda Binaria)",
         "Salir"
     };
     int seleccion = 0;
@@ -220,6 +221,13 @@ void mostrarMenu(ListaCircularDoble& lista) {
                     getline(cin, prefijo);
                 } while (!Validaciones::validarTitulo(prefijo,"Prefijo"));
                 FuncionesBusquedaBinaria::buscarPorPrefijo(lista, prefijo);
+            }else if (opciones[seleccion] == "Buscar por sufijo (Búsqueda Binaria)") {
+                string sufijo;
+                do {
+                    cout << "\nIngrese el sufijo del título a buscar: ";
+                    getline(cin, sufijo);
+                } while (!Validaciones::validarTitulo(sufijo,"Sufijo"));
+                FuncionesBusquedaBinaria::buscarPorSufijo(lista, sufijo);
             }else if (opciones[seleccion] == "Salir") {
                 break;
             }

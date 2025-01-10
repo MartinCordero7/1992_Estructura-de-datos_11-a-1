@@ -156,3 +156,58 @@ void FuncionesBusquedaBinaria::buscarPorPrefijo(const ListaCircularDoble& lista,
             << setw(15) << nodo->libro.getAutor().getFechaNacimiento().mostrar() << endl;
     }
 }
+
+bool FuncionesBusquedaBinaria::comparaSufijo(const string& str, const string& sufijo) {
+    if (str.length() < sufijo.length()) return false;
+    return str.substr(str.length() - sufijo.length()) == sufijo;
+}
+
+void FuncionesBusquedaBinaria::buscarPorSufijo(const ListaCircularDoble& lista, const string& sufijo) {
+    if (!lista.getCabeza() || sufijo.empty()) {
+        cout << "No hay libros registrados o el sufijo está vacío." << endl;
+        return;
+    }
+
+    // Verificar y ordenar si es necesario
+    if (!estaOrdenada(lista)) {
+        ordenarPorTitulo(const_cast<ListaCircularDoble&>(lista));
+    }
+
+    // Convertir sufijo a minúsculas
+    string sufijoLower = sufijo;
+    transform(sufijoLower.begin(), sufijoLower.end(), sufijoLower.begin(), ::tolower);
+
+    cout << "Libros encontrados con el sufijo '" << sufijo << "':" << endl;
+    cout << left << setw(41) << "Título" 
+        << setw(25) << "Autor" 
+        << setw(25) << "ISNI" 
+        << setw(20) << "ISBN"
+        << setw(15) << "Publicación" 
+        << setw(15) << "Nac. Autor" << endl;
+    cout << string(140, '-') << endl;
+
+    bool encontrado = false;
+    int n = contarNodos(lista);
+
+    // Búsqueda binaria modificada para sufijos
+    for (int i = 0; i < n; i++) {
+        Nodo* nodo = obtenerNodoPorIndice(lista, i);
+        string titulo = nodo->libro.getTitulo();
+        string tituloLower = titulo;
+        transform(tituloLower.begin(), tituloLower.end(), tituloLower.begin(), ::tolower);
+
+        if (comparaSufijo(tituloLower, sufijoLower)) {
+            encontrado = true;
+            cout << left << setw(40) << titulo
+                << setw(25) << nodo->libro.getAutor().getNombre()
+                << setw(25) << nodo->libro.getAutor().getIsni()
+                << setw(20) << nodo->libro.getIsbn()
+                << setw(15) << nodo->libro.getFechaPublicacion().mostrar()
+                << setw(15) << nodo->libro.getAutor().getFechaNacimiento().mostrar() << endl;
+        }
+    }
+
+    if (!encontrado) {
+        cout << "No se encontraron coincidencias con el sufijo '" << sufijo << "'." << endl;
+    }
+}
