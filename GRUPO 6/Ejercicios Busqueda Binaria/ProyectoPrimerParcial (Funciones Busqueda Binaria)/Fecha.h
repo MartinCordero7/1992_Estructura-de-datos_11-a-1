@@ -44,6 +44,15 @@ private:
     }
 
 public:
+    // Add operator== for date comparison
+    bool operator==(const Fecha& otra) const {
+        return dia == otra.dia && mes == otra.mes && anio == otra.anio;
+    }
+
+    // Add operator!= for completeness
+    bool operator!=(const Fecha& otra) const {
+        return !(*this == otra);
+    }
     // Método para comparar si una fecha es anterior a otra
     bool esAnterior(const Fecha& otra) const {
         return anio < otra.anio;

@@ -211,3 +211,100 @@ void FuncionesBusquedaBinaria::buscarPorSufijo(const ListaCircularDoble& lista, 
         cout << "No se encontraron coincidencias con el sufijo '" << sufijo << "'." << endl;
     }
 }
+
+void FuncionesBusquedaBinaria::ordenarPorFecha(ListaCircularDoble& lista) {
+    if (!lista.getCabeza() || lista.getCabeza()->siguiente == lista.getCabeza()) {
+        return;
+    }
+
+    bool intercambio;
+    do {
+        intercambio = false;
+        Nodo* actual = lista.getCabeza();
+        do {
+            if (compararFechas(actual->siguiente->libro.getFechaPublicacion(), 
+                            actual->libro.getFechaPublicacion())) {
+                Libro temp = actual->libro;
+                actual->libro = actual->siguiente->libro;
+                actual->siguiente->libro = temp;
+                intercambio = true;
+            }
+            actual = actual->siguiente;
+        } while (actual->siguiente != lista.getCabeza());
+    } while (intercambio);
+}
+
+void FuncionesBusquedaBinaria::buscarPorRangoFecha(const ListaCircularDoble& lista, const Fecha& fechaInicio, const Fecha& fechaFin) {
+    if (!lista.getCabeza()) {
+        cout << "No hay libros registrados." << endl;
+        return;
+    }
+
+    // Ordenar la lista por fecha
+    ordenarPorFecha(const_cast<ListaCircularDoble&>(lista));
+
+    int n = contarNodos(lista);
+    int izq = 0;
+    int der = n - 1;
+    int primerIndice = -1;
+
+    // Búsqueda binaria para encontrar el primer libro en el rango
+    while (izq <= der) {
+        int medio = izq + (der - izq) / 2;
+        Nodo* nodoMedio = obtenerNodoPorIndice(lista, medio);
+        Fecha fechaMedio = nodoMedio->libro.getFechaPublicacion();
+
+        if (estaEnRango(fechaMedio, fechaInicio, fechaFin)) {
+            primerIndice = medio;
+            der = medio - 1;  // Seguir buscando hacia la izquierda
+        } else if (compararFechas(fechaMedio, fechaInicio)) {
+            izq = medio + 1;
+        } else {
+            der = medio - 1;
+        }
+    }
+
+    if (primerIndice == -1) {
+        cout << "No se encontraron libros en el rango de fechas especificado." << endl;
+        return;
+    }
+
+    cout << "Libros encontrados entre " << fechaInicio.mostrar() << " y " << fechaFin.mostrar() << ":" << endl;
+    cout << left << setw(41) << "Título" 
+        << setw(25) << "Autor" 
+        << setw(25) << "ISNI" 
+        << setw(20) << "ISBN"
+        << setw(15) << "Publicación" 
+        << setw(15) << "Nac. Autor" << endl;
+    cout << string(140, '-') << endl;
+
+    // Mostrar todos los libros en el rango
+    for (int i = primerIndice; i < n; i++) {
+        Nodo* nodo = obtenerNodoPorIndice(lista, i);
+        Fecha fechaPublicacion = nodo->libro.getFechaPublicacion();
+        
+        if (!estaEnRango(fechaPublicacion, fechaInicio, fechaFin)) {
+            break;
+        }
+
+        cout << left << setw(40) << nodo->libro.getTitulo()
+            << setw(25) << nodo->libro.getAutor().getNombre()
+            << setw(25) << nodo->libro.getAutor().getIsni()
+            << setw(20) << nodo->libro.getIsbn()
+            << setw(15) << nodo->libro.getFechaPublicacion().mostrar()
+            << setw(15) << nodo->libro.getAutor().getFechaNacimiento().mostrar() << endl;
+    }
+}
+
+bool FuncionesBusquedaBinaria::estaEnRango(const Fecha& fecha, const Fecha& inicio, const Fecha& fin) {
+    return (compararFechas(inicio, fecha) || fecha == inicio) && 
+        (compararFechas(fecha, fin) || fecha == fin);
+}
+
+bool FuncionesBusquedaBinaria::compararFechas(const Fecha& fecha1, const Fecha& fecha2) {
+    if (fecha1.getAnio() != fecha2.getAnio())
+        return fecha1.getAnio() < fecha2.getAnio();
+    if (fecha1.getMes() != fecha2.getMes())
+        return fecha1.getMes() < fecha2.getMes();
+    return fecha1.getDia() < fecha2.getDia();
+}

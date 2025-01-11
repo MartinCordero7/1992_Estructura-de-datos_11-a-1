@@ -68,6 +68,7 @@ void mostrarMenu(ListaCircularDoble& lista) {
         "Buscar por rango",
         "Buscar por prefijo (Búsqueda Binaria)",
         "Buscar por sufijo (Búsqueda Binaria)",
+        "Buscar por Rango de Fechas (Búsqueda Binaria)",
         "Salir"
     };
     int seleccion = 0;
@@ -228,6 +229,36 @@ void mostrarMenu(ListaCircularDoble& lista) {
                     getline(cin, sufijo);
                 } while (!Validaciones::validarTitulo(sufijo,"Sufijo"));
                 FuncionesBusquedaBinaria::buscarPorSufijo(lista, sufijo);
+            }else if (opciones[seleccion] == "Buscar por Rango de Fechas (Búsqueda Binaria)") {
+                string fechaIni, fechaFin;
+                Fecha fechaInicio, fechaFinal;
+
+                while (true) {
+                    do {
+                        cout << "\nIngrese fecha inicial (DD-MM-YYYY): ";
+                        getline(cin, fechaIni);
+                    } while (!Validaciones::validarFechaRango(fechaIni));
+                    
+                    do {
+                        cout << "Ingrese fecha final (DD-MM-YYYY): ";
+                        getline(cin, fechaFin);
+                    } while (!Validaciones::validarFechaRango(fechaFin));
+
+                    fechaInicio = Fecha::crearDesdeCadena(fechaIni);
+                    fechaFinal = Fecha::crearDesdeCadena(fechaFin);
+
+                    // Validar que la fecha final sea posterior a la inicial
+                    if (fechaFinal.getAnio() > fechaInicio.getAnio() || 
+                    (fechaFinal.getAnio() == fechaInicio.getAnio() && fechaFinal.getMes() > fechaInicio.getMes()) ||
+                    (fechaFinal.getAnio() == fechaInicio.getAnio() && fechaFinal.getMes() == fechaInicio.getMes() && 
+                        fechaFinal.getDia() >= fechaInicio.getDia())) {
+                        break;
+                    } else {
+                        cout << "Error: La fecha final debe ser posterior o igual a la fecha inicial." << endl;
+                    }
+                }
+
+                FuncionesBusquedaBinaria::buscarPorRangoFecha(lista, fechaInicio, fechaFinal);
             }else if (opciones[seleccion] == "Salir") {
                 break;
             }

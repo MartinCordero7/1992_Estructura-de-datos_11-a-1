@@ -11,6 +11,38 @@
 
 #include "Validaciones.h"
 
+bool Validaciones::validarFechaRango(const string& fecha) {
+    regex formatoFecha(R"(\d{2}-\d{2}-\d{4})");
+    if (!regex_match(fecha, formatoFecha)) {
+        cout << "Error: El formato de la fecha debe ser DD-MM-YYYY.\n";
+        return false;
+    }
+
+    int dia, mes, anio;
+    sscanf(fecha.c_str(), "%d-%d-%d", &dia, &mes, &anio);
+
+    if (anio < 1 || anio > 2024 || mes < 1 || mes > 12 || dia < 1 || dia > diasEnMes(mes, anio)) {
+        cout << "Error: Fecha no válida.\n";
+        return false;
+    }
+
+    // Obtener la fecha actual
+    time_t t = time(nullptr);
+    tm* fechaActual = localtime(&t);
+
+    int diaActual = fechaActual->tm_mday;
+    int mesActual = fechaActual->tm_mon + 1;
+    int anioActual = fechaActual->tm_year + 1900;
+
+    // Verificar que la fecha ingresada no sea mayor a la actual
+    if (anio > anioActual || (anio == anioActual && mes > mesActual) || (anio == anioActual && mes == mesActual && dia > diaActual)) {
+        cout << "Error: La fecha no puede ser mayor a la fecha actual.\n";
+        return false;
+    }
+    
+    return true;
+}
+
 // Validación de fecha
 bool Validaciones::validarFecha(const string& fecha) {
     regex formatoFecha(R"(\d{2}-\d{2}-\d{4})");

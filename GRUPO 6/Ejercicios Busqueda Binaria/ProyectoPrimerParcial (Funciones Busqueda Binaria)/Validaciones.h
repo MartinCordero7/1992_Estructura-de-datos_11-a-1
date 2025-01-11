@@ -22,6 +22,7 @@ using namespace std;
 class Validaciones {
 public:
     static bool validarFechaPublicacion(const string& fechaPub, const string& fechaNacAutor);
+    static bool validarFechaRango(const string& fecha);
     static bool validarTituloNombre(const string& texto, const string& campo);
     static bool validarTitulo(const string& texto, const string& campo);
     static bool validarFecha(const string& fecha);
