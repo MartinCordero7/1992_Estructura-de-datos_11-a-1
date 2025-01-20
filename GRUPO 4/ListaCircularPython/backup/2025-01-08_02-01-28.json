@@ -1,0 +1,18 @@
+[
+    {
+        "nombre1": "asda",
+        "nombre2": "sda",
+        "apellido": "sadas",
+        "correo": "assadas@espe.edu.ec",
+        "cedula": "1710746684",
+        "fecha": "4000-02-29"
+    },
+    {
+        "nombre1": "asdsa",
+        "nombre2": "asdasd",
+        "apellido": "sdaasd",
+        "correo": "aasdaasd@espe.edu.ec",
+        "cedula": "2222222222",
+        "fecha": "2004-02-29"
+    }
+]
