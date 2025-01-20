@@ -1,0 +1,26 @@
+[
+    {
+        "nombre1": "Steven",
+        "nombre2": "David",
+        "apellido": "Jacome",
+        "correo": "sdjacome@espe.edu.ec",
+        "cedula": "1727641407",
+        "fecha": "2000-02-29"
+    },
+    {
+        "nombre1": "pablo",
+        "nombre2": "est",
+        "apellido": "dominguez",
+        "correo": "pedominguez@espe.edu.ec",
+        "cedula": "1710746684",
+        "fecha": "2001-03-21"
+    },
+    {
+        "nombre1": "sofia",
+        "nombre2": "seri",
+        "apellido": "Guaya",
+        "correo": "ssguaya@espe.edu.ec",
+        "cedula": "1754404570",
+        "fecha": "2003-07-09"
+    }
+]
