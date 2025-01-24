@@ -65,7 +65,7 @@ Fecha Fecha::crearDesdeCadena(const string& fechaStr) {
     int d, m, a; char separador1, separador2;
     stringstream ss(fechaStr);
     ss >> d >> separador1 >> m >> separador2 >> a;
-    if ((separador1 != '/' && separador1 != '-') || (separador2 != '/' && separador2 != '-') || !esFechaValida(d, m, a)) 
+    if (separador1 != '-' || separador2 != '-' || !esFechaValida(d, m, a)) 
         throw invalid_argument("Formato o fecha invalida: " + fechaStr);
     return Fecha(d, m, a);
 }

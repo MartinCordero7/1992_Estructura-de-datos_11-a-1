@@ -44,6 +44,14 @@ private:
     }
 
 public:
+// Constructor por defectostring toString() const {
+    string toString() const {
+        stringstream ss;
+        ss << setw(2) << setfill('0') << dia << "-"
+           << setw(2) << setfill('0') << mes << "-"
+           << anio;
+        return ss.str();
+    }
     // Método para comparar si una fecha es anterior a otra
     bool esAnterior(const Fecha& otra) const {
         return anio < otra.anio;

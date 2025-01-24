@@ -12,6 +12,7 @@
 #define MENU_H
 
 #include "LibroManager.h"
+#include "ListaCircularMenu.cpp"
 #include <vector>
 
 void mostrarMenu(LibroManager& lista);
