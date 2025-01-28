@@ -324,46 +324,42 @@ vector<string> LibroManager::buscarLibroConAutocompletado(const string& prefijo)
 
 // Buscar libro con autocompletado y sugerencias basadas en errores tipográficos
 vector<string> LibroManager::buscarLibroConErroresTipograficos(const string& prefijo) {
-    vector<string> sugerencias = trie.getSuggestions(prefijo);
+    vector<string> sugerencias = trie.getTypoSuggestions(prefijo, 2);
     
     if (sugerencias.empty()) {
-        cout << "No se encontraron sugerencias exactas para el prefijo: " << prefijo << endl;
-        cout << "Buscando sugerencias basadas en errores tipográficos..." << endl;
-        sugerencias = trie.getTypoSuggestions(prefijo, 2); // Ajusta el valor de maxDistance según sea necesario
-    }
-
-    if (sugerencias.empty()) {
-        cout << "No se encontraron sugerencias para el prefijo: " << prefijo << endl;
+        cout << "No se encontraron sugerencias para: " << prefijo << endl;
         return sugerencias;
     }
 
-    // Mostrar todas las sugerencias
     cout << "Sugerencias encontradas:" << endl;
     for (size_t i = 0; i < sugerencias.size(); ++i) {
         cout << i + 1 << ". " << sugerencias[i] << endl;
     }
 
-    // Permitir al usuario seleccionar una sugerencia
-    int seleccion;
-    cout << "Seleccione una sugerencia (1-" << sugerencias.size() << "): ";
-    cin >> seleccion;
+    while (true) {
+        cout << "Seleccione una sugerencia (1-" << sugerencias.size() << ") o 0 para cancelar: ";
+        int seleccion;
+        cin >> seleccion;
+        cin.ignore();
 
-    // Validar la selección del usuario
-    if (seleccion < 1 || seleccion > sugerencias.size()) {
-        cout << "Selección inválida." << endl;
-        return sugerencias;
-    }
+        if (seleccion == 0) {
+            cout << "Búsqueda cancelada." << endl;
+            break;
+        }
 
-    // Obtener el libro correspondiente a la sugerencia seleccionada
-    string tituloSeleccionado = sugerencias[seleccion - 1];
-    trim(tituloSeleccionado); // Eliminar espacios en blanco
-    cout << "Sugerencia seleccionada: " << tituloSeleccionado << endl;
-    Libro* libro = buscarLibroPorTitulo(tituloSeleccionado);
-    if (libro) {
-        cout << "Información del libro: " << endl;
-        libro->mostrar();
-    } else {
-        cout << "Libro no encontrado.\n";
+        if (seleccion < 1 || seleccion > sugerencias.size()) {
+            cout << "Selección inválida. Intente nuevamente." << endl;
+            continue;
+        }
+
+        string tituloSeleccionado = sugerencias[seleccion - 1];
+        trim(tituloSeleccionado);
+        cout << "\nLibro seleccionado:" << endl;
+        Libro* libro = buscarLibroPorTitulo(tituloSeleccionado);
+        if (libro) {
+            libro->mostrar();
+        }
+        break;
     }
     
     return sugerencias;

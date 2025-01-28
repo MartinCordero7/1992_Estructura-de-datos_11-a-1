@@ -1,6 +1,7 @@
 #include "Trie.h"
 #include <algorithm>
 #include <queue>
+#include <set> // Add this include for set container
 
 Trie::Trie() {
     root = new TrieNode();
@@ -109,8 +110,13 @@ vector<string> Trie::getSuggestions(const string& prefix) {
 
 // Función para calcular la distancia de Levenshtein
 int Trie::levenshteinDistance(const string& s1, const string& s2) {
-    const size_t m = s1.size();
-    const size_t n = s2.size();
+    string str1 = s1, str2 = s2;
+    // Convert to lowercase for case-insensitive comparison
+    transform(str1.begin(), str1.end(), str1.begin(), ::tolower);
+    transform(str2.begin(), str2.end(), str2.begin(), ::tolower);
+    
+    const size_t m = str1.size();
+    const size_t n = str2.size();
     vector<vector<int>> dp(m + 1, vector<int>(n + 1));
 
     for (size_t i = 0; i <= m; ++i) dp[i][0] = i;
@@ -118,25 +124,49 @@ int Trie::levenshteinDistance(const string& s1, const string& s2) {
 
     for (size_t i = 1; i <= m; ++i) {
         for (size_t j = 1; j <= n; ++j) {
-            if (s1[i - 1] == s2[j - 1]) {
+            if (str1[i - 1] == str2[j - 1]) {
                 dp[i][j] = dp[i - 1][j - 1];
             } else {
-                dp[i][j] = min({ dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + 1 });
+                dp[i][j] = min({
+                    dp[i - 1][j] + 1,     // deletion
+                    dp[i][j - 1] + 1,     // insertion
+                    dp[i - 1][j - 1] + 1  // substitution
+                });
             }
         }
     }
-
     return dp[m][n];
 }
 
 // Función para obtener sugerencias basadas en errores tipográficos
 vector<string> Trie::getTypoSuggestions(const string& prefix, int maxDistance) {
     vector<string> suggestions;
+    set<string> uniqueSuggestions; // Use set to avoid duplicates
     vector<Libro*> libros = collectAllBooks();
+    
+    // First, add exact prefix matches
     for (const auto& libro : libros) {
-        if (levenshteinDistance(prefix, libro->getTitulo()) <= maxDistance) {
-            suggestions.push_back(libro->getTitulo());
+        string titulo = libro->getTitulo();
+        string tituloLower = titulo;
+        string prefixLower = prefix;
+        transform(tituloLower.begin(), tituloLower.end(), tituloLower.begin(), ::tolower);
+        transform(prefixLower.begin(), prefixLower.end(), prefixLower.begin(), ::tolower);
+        
+        // Check for prefix match
+        if (tituloLower.find(prefixLower) == 0) {
+            uniqueSuggestions.insert(titulo);
         }
     }
+    
+    // Then add fuzzy matches
+    for (const auto& libro : libros) {
+        string titulo = libro->getTitulo();
+        int distance = levenshteinDistance(prefix, titulo.substr(0, max(prefix.length(), size_t(3))));
+        if (distance <= maxDistance) {
+            uniqueSuggestions.insert(titulo);
+        }
+    }
+    
+    suggestions.assign(uniqueSuggestions.begin(), uniqueSuggestions.end());
     return suggestions;
 }
