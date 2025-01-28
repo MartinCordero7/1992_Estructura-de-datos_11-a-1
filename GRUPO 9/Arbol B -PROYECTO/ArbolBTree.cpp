@@ -1,13 +1,3 @@
-/********************************************************************************************
- *            UNIVERSIDAD DE LAS FUERZAS ARMADAS ESPE                                       *
- * Proposito:                      Archivo principal de proyecto                            *
- * Autor:                          Erika Guayanay, Maycol Celi, Jerson Llumiquinga          *
- * Fecha de creacion:              01/12/2024                                               *
- * Fecha de modificacion:          01/01/2025                                               *
- * Materia:                        Estructura de datos                                      *
- * NRC :                           1992                                                     *
- ********************************************************************************************/
-
 #include "ArbolBTree.h"
 #include "Persona.h"
 #include "BackupManager.h"
@@ -27,15 +17,10 @@ void ArbolBTree::insertar(const Libro& libro) {
             raiz = new NodoBTree(true);
             raiz->claves.push_back(libro);
         } else {
-            if (raiz->claves.size() == 2 * t - 1) {
-                NodoBTree* nuevaRaiz = new NodoBTree(false);
-                nuevaRaiz->hijos.push_back(raiz);
-                dividirNodo(nuevaRaiz, 0);
-                raiz = nuevaRaiz;
-            }
             insertarEnNodo(raiz, libro);
         }
         std::cout << "Libro agregado: " << libro.getTitulo() << std::endl;
+        // Guardar solo si no se está restaurando un backup
         if (!evitarGuardar) {
             guardarLibrosEnArchivo();
         }
@@ -102,31 +87,29 @@ NodoBTree* ArbolBTree::buscarLibroPorIsbn(const std::string& isbn) {
     try {
         if (!raiz) return nullptr;
         NodoBTree* actual = raiz;
-
         while (actual) {
+            for (const auto& libro : actual->claves) {
+                if (libro.getIsbn() == isbn) {
+                    return actual;
+                }
+            }
+            // Move to the next node based on the B-Tree properties
             int i = 0;
             while (i < actual->claves.size() && isbn > actual->claves[i].getIsbn()) {
                 i++;
             }
-
-            if (i < actual->claves.size() && actual->claves[i].getIsbn() == isbn) {
-                return actual;  // Encontrado
-            }
-
             if (actual->esHoja) {
-                return nullptr;  // No encontrado en hojas
+                return nullptr;
             } else {
                 actual = actual->hijos[i];
             }
         }
-
         return nullptr;
     } catch (const std::exception& e) {
         std::cerr << "Error al buscar libro por ISBN: " << e.what() << std::endl;
         return nullptr;
     }
 }
-
 
 Persona ArbolBTree::buscarAutorPorIsni(const std::string& isni) {
     try {
@@ -245,65 +228,66 @@ void ArbolBTree::cargarLibrosDesdeArchivo() {
     }
 }
 
-void ArbolBTree::eliminar(const std::string& isbn) {
-    if (!raiz) return;
+void ArbolBTree::eliminar(const std::string& titulo) {
+    try {
+        if (!raiz) return;
 
-    // Helper function to find and remove the book
-    std::function<bool(NodoBTree*, const std::string&)> eliminarEnNodo = [&](NodoBTree* nodo, const std::string& isbn) -> bool {
-        int i = 0;
-        while (i < nodo->claves.size() && nodo->claves[i].getIsbn() < isbn) {
-            i++;
-        }
+        // Helper function to find and remove the book
+        std::function<bool(NodoBTree*, const std::string&)> eliminarEnNodo = [&](NodoBTree* nodo, const std::string& titulo) -> bool {
+            int i = 0;
+            while (i < nodo->claves.size() && nodo->claves[i].getTitulo() < titulo) {
+                i++;
+            }
 
-        if (i < nodo->claves.size() && nodo->claves[i].getIsbn() == isbn) {
-            if (nodo->esHoja) {
-                nodo->claves.erase(nodo->claves.begin() + i);
-                return true;
-            } else {
-                // Eliminar en nodo no hoja
-                Libro libroReemplazo;
-                if (nodo->hijos[i]->claves.size() >= t) {
-                    libroReemplazo = obtenerPredecesor(nodo, i);
-                    nodo->claves[i] = libroReemplazo;
-                    eliminarEnNodo(nodo->hijos[i], libroReemplazo.getIsbn());
-                } else if (nodo->hijos[i + 1]->claves.size() >= t) {
-                    libroReemplazo = obtenerSucesor(nodo, i);
-                    nodo->claves[i] = libroReemplazo;
-                    eliminarEnNodo(nodo->hijos[i + 1], libroReemplazo.getIsbn());
+            if (i < nodo->claves.size() && nodo->claves[i].getTitulo() == titulo) {
+                if (nodo->esHoja) {
+                    nodo->claves.erase(nodo->claves.begin() + i);
+                    return true;
                 } else {
-                    fusionarNodos(nodo, i);
-                    eliminarEnNodo(nodo->hijos[i], isbn);
+                    // Eliminar en nodo no hoja
+                    Libro libroReemplazo;
+                    if (nodo->hijos[i]->claves.size() >= t) {
+                        libroReemplazo = obtenerPredecesor(nodo, i);
+                        nodo->claves[i] = libroReemplazo;
+                        eliminarEnNodo(nodo->hijos[i], libroReemplazo.getTitulo());
+                    } else if (nodo->hijos[i + 1]->claves.size() >= t) {
+                        libroReemplazo = obtenerSucesor(nodo, i);
+                        nodo->claves[i] = libroReemplazo;
+                        eliminarEnNodo(nodo->hijos[i + 1], libroReemplazo.getTitulo());
+                    } else {
+                        fusionarNodos(nodo, i);
+                        eliminarEnNodo(nodo->hijos[i], titulo);
+                    }
+                    return true;
                 }
-                return true;
+            } else if (!nodo->esHoja) {
+                bool eliminado = eliminarEnNodo(nodo->hijos[i], titulo);
+                if (eliminado && nodo->hijos[i]->claves.size() < t - 1) {
+                    balancearNodo(nodo, i);
+                }
+                return eliminado;
             }
-        } else if (!nodo->esHoja) {
-            if (i == nodo->claves.size() || nodo->claves[i].getIsbn() > isbn) {
-                i--;
-            }
-            bool eliminado = eliminarEnNodo(nodo->hijos[i + 1], isbn);
-            if (eliminado && nodo->hijos[i + 1]->claves.size() < t - 1) {
-                balancearNodo(nodo, i + 1);
-            }
-            return eliminado;
-        }
-        return false;
-    };
+            return false;
+        };
 
-    bool eliminado = eliminarEnNodo(raiz, isbn);
-    if (eliminado) {
-        if (raiz->claves.empty()) {
-            NodoBTree* temp = raiz;
-            if (raiz->esHoja) {
-                raiz = nullptr;
-            } else {
-                raiz = raiz->hijos[0];
+        bool eliminado = eliminarEnNodo(raiz, titulo);
+        if (eliminado) {
+            if (raiz->claves.empty()) {
+                NodoBTree* temp = raiz;
+                if (raiz->esHoja) {
+                    raiz = nullptr;
+                } else {
+                    raiz = raiz->hijos[0];
+                }
+                delete temp;
             }
-            delete temp;
+            std::cout << "Libro eliminado: " << titulo << std::endl;
+            guardarLibrosEnArchivo();
+        } else {
+            std::cout << "Libro no encontrado: " << titulo << std::endl;
         }
-        std::cout << "Libro eliminado con ISBN: " << isbn << std::endl;
-        guardarLibrosEnArchivo();
-    } else {
-        std::cout << "Libro no encontrado con ISBN: " << isbn << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Error al eliminar el libro: " << e.what() << std::endl;
     }
 }
 
@@ -474,16 +458,6 @@ void ArbolBTree::crearBackup(const std::string& nombreArchivo) {
     } catch (const std::exception& e) {
         std::cerr << "Error al crear backup: " << e.what() << std::endl;
     }
-}
-
-bool ArbolBTree::verificarArchivoLibros() {
-    std::ifstream archivo("libros.txt");
-    if (!archivo.is_open()) {
-        std::cout << "Libros no registrados.\n";
-        return false;
-    }
-    archivo.close();
-    return true;
 }
 
 int ArbolBTree::getT() const {

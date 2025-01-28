@@ -20,7 +20,6 @@ public:
     // Métodos públicos de la clase
     static void crearCarpetaSiNoExiste(const std::string& ruta);
     static std::vector<std::string> listarArchivosEnCarpeta(const std::string& carpeta);
-    static void crearBackup(ArbolBTree& arbol);
     static void restaurarBackup(ArbolBTree& arbol);
 };
 

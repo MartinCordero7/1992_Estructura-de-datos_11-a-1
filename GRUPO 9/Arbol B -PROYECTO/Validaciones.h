@@ -34,6 +34,8 @@ public:
     static int calcularDigitoControlIsbn10(const string& isbn);
     static int calcularDigitoControlIsbn13(const string& isbn);
     static int ingresarAnio(const string& mensaje); // Declaration for ingresarAnio
+    static string leerSoloNumeros(); // Declaration for leerSoloNumeros
+    static string leerIsbnIsni(); // Declaration for leerIsbnIsni
 
 private:
     static int diasEnMes(int mes, int anio);
