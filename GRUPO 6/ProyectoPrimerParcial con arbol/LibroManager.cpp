@@ -16,8 +16,33 @@
 #include <direct.h>  // Para mkdir en Windows
 #include <sys/stat.h>  // Para usar _stat
 #include "BackupManager.h"  // Incluir el archivo de cabecera con la declaración de la función
+#include <algorithm> 
+#include <cctype>
+#include <locale>
 
 using namespace std;
+
+
+
+// trim from start (in place)
+static inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string &s) {
+    ltrim(s);
+    rtrim(s);
+}
 
 // Agregar libro
 void LibroManager::agregarLibro(const Libro& libro) {
@@ -235,4 +260,152 @@ void LibroManager::restaurarBackup(const string& nombreArchivo) {
 
     guardarLibrosEnArchivo();
     cout << "Backup restaurado: " << nombreArchivo << endl;
+}
+
+// Buscar libro por título
+Libro* LibroManager::buscarLibroPorTitulo(const string& titulo) {
+    vector<Libro*> libros = trie.collectAllBooks();
+    for (Libro* libro : libros) {
+        if (libro->getTitulo() == titulo) {
+            return libro;
+        }
+    }
+    return nullptr;
+}
+
+// Función para imprimir todos los títulos de los libros
+void LibroManager::imprimirTitulosLibros() const {
+    cout << "Libros disponibles:" << endl;
+    for (const auto& libro : libros) {
+        cout << libro.getTitulo() << endl;
+    }
+}
+
+// Buscar libro con autocompletado
+vector<string> LibroManager::buscarLibroConAutocompletado(const string& prefijo) {
+    vector<string> sugerencias = trie.getSuggestions(prefijo);
+    
+    if (sugerencias.empty()) {
+        cout << "No se encontraron sugerencias para el prefijo: " << prefijo << endl;
+        return sugerencias;
+    }
+
+    // Mostrar todas las sugerencias
+    cout << "Sugerencias encontradas:" << endl;
+    for (size_t i = 0; i < sugerencias.size(); ++i) {
+        cout << i + 1 << ". " << sugerencias[i] << endl;
+    }
+
+    // Permitir al usuario seleccionar una sugerencia
+    int seleccion;
+    cout << "Seleccione una sugerencia (1-" << sugerencias.size() << "): ";
+    cin >> seleccion;
+
+    // Validar la selección del usuario
+    if (seleccion < 1 || seleccion > sugerencias.size()) {
+        cout << "Selección inválida." << endl;
+        return sugerencias;
+    }
+
+    // Obtener el libro correspondiente a la sugerencia seleccionada
+    string tituloSeleccionado = sugerencias[seleccion - 1];
+    trim(tituloSeleccionado); // Eliminar espacios en blanco
+    cout << "Sugerencia seleccionada: " << tituloSeleccionado << endl;
+    Libro* libro = buscarLibroPorTitulo(tituloSeleccionado);
+    if (libro) {
+        cout << "Información del libro: " << endl;
+        libro->mostrar();
+    } else {
+        cout << "Libro no encontrado.\n";
+    }
+    
+    return sugerencias;
+}
+
+// Buscar libro con autocompletado y sugerencias basadas en errores tipográficos
+vector<string> LibroManager::buscarLibroConErroresTipograficos(const string& prefijo) {
+    vector<string> sugerencias = trie.getSuggestions(prefijo);
+    
+    if (sugerencias.empty()) {
+        cout << "No se encontraron sugerencias exactas para el prefijo: " << prefijo << endl;
+        cout << "Buscando sugerencias basadas en errores tipográficos..." << endl;
+        sugerencias = trie.getTypoSuggestions(prefijo, 2); // Ajusta el valor de maxDistance según sea necesario
+    }
+
+    if (sugerencias.empty()) {
+        cout << "No se encontraron sugerencias para el prefijo: " << prefijo << endl;
+        return sugerencias;
+    }
+
+    // Mostrar todas las sugerencias
+    cout << "Sugerencias encontradas:" << endl;
+    for (size_t i = 0; i < sugerencias.size(); ++i) {
+        cout << i + 1 << ". " << sugerencias[i] << endl;
+    }
+
+    // Permitir al usuario seleccionar una sugerencia
+    int seleccion;
+    cout << "Seleccione una sugerencia (1-" << sugerencias.size() << "): ";
+    cin >> seleccion;
+
+    // Validar la selección del usuario
+    if (seleccion < 1 || seleccion > sugerencias.size()) {
+        cout << "Selección inválida." << endl;
+        return sugerencias;
+    }
+
+    // Obtener el libro correspondiente a la sugerencia seleccionada
+    string tituloSeleccionado = sugerencias[seleccion - 1];
+    trim(tituloSeleccionado); // Eliminar espacios en blanco
+    cout << "Sugerencia seleccionada: " << tituloSeleccionado << endl;
+    Libro* libro = buscarLibroPorTitulo(tituloSeleccionado);
+    if (libro) {
+        cout << "Información del libro: " << endl;
+        libro->mostrar();
+    } else {
+        cout << "Libro no encontrado.\n";
+    }
+    
+    return sugerencias;
+}
+//Listar libros por primer letra del título
+void LibroManager::listarLibrosPorLetra(const char letra) {
+    vector<Libro*> libros = trie.collectAllBooks();
+    bool encontrado = false;
+    for (Libro* libro : libros) {
+        if (libro->getTitulo()[0] == letra) {
+            cout << "Título: " << libro->getTitulo() << endl;
+            cout << "Autor: " << libro->getAutor().getNombre() << endl;
+            cout << "ISNI: " << libro->getAutor().getIsni() << endl;
+            cout << "ISBN: " << libro->getIsbn() << endl;
+            cout << "Fecha de publicación: " << libro->getFechaPublicacion().mostrar() << endl;
+            cout << "Fecha de nacimiento del autor: " << libro->getAutor().getFechaNacimiento().mostrar() << endl;
+            cout << "-----------------------------------" << endl;
+            encontrado = true;
+        }
+    }
+    if (!encontrado) {
+        cout << "No se encontraron libros con la letra: " << letra << endl;
+    }
+}
+
+//Buscar libros que contengan una subcadena
+void LibroManager::buscarLibroPorSubcadena(const string& subcadena) {
+    vector<Libro*> libros = trie.collectAllBooks();
+    bool encontrado = false;
+    for (Libro* libro : libros) {
+        if (libro->getTitulo().find(subcadena) != string::npos) {
+            cout << "Título: " << libro->getTitulo() << endl;
+            cout << "Autor: " << libro->getAutor().getNombre() << endl;
+            cout << "ISNI: " << libro->getAutor().getIsni() << endl;
+            cout << "ISBN: " << libro->getIsbn() << endl;
+            cout << "Fecha de publicación: " << libro->getFechaPublicacion().mostrar() << endl;
+            cout << "Fecha de nacimiento del autor: " << libro->getAutor().getFechaNacimiento().mostrar() << endl;
+            cout << "-----------------------------------" << endl;
+            encontrado = true;
+        }
+    }
+    if (!encontrado) {
+        cout << "No se encontraron libros con la subcadena: " << subcadena << endl;
+    }
 }

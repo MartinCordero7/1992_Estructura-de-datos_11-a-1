@@ -77,6 +77,9 @@ void mostrarMenu(LibroManager& lista) {
     menuOpciones.insertar("Crear backup");
     menuOpciones.insertar("Restaurar backup");
     menuOpciones.insertar("Buscar por rango");
+    menuOpciones.insertar("Buscar libro con sugerencias");
+    menuOpciones.insertar("Listar libros por letra");
+    menuOpciones.insertar("Buscar libro por subcadena");
     menuOpciones.insertar("Salir");
 
     int seleccion = 0;
@@ -295,8 +298,35 @@ void mostrarMenu(LibroManager& lista) {
             cout << "Error: El año ingresado está fuera del rango permitido.\n";
         }
             }
-        }else if (opcionSeleccionada == "Salir") {
-                break;
+        } else if (opcionSeleccionada == "Buscar libro con sugerencias") {
+        string prefijo;
+        cout << "Ingrese el título a buscar: ";
+        getline(cin, prefijo);
+        if (prefijo.empty()) {
+            cout << "Regresando al menú principal...\n";
+            continue;
+        }
+        lista.buscarLibroConErroresTipograficos(prefijo);
+        
+        } else if (opcionSeleccionada == "Listar libros por letra") {
+            char letra;
+            cout << "Ingrese la letra inicial: ";
+            cin >> letra;
+            cin.ignore();
+            letra = toupper(letra);
+            lista.listarLibrosPorLetra(letra);
+            
+        } else if (opcionSeleccionada == "Buscar libro por subcadena") {
+            string subcadena;
+            cout << "Ingrese la subcadena a buscar: ";
+            getline(cin, subcadena);
+            if (subcadena.empty()) {
+                cout << "Regresando al menú principal...\n";
+                continue;
+            }
+            lista.buscarLibroPorSubcadena(subcadena);
+        } else if (opcionSeleccionada == "Salir") {
+                    break;
             }
             cout << "Presione cualquier tecla para continuar...\n";
             _getch();

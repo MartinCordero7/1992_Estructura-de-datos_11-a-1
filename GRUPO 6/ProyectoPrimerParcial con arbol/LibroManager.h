@@ -26,6 +26,7 @@ private:
     Trie trie;
     string archivoLibros = "libros.txt";  // Archivo donde se guardarán los libros
     bool evitarGuardar = false;           // Bandera para controlar el guardado
+    vector<Libro> libros;
 public:
     // Agregar libro
     void agregarLibro(const Libro& libro);
@@ -33,6 +34,8 @@ public:
     void imprimirLibros();
     // Buscar libro por título
     Libro* buscarLibro(const string& titulo);
+    // Buscar libro por título
+    Libro* buscarLibroPorTitulo(const string& titulo);
     // Buscar libro por ISBN
     Libro* buscarLibroPorIsbn(const string& isbn);
     // Buscar autor por ISNI
@@ -49,6 +52,17 @@ public:
     void cargarLibrosDesdeArchivo();
     // Limpiar la lista
     void limpiarLista();
+    // Buscar libro con autocompletado
+    vector<string> buscarLibroConAutocompletado(const string& prefijo);
+    vector<string> buscarLibroConErroresTipograficos(const string& prefijo);
+    void imprimirTitulosLibros() const; // Declaración del método imprimirTitulosLibros
+    void listarLibrosPorLetra(const char letra); // Declaración del método listarLibrosPorLetra
+    void buscarLibroCortoLargo(); // Declaración del método buscarLibroCortoLargo
+    void buscarLibroPorSubcadena(const string& subcadena); // Declaración del método buscarLibroPorSubcadena
+    void buscarLibroPorIsbnConAutocompletado(const string& prefijo); // Declaración del método buscarLibroPorIsbnConAutocompletado
+    void buscarLibroCercano(const string& ruta, const int anioInicio, const int anioFin); // Declaración del método buscarLibroPorRango
+
+
 };
 
 #endif

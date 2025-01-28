@@ -19,6 +19,9 @@ public:
 class Trie {
 private:
     TrieNode* root;
+    void collectAllBooks(TrieNode* node, vector<Libro*>& libros);
+    void collectSuggestions(TrieNode* node, const string& prefix, vector<string>& suggestions);
+    int levenshteinDistance(const string& s1, const string& s2);
 public:
     Trie();
     void insert(const string& key, Libro* libro);
@@ -27,8 +30,9 @@ public:
     bool removeHelper(TrieNode* node, const string& key, int depth);
     void printAll(TrieNode* node, string prefix, ofstream& archivo);
     void printAll(ofstream& archivo);
-    void collectAllBooks(TrieNode* node, vector<Libro*>& libros);
     vector<Libro*> collectAllBooks();
+    vector<string> getSuggestions(const string& prefix);
+    vector<string> getTypoSuggestions(const string& prefix, int maxDistance);
 };
 
 #endif
