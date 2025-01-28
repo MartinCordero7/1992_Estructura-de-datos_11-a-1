@@ -237,19 +237,29 @@ void mostrarMenu(LibroManager& lista) {
                 cin >> ws; getline(cin, prefijo);
                 vector<string> sugerencias = lista.buscarLibroConErroresTipograficos(prefijo);
             } else if (opciones[seleccion] == "Función para listar libros por primer letra del título") {
-                char letra;
-                do {
-                    cout << "Ingrese la letra por la que desea buscar: ";
-                    cin.get(letra);  // Usamos cin.get() para capturar el primer carácter ingresado
-                
-                    // Limpiar el buffer de entrada en caso de que se ingrese más de un carácter
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    char letra;
+    string entrada;
 
-                    // Verificar que sea una letra y que no sea un espacio
-                } while (!isalpha(letra) || letra == ' '|| cin.gcount() != 1 || !isupper(letra));  // Rechaza espacios y caracteres no alfabéticos
+    do {
+        cout << "Ingrese la letra por la que desea buscar (una sola letra): ";
+        cin >> entrada;
 
-                lista.listarLibrosPorLetra(letra);
-            }else if (opciones[seleccion] == "Buscar el libro más corto y el más largo") {
+        // Verificar que la entrada tenga solo un carácter y que sea una letra
+        if (entrada.size() == 1 && isalpha(entrada[0])) {
+            letra = entrada[0];
+            break; // Salir del bucle si es válida
+        }
+
+        cout << "Entrada no válida. Por favor, ingrese una única letra." << endl;
+
+    } while (true);
+
+    // Convertir a mayúscula (si es necesario)
+    letra = toupper(letra);
+
+    lista.listarLibrosPorLetra(letra);
+}
+else if (opciones[seleccion] == "Buscar el libro más corto y el más largo") {
                 lista.buscarLibroCortoLargo();
             }else if (opciones[seleccion] == "Buscar libro por subcadena") {
                 string subcadena;
