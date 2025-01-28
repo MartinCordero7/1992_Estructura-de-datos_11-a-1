@@ -309,22 +309,56 @@ void mostrarMenu(LibroManager& lista) {
         lista.buscarLibroConErroresTipograficos(prefijo);
         
         } else if (opcionSeleccionada == "Listar libros por letra") {
-            char letra;
-            cout << "Ingrese la letra inicial: ";
-            cin >> letra;
-            cin.ignore();
-            letra = toupper(letra);
-            lista.listarLibrosPorLetra(letra);
+            char caracter;
+            while (true) {
+                cout << "Ingrese un caracter (A-Z, 0-9): ";
+                string entrada;
+                getline(cin, entrada);
+                
+                if (entrada.empty()) {
+                    cout << "Regresando al menú principal...\n";
+                    break;
+                }
+
+                if (entrada.length() != 1) {
+                    cout << "Error: Ingrese solo un caracter.\n";
+                    continue;
+                }
+                
+                caracter = entrada[0];
+                if (!isalnum(caracter)) {
+                    cout << "Error: El caracter debe ser una letra o número.\n";
+                    continue;
+                }
+                
+                if (isalpha(caracter)) {
+                    caracter = toupper(caracter);
+                }
+                
+                lista.listarLibrosPorLetra(caracter);
+                break;
+            }
             
         } else if (opcionSeleccionada == "Buscar libro por subcadena") {
             string subcadena;
-            cout << "Ingrese la subcadena a buscar: ";
-            getline(cin, subcadena);
-            if (subcadena.empty()) {
-                cout << "Regresando al menú principal...\n";
-                continue;
+            while (true) {
+                cout << "Ingrese la subcadena a buscar (sin espacios): ";
+                getline(cin, subcadena);
+                
+                if (subcadena.empty()) {
+                    cout << "Regresando al menú principal...\n";
+                    break;
+                }
+                
+                // Verificar si hay espacios
+                if (subcadena.find(' ') != string::npos) {
+                    cout << "Error: La subcadena no debe contener espacios.\n";
+                    continue;
+                }
+                
+                lista.buscarLibroPorSubcadena(subcadena);
+                break;
             }
-            lista.buscarLibroPorSubcadena(subcadena);
         } else if (opcionSeleccionada == "Salir") {
                     break;
             }
