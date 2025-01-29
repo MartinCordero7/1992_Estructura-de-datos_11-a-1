@@ -77,7 +77,7 @@ void mostrarMenu(LibroManager& lista) {
     menuOpciones.insertar("Crear backup");
     menuOpciones.insertar("Restaurar backup");
     menuOpciones.insertar("Buscar por rango");
-    menuOpciones.insertar("Buscar libro con sugerencias");
+    menuOpciones.insertar("Buscar libro por autor con sugerencias");
     menuOpciones.insertar("Listar libros por letra");
     menuOpciones.insertar("Buscar libro por subcadena");
     menuOpciones.insertar("Salir");
@@ -298,15 +298,34 @@ void mostrarMenu(LibroManager& lista) {
             cout << "Error: El año ingresado está fuera del rango permitido.\n";
         }
             }
-        } else if (opcionSeleccionada == "Buscar libro con sugerencias") {
-        string prefijo;
-        cout << "Ingrese el título a buscar: ";
-        getline(cin, prefijo);
-        if (prefijo.empty()) {
-            cout << "Regresando al menú principal...\n";
-            continue;
-        }
-        lista.buscarLibroConErroresTipograficos(prefijo);
+        } else if (opcionSeleccionada == "Buscar libro por autor con sugerencias") {
+            while (true) {
+                string nombreAutor;
+                cout << "Ingrese el nombre del autor a buscar: ";
+                getline(cin, nombreAutor);
+                
+                if (nombreAutor.empty()) {
+                    cout << "Regresando al menú principal...\n";
+                    break;
+                }
+                
+                // Validar que no contenga números
+                bool contieneNumeros = false;
+                for (char c : nombreAutor) {
+                    if (isdigit(c)) {
+                        contieneNumeros = true;
+                        break;
+                    }
+                }
+                
+                if (contieneNumeros) {
+                    cout << "Error: El nombre del autor no debe contener números.\n";
+                    continue;
+                }
+                
+                lista.buscarLibroConErroresTipograficos(nombreAutor);
+                break;
+            }
         
         } else if (opcionSeleccionada == "Listar libros por letra") {
             char caracter;

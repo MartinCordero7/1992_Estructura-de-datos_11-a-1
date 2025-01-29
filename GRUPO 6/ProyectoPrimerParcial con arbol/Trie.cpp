@@ -141,29 +141,29 @@ int Trie::levenshteinDistance(const string& s1, const string& s2) {
 // Función para obtener sugerencias basadas en errores tipográficos
 vector<string> Trie::getTypoSuggestions(const string& prefix, int maxDistance) {
     vector<string> suggestions;
-    set<string> uniqueSuggestions; // Use set to avoid duplicates
+    set<string> uniqueSuggestions;
     vector<Libro*> libros = collectAllBooks();
     
-    // First, add exact prefix matches
+    // First, add exact prefix matches for authors
     for (const auto& libro : libros) {
-        string titulo = libro->getTitulo();
-        string tituloLower = titulo;
+        string autorNombre = libro->getAutor().getNombre();
+        string autorLower = autorNombre;
         string prefixLower = prefix;
-        transform(tituloLower.begin(), tituloLower.end(), tituloLower.begin(), ::tolower);
+        transform(autorLower.begin(), autorLower.end(), autorLower.begin(), ::tolower);
         transform(prefixLower.begin(), prefixLower.end(), prefixLower.begin(), ::tolower);
         
-        // Check for prefix match
-        if (tituloLower.find(prefixLower) == 0) {
-            uniqueSuggestions.insert(titulo);
+        // Check for author name match
+        if (autorLower.find(prefixLower) == 0) {
+            uniqueSuggestions.insert(autorNombre);
         }
     }
     
-    // Then add fuzzy matches
+    // Then add fuzzy matches for author names
     for (const auto& libro : libros) {
-        string titulo = libro->getTitulo();
-        int distance = levenshteinDistance(prefix, titulo.substr(0, max(prefix.length(), size_t(3))));
+        string autorNombre = libro->getAutor().getNombre();
+        int distance = levenshteinDistance(prefix, autorNombre);
         if (distance <= maxDistance) {
-            uniqueSuggestions.insert(titulo);
+            uniqueSuggestions.insert(autorNombre);
         }
     }
     

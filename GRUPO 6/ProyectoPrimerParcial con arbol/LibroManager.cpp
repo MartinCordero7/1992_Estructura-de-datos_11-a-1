@@ -19,6 +19,7 @@
 #include <algorithm> 
 #include <cctype>
 #include <locale>
+#include <map>
 
 using namespace std;
 
@@ -325,19 +326,27 @@ vector<string> LibroManager::buscarLibroConAutocompletado(const string& prefijo)
 // Buscar libro con autocompletado y sugerencias basadas en errores tipográficos
 vector<string> LibroManager::buscarLibroConErroresTipograficos(const string& prefijo) {
     vector<string> sugerencias = trie.getTypoSuggestions(prefijo, 2);
+    map<string, vector<Libro*>> librosPorAutor;
+    vector<Libro*> todosLosLibros = trie.collectAllBooks();
+    
+    // Group books by author
+    for (Libro* libro : todosLosLibros) {
+        string nombreAutor = libro->getAutor().getNombre();
+        librosPorAutor[nombreAutor].push_back(libro);
+    }
     
     if (sugerencias.empty()) {
-        cout << "No se encontraron sugerencias para: " << prefijo << endl;
+        cout << "No se encontraron autores similares a: " << prefijo << endl;
         return sugerencias;
     }
 
-    cout << "Sugerencias encontradas:" << endl;
+    cout << "Autores encontrados:" << endl;
     for (size_t i = 0; i < sugerencias.size(); ++i) {
         cout << i + 1 << ". " << sugerencias[i] << endl;
     }
 
     while (true) {
-        cout << "Seleccione una sugerencia (1-" << sugerencias.size() << ") o 0 para cancelar: ";
+        cout << "Seleccione un autor (1-" << sugerencias.size() << ") o 0 para cancelar: ";
         int seleccion;
         cin >> seleccion;
         cin.ignore();
@@ -352,12 +361,17 @@ vector<string> LibroManager::buscarLibroConErroresTipograficos(const string& pre
             continue;
         }
 
-        string tituloSeleccionado = sugerencias[seleccion - 1];
-        trim(tituloSeleccionado);
-        cout << "\nLibro seleccionado:" << endl;
-        Libro* libro = buscarLibroPorTitulo(tituloSeleccionado);
-        if (libro) {
-            libro->mostrar();
+        string autorSeleccionado = sugerencias[seleccion - 1];
+        cout << "\nLibros del autor " << autorSeleccionado << ":" << endl;
+        
+        for (Libro* libro : librosPorAutor[autorSeleccionado]) {
+            cout << "Título: " << libro->getTitulo() << endl;
+            cout << "Autor: " << libro->getAutor().getNombre() << endl;
+            cout << "ISNI: " << libro->getAutor().getIsni() << endl;
+            cout << "ISBN: " << libro->getIsbn() << endl;
+            cout << "Fecha de publicación: " << libro->getFechaPublicacion().mostrar() << endl;
+            cout << "Fecha de nacimiento del autor: " << libro->getAutor().getFechaNacimiento().mostrar() << endl;
+            cout << "-----------------------------------" << endl;
         }
         break;
     }
