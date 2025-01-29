@@ -285,43 +285,38 @@ void buscarAutoresPorRango(const std::string& rutaArchivo, int anioInicio, int a
             return;
         }
 
-        vector<tuple<string, string, string, string, string, string>> registros;
+        bool cabeceraImprimida = false;
+        bool autoresEncontrados = false;
         string linea;
+
         while (getline(archivo, linea)) {
             vector<string> campos = dividir(linea, ';');
             if (campos.size() >= 6) {
-                registros.emplace_back(campos[0], campos[1], campos[2], campos[3], campos[4], campos[5]);
+                int anioNacimiento = stoi(campos[3].substr(campos[3].size() - 4));
+                if (anioNacimiento >= anioInicio && anioNacimiento <= anioFin) {
+                    if (!cabeceraImprimida) {
+                        imprimirCabecera();
+                        cabeceraImprimida = true;
+                    }
+
+                    cout << left;
+                    cout << setw(40) << campos[0]
+                        << setw(25) << campos[1]
+                        << setw(22) << campos[2]
+                        << setw(20) << campos[4]
+                        << setw(15) << campos[5]
+                        << campos[3] << endl;
+
+                    autoresEncontrados = true;
+                }
             }
         }
-        archivo.close();
 
-        sort(registros.begin(), registros.end(), [](const auto& a, const auto& b) {
-            return get<3>(a) < get<3>(b); // Ordenar por fecha de nacimiento
-        });
-
-        auto itInicio = lower_bound(registros.begin(), registros.end(), anioInicio, [](const auto& registro, int anio) {
-            return stoi(get<3>(registro).substr(get<3>(registro).size() - 4)) < anio;
-        });
-
-        auto itFin = lower_bound(registros.begin(), registros.end(), anioFin + 1, [](const auto& registro, int anio) {
-            return stoi(get<3>(registro).substr(get<3>(registro).size() - 4)) < anio;
-        });
-
-        if (itInicio == registros.end() || itInicio == itFin) {
+        if (!autoresEncontrados) {
             cout << "No existen autores nacidos entre " << anioInicio << " y " << anioFin << "." << endl;
-            return;
         }
 
-        imprimirCabecera();
-        for (auto it = itInicio; it != itFin; ++it) {
-            cout << left;
-            cout << setw(40) << get<0>(*it)
-                << setw(25) << get<1>(*it)
-                << setw(22) << get<2>(*it)
-                << setw(20) << get<4>(*it)
-                << setw(15) << get<5>(*it)
-                << get<3>(*it) << endl;
-        }
+        archivo.close();
     } catch (const exception& e) {
         cerr << "Error al buscar autores por rango: " << e.what() << endl;
     }
