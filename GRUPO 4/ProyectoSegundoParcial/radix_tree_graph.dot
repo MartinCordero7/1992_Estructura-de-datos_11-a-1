@@ -1,0 +1,11 @@
+digraph G {
+    "root" -> "root_Hola" [label="Hola"];
+    "root" -> "root_D" [label="D"];
+    "root_Hola" -> "root_Hola_s" [label="s"];
+    "root_Hola" [label="Hola", shape=box];
+    "root_D" -> "root_D_inosaurio" [label="inosaurio"];
+    "root_D" -> "root_D_une" [label="une"];
+    "root_Hola_s" [label="Holas", shape=box];
+    "root_D_inosaurio" [label="Dinosaurio", shape=box];
+    "root_D_une" [label="Dune", shape=box];
+}
