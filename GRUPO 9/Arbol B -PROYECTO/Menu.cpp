@@ -1,6 +1,6 @@
 /********************************************************************************************
  *            UNIVERSIDAD DE LAS FUERZAS ARMADAS ESPE                                       *
- * Proposito:                      Archivo principal de proyecto                            *
+ * Proposito:                      Menu principal                                           *
  * Autor:                          Erika Guayanay, Maycol Celi, Jerson Llumiquinga          *
  * Fecha de creacion:              01/12/2024                                               *
  * Fecha de modificacion:          01/01/2025                                               *
@@ -14,8 +14,12 @@
 #include "Validaciones.cpp"
 #include <conio.h> 
 #include <vector>
+#include <ctime>
+#include <iomanip>
+#include <cctype>
 #include <sstream>
 #include <ctime>
+#include "Validaciones.h"
 #include "pdf_generator.h"
 #include <windows.h>
 #include "funciones.h"
@@ -48,6 +52,9 @@ void mostrarMenu(ArbolBTree& arbol) {
         "Buscar por rango",
         "Ordenar lista por nombre (Distribution Sort)",
         "Mostrar archivo de distribución ordenado",
+        "Busqueda de autores por año", // Nueva opción
+        "Busqueda binaria por título", // Nueva opción
+        "Busqueda de autores por caracter", // Nueva opción
         "Salir"
     };
     int seleccion = 0;
@@ -81,12 +88,18 @@ void mostrarMenu(ArbolBTree& arbol) {
                 do {
                     cout << "Ingrese título del libro: ";
                     getline(cin, titulo);
-                } while (!Validaciones::validarTitulo(titulo, "Título"));
+                    if (!Validaciones::contieneLetra(titulo)) {
+                        cout << "Error: El título debe contener al menos una letra." << endl;
+                    }
+                } while (!Validaciones::validarTitulo(titulo, "Título") || !Validaciones::contieneLetra(titulo));
 
                 // Solicitar ISBN
                 do {
-                    cout << "Ingrese ISBN: ";
-                    isbn = Validaciones::leerIsbnIsni();
+                cout << "Ingrese ISBN: ";
+                isbn = Validaciones::leerIsbnIsni();
+                if (!Validaciones::validarIsbn(isbn)) {
+                cout << "El ISBN no es válido, por favor ingrese de nuevo.\n";
+                     }
                 } while (!Validaciones::validarIsbn(isbn));
 
                 // Verificar si el ISBN ya existe
@@ -221,20 +234,17 @@ void mostrarMenu(ArbolBTree& arbol) {
                 arbol.guardarLibrosEnArchivo(); // Asegurarse de que los datos estén actualizados en el archivo
                 const std::string inputFile = "libros.txt";
                 createPDF(inputFile);
+                
             } else if (opciones[seleccion] == "Crear backup") {
-                if (!arbol.verificarArchivoLibros()) {
-                    cout << "No hay libros registrados para crear backup.\n";
-                    cout << "Presione cualquier tecla para continuar...\n";
-                    _getch();
-                    continue;
-                }
-
                 time_t ahora = time(0);
                 tm* tiempo = localtime(&ahora);
-                stringstream ss;
-                ss << (1900 + tiempo->tm_year) << "_" << (1 + tiempo->tm_mon) << "_" << tiempo->tm_mday << "_"
-                   << tiempo->tm_hour << "_" << tiempo->tm_min << "_" << tiempo->tm_sec << ".txt";
-                arbol.crearBackup(ss.str());
+                char buffer[80];
+                strftime(buffer, sizeof(buffer), "%a %b %d %H.%M.%S %Y", tiempo);
+                std::string nombreArchivo(buffer);
+                arbol.crearBackup(nombreArchivo);
+            } else if (opciones[seleccion] == "Salir") {
+                break;
+
             } else if (opciones[seleccion] == "Restaurar backup") {
                 if (!arbol.verificarArchivoLibros()) {
                     cout << "No hay archivos registrados para restaurar.\n";
@@ -249,8 +259,8 @@ void mostrarMenu(ArbolBTree& arbol) {
                 int anioInicio, anioFin;
 
                 while (true) {
-                    anioFin = Validaciones::ingresarAnio("Ingrese el año de fin (0001 a 2024): ");
-                    anioInicio = Validaciones::ingresarAnio("Ingrese el año de inicio (0001 a 2024): ");
+                    anioFin = Validaciones::ingresarAnio("Ingrese el año de fin (desde 1900 hasta el año actual): ");
+                    anioInicio = Validaciones::ingresarAnio("Ingrese el año de inicio (desde 1900 hasta el año actual): ");
 
                     // Validar que el año final sea mayor al inicial
                     if (anioFin > anioInicio) {
@@ -267,6 +277,43 @@ void mostrarMenu(ArbolBTree& arbol) {
                 fusionarArchivos("libros_ordenados.txt");
             } else if (opciones[seleccion] == "Mostrar archivo de distribución ordenado") {
                 mostrarArchivo("libros_ordenados.txt");
+            } else if (opciones[seleccion] == "Busqueda de autores por año") {
+                const std::string inputFile = "libros.txt";
+                int anioInicio, anioFin;
+
+                while (true) {
+                    anioFin = Validaciones::ingresarAnio("Ingrese el año de fin (desde 1900 hasta el año actual): ");
+                    anioInicio = Validaciones::ingresarAnio("Ingrese el año de inicio (desde 1900 hasta el año actual): ");
+
+                    // Validar que el año final sea mayor al inicial
+                    if (anioFin > anioInicio) {
+                        break;
+                    } else {
+                        cout << "Error: El año de fin debe ser mayor al año de inicio, y no pueden ser iguales." << endl;
+                    }
+                }
+
+                cout << "Autores nacidos entre " << anioInicio << " y " << anioFin << ":\n";
+                buscarAutoresPorRango(inputFile, anioInicio, anioFin);
+            } else if (opciones[seleccion] == "Busqueda binaria por título") {
+                const std::string inputFile = "libros.txt";
+                string titulo;
+                cout << "Ingrese el título del libro a buscar: ";
+                getline(cin, titulo);
+                buscarPorTitulo(inputFile, titulo);
+
+            } else if (opciones[seleccion] == "Busqueda de autores por caracter") {
+                const std::string inputFile = "libros.txt";
+                char caracter;
+                cout << "Ingrese el caracter por el cual buscar autores: ";
+                std::string input = Validaciones::leerSoloCaracteres();
+                if (!input.empty()) {
+                    caracter = toupper(input[0]); // Convertir el primer carácter a mayúscula
+                    buscarAutoresPorCaracter(inputFile, caracter);
+                } else {
+                    cout << "Error: No se ingresó un carácter válido.\n";
+                }
+
             } else if (opciones[seleccion] == "Salir") {
                 cout << "Saliendo...\n";
                 break;

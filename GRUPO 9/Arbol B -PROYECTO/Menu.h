@@ -1,6 +1,6 @@
 /********************************************************************************************
  *            UNIVERSIDAD DE LAS FUERZAS ARMADAS ESPE                                       *
- * Proposito:                      Archivo principal de proyecto                            *
+ * Proposito:                      Interfaz Menu principal                                  *
  * Autor:                          Erika Guayanay, Maycol Celi, Jerson Llumiquinga          *
  * Fecha de creacion:              01/12/2024                                               *
  * Fecha de modificacion:          01/01/2025                                               *

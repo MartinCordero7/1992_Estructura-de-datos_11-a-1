@@ -1,6 +1,6 @@
 /********************************************************************************************
  *            UNIVERSIDAD DE LAS FUERZAS ARMADAS ESPE                                       *
- * Proposito:                      Archivo principal de proyecto                            *
+ * Proposito:                      Validaciones de entrada de datos                         *
  * Autor:                          Erika Guayanay, Maycol Celi, Jerson Llumiquinga          *
  * Fecha de creacion:              01/12/2024                                               *
  * Fecha de modificacion:          01/01/2025                                               *
@@ -10,6 +10,7 @@
 
 
 #include "Validaciones.h"
+#include <cctype>
 #include <conio.h> // Para _getch()
 
 // Validación de fecha
@@ -24,8 +25,8 @@ bool Validaciones::validarFecha(const string& fecha) {
         int dia, mes, anio;
         sscanf(fecha.c_str(), "%d-%d-%d", &dia, &mes, &anio);
 
-        if (anio <= 0 || mes < 1 || mes > 12 || dia < 1 || dia > diasEnMes(mes, anio)) {
-            cout << "Error: Fecha no válida.\n";
+        if (anio < 1900 || anio <= 0 || mes < 1 || mes > 12 || dia < 1 || dia > diasEnMes(mes, anio)) {
+            cout << "Error: Fecha no válida. Ingrese nuevamente.\n";
             return false;
         }
 
@@ -55,7 +56,6 @@ bool Validaciones::validarFecha(const string& fecha) {
         return false;
     }
 }
-
 
 // Validación de título y nombre
 bool Validaciones::validarTituloNombre(const string& texto, const string& campo) {
@@ -414,12 +414,12 @@ int Validaciones::ingresarAnio(const string& mensaje) {
         // Validar que el año sea numérico y tenga 4 dígitos
         try {
             anio = stoi(input);  // Convertimos la entrada a entero
-            if (anio < 1 || anio > 2024) {
+            if (anio < 1900 || anio > 2025) {
                 throw invalid_argument("Año fuera de rango.");
             }
             break;  // Salimos del bucle si el año es válido
         } catch (const invalid_argument& e) {
-            cout << "Error: Ingrese un año válido de 4 dígitos entre 0001 y 2024." << endl;
+            cout << "Error: Ingrese un año válido de 4 dígitos desde 1900 hasta el año actual." << endl;
         } catch (const out_of_range& e) {
             cout << "Error: El año ingresado está fuera de rango." << endl;
         }
@@ -466,6 +466,36 @@ string Validaciones::leerIsbnIsni() {
         return input;
     } catch (const exception& e) {
         cerr << "Error al leer ISBN/ISNI: " << e.what() << endl;
+        return "";
+    }
+}
+
+bool Validaciones::contieneLetra(const std::string& titulo) {
+    for (char c : titulo) {
+        if (std::isalpha(c)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::string Validaciones::leerSoloCaracteres() {
+    try {
+        std::string input;
+        char ch;
+        while ((ch = _getch()) != '\r') { // Leer hasta que se presione Enter
+            if (isalpha(ch) && input.empty()) { // Permitir solo un carácter alfabético
+                std::cout << ch;
+                input += ch;
+            } else if (ch == '\b' && !input.empty()) { // Permitir backspace
+                std::cout << "\b \b";
+                input.pop_back();
+            }
+        }
+        std::cout << std::endl;
+        return input;
+    } catch (const std::exception& e) {
+        std::cerr << "Error al leer solo caracteres: " << e.what() << std::endl;
         return "";
     }
 }

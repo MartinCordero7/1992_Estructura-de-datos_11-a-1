@@ -1,6 +1,6 @@
 /********************************************************************************************
  *            UNIVERSIDAD DE LAS FUERZAS ARMADAS ESPE                                       *
- * Proposito:                      Archivo principal de proyecto                            *
+ * Proposito:                      Archivo de funciones.cpp                                 *
  * Autor:                          Erika Guayanay, Maycol Celi, Jerson Llumiquinga          *
  * Fecha de creacion:              01/12/2024                                               *
  * Fecha de modificacion:          01/01/2025                                               *
@@ -274,5 +274,151 @@ void eliminarDeCubeta(const string& titulo) {
         }
     } catch (const exception& e) {
         cerr << "Error al eliminar del archivo de cubeta: " << e.what() << endl;
+    }
+}
+
+void buscarAutoresPorRango(const std::string& rutaArchivo, int anioInicio, int anioFin) {
+    try {
+        ifstream archivo(rutaArchivo);
+        if (!archivo.is_open()) {
+            cerr << "No se pudo abrir el archivo." << endl;
+            return;
+        }
+
+        vector<tuple<string, string, string, string, string, string>> registros;
+        string linea;
+        while (getline(archivo, linea)) {
+            vector<string> campos = dividir(linea, ';');
+            if (campos.size() >= 6) {
+                registros.emplace_back(campos[0], campos[1], campos[2], campos[3], campos[4], campos[5]);
+            }
+        }
+        archivo.close();
+
+        sort(registros.begin(), registros.end(), [](const auto& a, const auto& b) {
+            return get<3>(a) < get<3>(b); // Ordenar por fecha de nacimiento
+        });
+
+        auto itInicio = lower_bound(registros.begin(), registros.end(), anioInicio, [](const auto& registro, int anio) {
+            return stoi(get<3>(registro).substr(get<3>(registro).size() - 4)) < anio;
+        });
+
+        auto itFin = upper_bound(registros.begin(), registros.end(), anioFin, [](int anio, const auto& registro) {
+            return anio < stoi(get<3>(registro).substr(get<3>(registro).size() - 4));
+        });
+
+        if (itInicio == registros.end() || itInicio == itFin) {
+            cout << "No existen autores nacidos entre " << anioInicio << " y " << anioFin << "." << endl;
+            return;
+        }
+
+        imprimirCabecera();
+        for (auto it = itInicio; it != itFin; ++it) {
+            cout << left;
+            cout << setw(40) << get<0>(*it)
+                << setw(25) << get<1>(*it)
+                << setw(22) << get<2>(*it)
+                << setw(20) << get<4>(*it)
+                << setw(15) << get<5>(*it)
+                << get<3>(*it) << endl;
+        }
+    } catch (const exception& e) {
+        cerr << "Error al buscar autores por rango: " << e.what() << endl;
+    }
+}
+
+void buscarPorTitulo(const string& rutaArchivo, const string& titulo) {
+    try {
+        ifstream archivo(rutaArchivo);
+        if (!archivo.is_open()) {
+            cerr << "No se pudo abrir el archivo." << endl;
+            return;
+        }
+
+        vector<tuple<string, string, string, string, string, string>> registros;
+        string linea;
+        while (getline(archivo, linea)) {
+            vector<string> campos = dividir(linea, ';');
+            if (campos.size() >= 6) {
+                registros.emplace_back(campos[0], campos[1], campos[2], campos[3], campos[4], campos[5]);
+            }
+        }
+        archivo.close();
+
+        sort(registros.begin(), registros.end(), [](const auto& a, const auto& b) {
+            return get<0>(a) < get<0>(b); // Ordenar por título
+        });
+
+        auto it = lower_bound(registros.begin(), registros.end(), titulo, [](const auto& registro, const string& titulo) {
+            return get<0>(registro) < titulo;
+        });
+
+        if (it == registros.end() || get<0>(*it) != titulo) {
+            cout << "No se encontraron libros con el título: " << titulo << "." << endl;
+            return;
+        }
+
+        imprimirCabecera();
+        while (it != registros.end() && get<0>(*it) == titulo) {
+            cout << left;
+            cout << setw(40) << get<0>(*it)
+                << setw(25) << get<1>(*it)
+                << setw(22) << get<2>(*it)
+                << setw(20) << get<4>(*it)
+                << setw(15) << get<5>(*it)
+                << get<3>(*it) << endl;
+            ++it;
+        }
+    } catch (const exception& e) {
+        cerr << "Error al buscar por título: " << e.what() << endl;
+    }
+}
+
+void buscarAutoresPorCaracter(const std::string& rutaArchivo, char caracter) {
+    try {
+        ifstream archivo(rutaArchivo);
+        if (!archivo.is_open()) {
+            cerr << "No se pudo abrir el archivo." << endl;
+            return;
+        }
+
+        vector<tuple<string, string, string, string, string, string>> registros;
+        string linea;
+        while (getline(archivo, linea)) {
+            vector<string> campos = dividir(linea, ';');
+            if (campos.size() >= 6) {
+                registros.emplace_back(campos[0], campos[1], campos[2], campos[3], campos[4], campos[5]);
+            }
+        }
+        archivo.close();
+
+        sort(registros.begin(), registros.end(), [](const auto& a, const auto& b) {
+            return get<1>(a) < get<1>(b); // Ordenar por nombre del autor
+        });
+
+        caracter = toupper(caracter); // Convertir el carácter a mayúscula
+
+        auto it = lower_bound(registros.begin(), registros.end(), caracter, [](const auto& registro, char caracter) {
+            return toupper(get<1>(registro)[0]) < caracter;
+        });
+
+        if (it == registros.end() || toupper(get<1>(*it)[0]) != caracter) {
+            cout << "No se encontraron autores que comiencen con la letra: " << caracter << "." << endl;
+            return;
+        }
+
+        imprimirCabecera();
+        while (it != registros.end() && toupper(get<1>(*it)[0]) == caracter) {
+            cout << left;
+            cout << setw(40) << get<0>(*it)
+                << setw(25) << get<1>(*it)
+                << setw(22) << get<2>(*it)
+                << setw(20) << get<4>(*it)
+                << setw(15) << get<5>(*it)
+                << get<3>(*it) << endl;
+            ++it;
+        }
+    } catch (const exception& e) {
+        cerr << "Error al buscar autores por caracter: " << e.what() << endl;
     }
 }

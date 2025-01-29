@@ -1,6 +1,6 @@
 /********************************************************************************************
  *            UNIVERSIDAD DE LAS FUERZAS ARMADAS ESPE                                       *
- * Proposito:                      Archivo principal de proyecto                            *
+ * Proposito:                      ArbolBtree.cpp                                           *
  * Autor:                          Erika Guayanay, Maycol Celi, Jerson Llumiquinga          *
  * Fecha de creacion:              01/12/2024                                               *
  * Fecha de modificacion:          01/01/2025                                               *
@@ -15,6 +15,7 @@
 #include <fstream>
 #include <functional>
 #include <sstream>
+#include <ctime>
 #include <iomanip>
 
 ArbolBTree::ArbolBTree(int t) : raiz(nullptr), t(t) {
@@ -432,6 +433,23 @@ void ArbolBTree::imprimirLibros() {
     }
 }
 
+
+
+
+bool ArbolBTree::verificarArchivoLibros() {
+    std::ifstream archivo("libros.txt");
+    if (!archivo.is_open()) {
+        std::cout << "Libros no registrados.\n";
+        return false;
+    }
+    archivo.close();
+    return true;
+}
+
+int ArbolBTree::getT() const {
+    return t;
+}
+
 void ArbolBTree::crearBackup(const std::string& nombreArchivo) {
     try {
         std::string carpetaBackup = "backup";  // Carpeta donde se almacenan los backups
@@ -440,7 +458,7 @@ void ArbolBTree::crearBackup(const std::string& nombreArchivo) {
         BackupManager::crearCarpetaSiNoExiste(carpetaBackup);
 
         // Crear la ruta completa para el archivo de backup dentro de la carpeta "backup"
-        std::string rutaCompleta = carpetaBackup + "\\" + nombreArchivo;
+        std::string rutaCompleta = carpetaBackup + "\\" + nombreArchivo + ".txt"; // Agregar la extensión .txt
 
         // Crear el archivo de backup
         std::ofstream archivo(rutaCompleta);
@@ -474,18 +492,4 @@ void ArbolBTree::crearBackup(const std::string& nombreArchivo) {
     } catch (const std::exception& e) {
         std::cerr << "Error al crear backup: " << e.what() << std::endl;
     }
-}
-
-bool ArbolBTree::verificarArchivoLibros() {
-    std::ifstream archivo("libros.txt");
-    if (!archivo.is_open()) {
-        std::cout << "Libros no registrados.\n";
-        return false;
-    }
-    archivo.close();
-    return true;
-}
-
-int ArbolBTree::getT() const {
-    return t;
 }

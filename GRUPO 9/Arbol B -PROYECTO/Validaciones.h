@@ -1,6 +1,6 @@
 /********************************************************************************************
  *            UNIVERSIDAD DE LAS FUERZAS ARMADAS ESPE                                       *
- * Proposito:                      Archivo principal de proyecto                            *
+ * Proposito:                      Interfaz para Validaciones de entrada de datos           *
  * Autor:                          Erika Guayanay, Maycol Celi, Jerson Llumiquinga          *
  * Fecha de creacion:              01/12/2024                                               *
  * Fecha de modificacion:          01/01/2025                                               *
@@ -36,7 +36,8 @@ public:
     static int ingresarAnio(const string& mensaje); // Declaration for ingresarAnio
     static string leerSoloNumeros(); // Declaration for leerSoloNumeros
     static string leerIsbnIsni(); // Declaration for leerIsbnIsni
-
+    static bool contieneLetra(const std::string& titulo); // Declaration for contieneLetra
+    static std::string leerSoloCaracteres(); // Declaración de la nueva función
 private:
     static int diasEnMes(int mes, int anio);
     static bool esBisiesto(int anio);
