@@ -242,9 +242,6 @@ void mostrarMenu(ArbolBTree& arbol) {
                 strftime(buffer, sizeof(buffer), "%a %b %d %H.%M.%S %Y", tiempo);
                 std::string nombreArchivo(buffer);
                 arbol.crearBackup(nombreArchivo);
-            } else if (opciones[seleccion] == "Salir") {
-                break;
-
             } else if (opciones[seleccion] == "Restaurar backup") {
                 if (!arbol.verificarArchivoLibros()) {
                     cout << "No hay archivos registrados para restaurar.\n";
@@ -298,10 +295,16 @@ void mostrarMenu(ArbolBTree& arbol) {
             } else if (opciones[seleccion] == "Busqueda binaria por título") {
                 const std::string inputFile = "libros.txt";
                 string titulo;
-                cout << "Ingrese el título del libro a buscar: ";
-                getline(cin, titulo);
-                buscarPorTitulo(inputFile, titulo);
+                // Solicitar título del libro
+                do {
+                    cout << "Ingrese el título del libro a buscar: ";
+                    getline(cin, titulo);
+                    if (!Validaciones::contieneLetra(titulo)) {
+                        cout << "Error: El título debe contener al menos una letra." << endl;
+                    }
+                } while (!Validaciones::validarTitulo(titulo, "Título") || !Validaciones::contieneLetra(titulo));
 
+                buscarPorTitulo(inputFile, titulo);
             } else if (opciones[seleccion] == "Busqueda de autores por caracter") {
                 const std::string inputFile = "libros.txt";
                 char caracter;
@@ -313,7 +316,6 @@ void mostrarMenu(ArbolBTree& arbol) {
                 } else {
                     cout << "Error: No se ingresó un carácter válido.\n";
                 }
-
             } else if (opciones[seleccion] == "Salir") {
                 cout << "Saliendo...\n";
                 break;

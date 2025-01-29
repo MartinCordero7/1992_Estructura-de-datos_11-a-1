@@ -303,8 +303,8 @@ void buscarAutoresPorRango(const std::string& rutaArchivo, int anioInicio, int a
             return stoi(get<3>(registro).substr(get<3>(registro).size() - 4)) < anio;
         });
 
-        auto itFin = upper_bound(registros.begin(), registros.end(), anioFin, [](int anio, const auto& registro) {
-            return anio < stoi(get<3>(registro).substr(get<3>(registro).size() - 4));
+        auto itFin = lower_bound(registros.begin(), registros.end(), anioFin + 1, [](const auto& registro, int anio) {
+            return stoi(get<3>(registro).substr(get<3>(registro).size() - 4)) < anio;
         });
 
         if (itInicio == registros.end() || itInicio == itFin) {
@@ -359,15 +359,14 @@ void buscarPorTitulo(const string& rutaArchivo, const string& titulo) {
         }
 
         imprimirCabecera();
-        while (it != registros.end() && get<0>(*it) == titulo) {
+        for (auto it2 = it; it2 != registros.end() && get<0>(*it2) == titulo; ++it2) {
             cout << left;
-            cout << setw(40) << get<0>(*it)
-                << setw(25) << get<1>(*it)
-                << setw(22) << get<2>(*it)
-                << setw(20) << get<4>(*it)
-                << setw(15) << get<5>(*it)
-                << get<3>(*it) << endl;
-            ++it;
+            cout << setw(40) << get<0>(*it2)
+                << setw(25) << get<1>(*it2)
+                << setw(22) << get<2>(*it2)
+                << setw(20) << get<4>(*it2)
+                << setw(15) << get<5>(*it2)
+                << get<3>(*it2) << endl;
         }
     } catch (const exception& e) {
         cerr << "Error al buscar por título: " << e.what() << endl;
@@ -408,15 +407,14 @@ void buscarAutoresPorCaracter(const std::string& rutaArchivo, char caracter) {
         }
 
         imprimirCabecera();
-        while (it != registros.end() && toupper(get<1>(*it)[0]) == caracter) {
+        for (auto it2 = it; it2 != registros.end() && toupper(get<1>(*it2)[0]) == caracter; ++it2) {
             cout << left;
-            cout << setw(40) << get<0>(*it)
-                << setw(25) << get<1>(*it)
-                << setw(22) << get<2>(*it)
-                << setw(20) << get<4>(*it)
-                << setw(15) << get<5>(*it)
-                << get<3>(*it) << endl;
-            ++it;
+            cout << setw(40) << get<0>(*it2)
+                << setw(25) << get<1>(*it2)
+                << setw(22) << get<2>(*it2)
+                << setw(20) << get<4>(*it2)
+                << setw(15) << get<5>(*it2)
+                << get<3>(*it2) << endl;
         }
     } catch (const exception& e) {
         cerr << "Error al buscar autores por caracter: " << e.what() << endl;
