@@ -1,9 +1,9 @@
 /********************************************************************************************
  *            UNIVERSIDAD DE LAS FUERZAS ARMADAS ESPE                                       *
- * Proposito:                      Menu principal                                           *
- * Autor:                          Abner Arboleda, Christian Acuña, Christian Bonifaz       *
+ * Proposito:                      Archivo principal de proyecto                            *
+ * Autor:                          Erika Guayanay, Maycol Celi, Jerson Llumiquinga          *
  * Fecha de creacion:              01/12/2024                                               *
- * Fecha de modificacion:          08/11/2024                                               *
+ * Fecha de modificacion:          01/01/2025                                               *
  * Materia:                        Estructura de datos                                      *
  * NRC :                           1992                                                     *
  ********************************************************************************************/
@@ -31,6 +31,11 @@ std::wstring getExecutablePath() {
     return path.substr(0, path.find_last_of(L"\\/"));
 }
 
+void setConsoleColor(int color) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, color);
+}
+
 void mostrarMenu(ArbolBTree& arbol) {
     vector<string> opciones = {
         "Agregar libro",
@@ -52,10 +57,13 @@ void mostrarMenu(ArbolBTree& arbol) {
         system("cls");
         cout << "=== Menu Principal ===\n";
         for (size_t i = 0; i < opciones.size(); ++i) {
-            if (i == static_cast<int>(seleccion))
+            if (i == static_cast<int>(seleccion)) {
+                setConsoleColor(11); // Set color to blue
                 cout << ">> " << opciones[i] << " <<\n";
-            else
+                setConsoleColor(7); // Reset to default color
+            } else {
                 cout << "   " << opciones[i] << endl;
+            }
         }
 
         char tecla = _getch();
@@ -140,10 +148,17 @@ void mostrarMenu(ArbolBTree& arbol) {
                     arbol.insertar(libro);
                 }
             } else if (opciones[seleccion] == "Buscar libro") {
+                if (!arbol.verificarArchivoLibros()) {
+                    cout << "No hay libros registrados para buscar.\n";
+                    cout << "Presione cualquier tecla para continuar...\n";
+                    _getch();
+                    continue;
+                }
+
                 string isbn;
                 while (true) {
                     cout << "Ingrese el ISBN del libro a buscar: ";
-                    isbn = Validaciones::leerIsbnIsni();
+                    isbn= Validaciones::leerIsbnIsni();
                     if (isbn.empty()) {
                         cout << "Error: La entrada no puede estar vacía.\n";
                         break;
@@ -165,10 +180,17 @@ void mostrarMenu(ArbolBTree& arbol) {
                     }
                 }
             } else if (opciones[seleccion] == "Eliminar libro") {
+                if (!arbol.verificarArchivoLibros()) {
+                    cout << "No hay libros registrados para eliminar.\n";
+                    cout << "Presione cualquier tecla para continuar...\n";
+                    _getch();
+                    continue;
+                }
+
                 string isbn;
                 while (true) {
                     cout << "Ingrese el ISBN del libro a eliminar: ";
-                    isbn = Validaciones::leerIsbnIsni();
+                    isbn= Validaciones::leerIsbnIsni();
                     if (isbn.empty()) {
                         cout << "Error: La entrada no puede estar vacía.\n";
                         break;
@@ -180,15 +202,8 @@ void mostrarMenu(ArbolBTree& arbol) {
                     // Eliminar usando ISBN
                     NodoBTree* libroAEliminar = arbol.buscarLibroPorIsbn(isbn);
                     if (libroAEliminar) {
-                        string titulo;
-                        for (const auto& libro : libroAEliminar->claves) {
-                            if (libro.getIsbn() == isbn) {
-                                titulo = libro.getTitulo();
-                                break;
-                            }
-                        }
-                        arbol.eliminar(titulo);
-                        eliminarDeCubeta(titulo); // Use the new function
+                        arbol.eliminar(isbn);
+                        eliminarDeCubeta(isbn); // Use the new function
                     } else {
                         cout << "Libro no encontrado con ISBN: " << isbn << endl;
                     }
@@ -196,10 +211,24 @@ void mostrarMenu(ArbolBTree& arbol) {
             } else if (opciones[seleccion] == "Ver todos los libros") {
                 arbol.imprimirLibros();
             } else if (opciones[seleccion] == "Exportar en archivo PDF") {
+                if (!arbol.verificarArchivoLibros()) {
+                    cout << "No hay libros registrados para exportar.\n";
+                    cout << "Presione cualquier tecla para continuar...\n";
+                    _getch();
+                    continue;
+                }
+
                 arbol.guardarLibrosEnArchivo(); // Asegurarse de que los datos estén actualizados en el archivo
                 const std::string inputFile = "libros.txt";
                 createPDF(inputFile);
             } else if (opciones[seleccion] == "Crear backup") {
+                if (!arbol.verificarArchivoLibros()) {
+                    cout << "No hay libros registrados para crear backup.\n";
+                    cout << "Presione cualquier tecla para continuar...\n";
+                    _getch();
+                    continue;
+                }
+
                 time_t ahora = time(0);
                 tm* tiempo = localtime(&ahora);
                 stringstream ss;
@@ -207,6 +236,13 @@ void mostrarMenu(ArbolBTree& arbol) {
                    << tiempo->tm_hour << "_" << tiempo->tm_min << "_" << tiempo->tm_sec << ".txt";
                 arbol.crearBackup(ss.str());
             } else if (opciones[seleccion] == "Restaurar backup") {
+                if (!arbol.verificarArchivoLibros()) {
+                    cout << "No hay archivos registrados para restaurar.\n";
+                    cout << "Presione cualquier tecla para continuar...\n";
+                    _getch();
+                    continue;
+                }
+
                 BackupManager::restaurarBackup(arbol);  // Llama a la función para restaurar el backup
             } else if (opciones[seleccion] == "Buscar por rango") {
                 const std::string inputFile12 = "libros.txt";

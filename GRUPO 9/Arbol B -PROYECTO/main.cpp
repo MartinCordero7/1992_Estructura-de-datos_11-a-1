@@ -1,9 +1,9 @@
 /********************************************************************************************
  *            UNIVERSIDAD DE LAS FUERZAS ARMADAS ESPE                                       *
  * Proposito:                      Archivo principal de proyecto                            *
- * Autor:                          Abner Arboleda, Christian Acuña, Christian Bonifaz       *
+ * Autor:                          Erika Guayanay, Maycol Celi, Jerson Llumiquinga          *
  * Fecha de creacion:              01/12/2024                                               *
- * Fecha de modificacion:          08/11/2024                                               *
+ * Fecha de modificacion:          01/01/2025                                               *
  * Materia:                        Estructura de datos                                      *
  * NRC :                           1992                                                     *
  ********************************************************************************************/
