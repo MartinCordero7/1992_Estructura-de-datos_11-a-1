@@ -2,6 +2,7 @@
 #define TRIE_H
 
 #include <vector>
+#include <list>  // Cambiar vector por list
 #include <map>
 #include <string>
 
@@ -11,7 +12,7 @@ private:
     std::map<char, Trie*> children;
 
     struct SubtreeInfo {
-        std::vector<std::string> lines;
+        std::list<std::string> lines;
         int width;
         int root_pos;
     };

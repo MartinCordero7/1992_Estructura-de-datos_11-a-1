@@ -45,19 +45,19 @@ Trie::SubtreeInfo Trie::buildSubtree(char c) {
     if (isLeaf) node_str += "*";
     
     if (children.empty()) {
-        info.lines = {node_str};
+        info.lines.push_back(node_str);
         info.width = node_str.size();
         info.root_pos = 0;
         return info;
     }
 
-    std::vector<SubtreeInfo> childSubtrees;
+    std::list<SubtreeInfo> childSubtrees;
     for (auto& pair : children) {
         childSubtrees.push_back(pair.second->buildSubtree(pair.first));
     }
 
     int total_width = 0;
-    std::vector<int> widths;
+    std::list<int> widths;
     for (auto& st : childSubtrees) {
         total_width += st.width + 2;
         widths.push_back(st.width);
@@ -69,39 +69,43 @@ Trie::SubtreeInfo Trie::buildSubtree(char c) {
         max_height = std::max(max_height, (int)st.lines.size());
     }
 
-    std::vector<std::string> lines(max_height + 2, std::string(total_width, ' '));
+    // Crear las líneas iniciales
+    for (int i = 0; i < max_height + 2; i++) {
+        info.lines.push_back(std::string(total_width, ' '));
+    }
+
     int root_x = total_width / 2;
     
     // Nodo actual
-    lines[0].replace(
-        root_x - node_str.size()/2, 
-        node_str.size(), 
-        node_str
-    );
+    auto first_line = info.lines.begin();
+    first_line->replace(root_x - node_str.size()/2, node_str.size(), node_str);
 
     // Conexiones
-    std::string& conn_line = lines[1];
+    auto conn_line = std::next(info.lines.begin());
     int child_x = 0;
-    for (size_t i = 0; i < childSubtrees.size(); ++i) {
-        int child_root = child_x + childSubtrees[i].root_pos;
-        conn_line[child_root] = (i == 0) ? '/' : '\\';
-        child_x += widths[i] + 2;
+    auto childIt = childSubtrees.begin();
+    auto widthIt = widths.begin();
+    
+    for (size_t i = 0; childIt != childSubtrees.end(); ++i, ++childIt, ++widthIt) {
+        int child_root = child_x + childIt->root_pos;
+        (*conn_line)[child_root] = (i == 0) ? '/' : '\\';
+        child_x += *widthIt + 2;
     }
 
     // Subárboles
     child_x = 0;
-    for (size_t i = 0; i < childSubtrees.size(); ++i) {
-        for (size_t line = 0; line < childSubtrees[i].lines.size(); ++line) {
-            lines[line + 2].replace(
-                child_x, 
-                childSubtrees[i].lines[line].size(), 
-                childSubtrees[i].lines[line]
-            );
+    for (auto& subtree : childSubtrees) {
+        auto lineIt = std::next(info.lines.begin(), 2);
+        auto subtreeLineIt = subtree.lines.begin();
+        
+        while (subtreeLineIt != subtree.lines.end()) {
+            lineIt->replace(child_x, subtreeLineIt->size(), *subtreeLineIt);
+            ++lineIt;
+            ++subtreeLineIt;
         }
-        child_x += widths[i] + 2;
+        child_x += subtree.width + 2;
     }
 
-    info.lines = lines;
     info.width = total_width;
     info.root_pos = root_x;
     return info;
@@ -109,12 +113,12 @@ Trie::SubtreeInfo Trie::buildSubtree(char c) {
 
 void Trie::printTree() {
     SubtreeInfo root_info;
-    root_info.lines = {"root"};
+    root_info.lines.push_back("root");
     root_info.width = 4;
     root_info.root_pos = 2;
 
     if (!children.empty()) {
-        std::vector<SubtreeInfo> childSubtrees;
+        std::list<SubtreeInfo> childSubtrees;
         for (auto& pair : children) {
             childSubtrees.push_back(pair.second->buildSubtree(pair.first));
         }
@@ -125,32 +129,42 @@ void Trie::printTree() {
         }
         if (!childSubtrees.empty()) total_width -= 2;
 
-        std::vector<std::string> lines(childSubtrees[0].lines.size() + 2, std::string(total_width, ' '));
-        lines[0].replace(total_width/2 - 2, 4, "root");
+        // Crear lista de líneas
+        std::list<std::string> lines;
+        auto firstChild = childSubtrees.front();
+        for (size_t i = 0; i < firstChild.lines.size() + 2; i++) {
+            lines.push_back(std::string(total_width, ' '));
+        }
+
+        // Root node
+        auto firstLine = lines.begin();
+        firstLine->replace(total_width/2 - 2, 4, "root");
 
         // Conexiones
-        std::string& conn_line = lines[1];
+        auto connLine = std::next(lines.begin());
         int current_x = 0;
-        for (size_t i = 0; i < childSubtrees.size(); ++i) {
-            int child_root = current_x + childSubtrees[i].root_pos;
-            conn_line[child_root] = (i == 0) ? '/' : '\\';
-            current_x += childSubtrees[i].width + 2;
+        for (auto& child : childSubtrees) {
+            int child_root = current_x + child.root_pos;
+            (*connLine)[child_root] = (current_x == 0) ? '/' : '\\';
+            current_x += child.width + 2;
         }
 
         // Subárboles
         current_x = 0;
         for (auto& st : childSubtrees) {
-            for (size_t line = 0; line < st.lines.size(); ++line) {
-                lines[line + 2].replace(
-                    current_x, 
-                    st.lines[line].size(), 
-                    st.lines[line]
-                );
+            auto lineIt = std::next(lines.begin(), 2);
+            auto stLineIt = st.lines.begin();
+            
+            while (stLineIt != st.lines.end()) {
+                lineIt->replace(current_x, stLineIt->size(), *stLineIt);
+                ++lineIt;
+                ++stLineIt;
             }
             current_x += st.width + 2;
         }
 
-        for (auto& line : lines) {
+        // Imprimir líneas
+        for (const auto& line : lines) {
             std::cout << line << std::endl;
         }
     } else {
