@@ -2,11 +2,14 @@
 #include <iostream>
 #include <limits>
 #include <locale>
-#include <cctype> // Para usar isalpha y toupper
-#include <cstdlib> // Para usar system("cls") y system("pause")
+#include <cctype>
+#include <cstdlib>
+#include <graphics.h>
+#include <conio.h> // Para _getch()
 
 using namespace std;
 
+// Función para limpiar el búfer de entrada
 void clearInputBuffer() {
     cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -16,24 +19,25 @@ void clearInputBuffer() {
 string leerPalabraSinNumeros() {
     string palabra;
     char c;
+    cout << "Ingrese una palabra (solo letras, los demás caracteres serán ignorados): ";
     while (true) {
         c = cin.get(); // Lee un carácter
-        if (c == '\n') { // Si el usuario presiona Enter, termina la lectura
+        if (c == '\n') { // Termina la lectura al presionar Enter
             break;
         }
         if (isalpha(c)) { // Solo permite letras
-            palabra += toupper(c); // Convierte a mayúscula y agrega a la palabra
+            palabra += toupper(c); // Convierte a mayúscula
         }
-        // Los números y otros caracteres simplemente se ignoran
     }
     return palabra;
 }
 
+// Función para mostrar el menú principal
 void mostrarMenu() {
     cout << "\n--- Menu del Trie ---\n";
-    cout << "1. Insertar palabra\n";
-    cout << "2. Eliminar palabra\n";
-    cout << "3. Imprimir Arbol\n";
+    cout << "1. Insertar Titulo\n";
+    cout << "2. Eliminar Titulo\n";
+    cout << "3. Imprimir Arbol (Modo Grafico)\n";
     cout << "4. Recorrido infijo (ordenado)\n";
     cout << "5. Imprimir datos (Altura, Profundidad, Nivel)\n";
     cout << "6. Salir\n";
@@ -41,93 +45,88 @@ void mostrarMenu() {
 }
 
 int main() {
-    // Configurar la consola para usar la configuración regional predeterminada del sistema
     setlocale(LC_ALL, "");
-    Trie root;
-    int opcion;
-    string palabra;
-    int contador = 0;
+    Trie root; // Instancia del Trie
+    int opcion; // Opción seleccionada por el usuario
+    int contador = 0; // Contador de elementos en el Trie
+    string palabra; // Variable para almacenar las palabras ingresadas
 
-    system("cls"); // Limpiar la consola al iniciar el programa
+    system("cls");
 
     do {
         mostrarMenu();
         cin >> opcion;
-        clearInputBuffer(); // Limpiar el buffer después de leer la opción
-        system("cls"); // Limpiar la consola después de seleccionar una opción
+        clearInputBuffer(); // Limpia el búfer después de leer la opción
+        system("cls");
 
         switch (opcion) {
-            case 1: {
-                cout << "Ingrese el titulo a insertar: ";
-                palabra = leerPalabraSinNumeros(); // Lee la palabra sin números
-
-                if (palabra.empty()) {
-                    cout << "Error: La palabra no puede estar vacia. Intente nuevamente.\n";
-                } else if (root.search(palabra)) {
-                    cout << "Error: La palabra '" << palabra << "' ya existe en el Trie.\n";
-                } else {
+            case 1: // Insertar Título
+                palabra = leerPalabraSinNumeros();
+                if (!palabra.empty()) {
                     root.insert(palabra);
-                    cout << "Palabra '" << palabra << "' insertada.\n";
                     contador++;
+                    cout << "Palabra '" << palabra << "' insertada correctamente.\n";
+                } else {
+                    cout << "Error: No se ingresaron letras válidas.\n";
                 }
                 break;
-            }
 
-            case 2: {
-                if (contador == 0) {
-                    cout << "No hay titulos para eliminar\n";
-                } else {
-                    cout << "Ingrese el titulo a eliminar: ";
-                    palabra = leerPalabraSinNumeros(); // Lee la palabra sin números
-
-                    if (palabra.empty()) {
-                        cout << "Error: La palabra no puede estar vacia. Intente nuevamente.\n";
-                    } else if (root.search(palabra)) {
-                        root.deletion(palabra);
-                        cout << "Palabra '" << palabra << "' eliminada.\n";
+            case 2: // Eliminar Título
+                palabra = leerPalabraSinNumeros();
+                if (!palabra.empty()) {
+                    if (root.deletion(palabra)) {
                         contador--;
+                        cout << "Palabra '" << palabra << "' eliminada correctamente.\n";
                     } else {
-                        cout << "La palabra '" << palabra << "' no existe en el árbol.\n";
+                        cout << "La palabra '" << palabra << "' no existe en el Trie.\n";
                     }
-                }
-                break;
-            }
-
-            case 3:
-                if (contador >= 2) {
-                    cout << "\nEstructura del Arbol:\n";
-                    root.printTree();
                 } else {
-                    cout << "No se puede imprimir el arbol con menos de 2 palabras\n";
+                    cout << "Error: No se ingresaron letras válidas.\n";
                 }
                 break;
 
-            case 4:
+            case 3: // Imprimir Árbol (Modo Gráfico)
                 if (contador >= 2) {
-                    cout << "\nPalabras en orden infijo:\n";
+                    cout << "Mostrando arbol en modo grafico...\n";
+                    root.printTree();
+                    cout << "Presione cualquier tecla para continuar...\n";
+                    _getch(); // Pausa hasta que se presione una tecla
+                } else {
+                    cout << "Error: El arbol debe tener al menos 2 elementos para mostrarlo.\n";
+                }
+                break;
+
+            case 4: // Recorrido infijo (ordenado)
+                if (contador >= 2) {
+                    cout << "Recorrido infijo (ordenado):\n";
                     root.printInOrder();
                 } else {
-                    cout << "No se puede imprimir el orden con menos de 2 palabras\n";
+                    cout << "Error: El arbol debe tener al menos 2 elementos para mostrar el recorrido.\n";
                 }
                 break;
 
-            case 5:
+            case 5: // Imprimir datos (Altura, Profundidad, Nivel)
                 if (contador >= 2) {
-                    cout << "\nDatos del Trie:\n";
-                    cout << "Altura: " << root.getHeight() << endl;
-                    cout << "Profundidad: " << root.getDepth() << endl;
-                    cout << "Nivel: " << root.getLevel() << endl;
+                    cout << "Altura del arbol: " << root.getHeight() << endl;
+                    cout << "Profundidad del arbol: " << root.getDepth() << endl;
+                    cout << "Nivel maximo del arbol: " << root.getLevel() << endl;
                 } else {
-                    cout << "No se puede imprimir los datos con menos de 2 palabras\n";
+                    cout << "Error: El arbol debe tener al menos 2 elementos para mostrar sus datos.\n";
                 }
                 break;
 
-            case 6:
-                cout << "Saliendo...\n";
+            case 6: // Salir
+                cout << "Saliendo del programa...\n";
                 break;
 
             default:
-                wcout << L"Opción inválida. Intente nuevamente.\n";
+                cout << "Opcion invalida. Por favor, intente nuevamente.\n";
+        }
+
+        if (opcion != 6) {
+            cout << "\nPresione Enter para continuar...";
+            cin.get(); // Espera a que el usuario presione Enter
+            system("cls");
         }
 
     } while (opcion != 6);
