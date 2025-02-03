@@ -26,7 +26,7 @@ private:
     Trie trie;
     string archivoLibros = "libros.txt";  // Archivo donde se guardarán los libros
     bool evitarGuardar = false;           // Bandera para controlar el guardado
-    vector<Libro> libros;
+    list<Libro> libros;
 public:
     // Agregar libro
     void agregarLibro(const Libro& libro);
@@ -53,8 +53,8 @@ public:
     // Limpiar la lista
     void limpiarLista();
     // Buscar libro con autocompletado
-    vector<string> buscarLibroConAutocompletado(const string& prefijo);
-    vector<string> buscarLibroConErroresTipograficos(const string& prefijo);
+    list<string> buscarLibroConAutocompletado(const string& prefijo);
+    list<string> buscarLibroConErroresTipograficos(const string& prefijo);
     void imprimirTitulosLibros() const; // Declaración del método imprimirTitulosLibros
     void listarLibrosPorLetra(const char letra); // Declaración del método listarLibrosPorLetra
     void buscarLibroCortoLargo(); // Declaración del método buscarLibroCortoLargo

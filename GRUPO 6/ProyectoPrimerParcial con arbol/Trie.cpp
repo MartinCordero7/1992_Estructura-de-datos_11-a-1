@@ -71,7 +71,7 @@ void Trie::printAll(ofstream& archivo) {
     printAll(root, "", archivo);
 }
 
-void Trie::collectAllBooks(TrieNode* node, vector<Libro*>& libros) {
+void Trie::collectAllBooks(TrieNode* node, list<Libro*>& libros) {
     if (node->libro) {
         libros.push_back(node->libro);
     }
@@ -80,13 +80,13 @@ void Trie::collectAllBooks(TrieNode* node, vector<Libro*>& libros) {
     }
 }
 
-vector<Libro*> Trie::collectAllBooks() {
-    vector<Libro*> libros;
+list<Libro*> Trie::collectAllBooks() {
+    list<Libro*> libros;
     collectAllBooks(root, libros);
     return libros;
 }
 
-void Trie::collectSuggestions(TrieNode* node, const string& prefix, vector<string>& suggestions) {
+void Trie::collectSuggestions(TrieNode* node, const string& prefix, list<string>& suggestions) {
     if (node->libro) {
         suggestions.push_back(prefix);
     }
@@ -95,8 +95,8 @@ void Trie::collectSuggestions(TrieNode* node, const string& prefix, vector<strin
     }
 }
 
-vector<string> Trie::getSuggestions(const string& prefix) {
-    vector<string> suggestions;
+list<string> Trie::getSuggestions(const string& prefix) {
+    list<string> suggestions;
     TrieNode* node = root;
     for (char c : prefix) {
         if (node->children.find(c) == node->children.end()) {
@@ -139,10 +139,10 @@ int Trie::levenshteinDistance(const string& s1, const string& s2) {
 }
 
 // Función para obtener sugerencias basadas en errores tipográficos
-vector<string> Trie::getTypoSuggestions(const string& prefix, int maxDistance) {
-    vector<string> suggestions;
+list<string> Trie::getTypoSuggestions(const string& prefix, int maxDistance) {
+    list<string> suggestions;
     set<string> uniqueSuggestions;
-    vector<Libro*> libros = collectAllBooks();
+    list<Libro*> libros = collectAllBooks();
     
     // First, add exact prefix matches for authors
     for (const auto& libro : libros) {

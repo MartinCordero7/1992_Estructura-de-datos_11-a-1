@@ -1,7 +1,9 @@
 #include "trie.cpp"
 #include <iostream>
 #include <limits>
+#include <locale>
 #include <cctype> // Para usar isalpha y toupper
+#include <cstdlib> // Para usar system("cls") y system("pause")
 
 using namespace std;
 
@@ -39,15 +41,20 @@ void mostrarMenu() {
 }
 
 int main() {
+    // Configurar la consola para usar la configuración regional predeterminada del sistema
+    setlocale(LC_ALL, "");
     Trie root;
     int opcion;
     string palabra;
     int contador = 0;
 
+    system("cls"); // Limpiar la consola al iniciar el programa
+
     do {
         mostrarMenu();
         cin >> opcion;
         clearInputBuffer(); // Limpiar el buffer después de leer la opción
+        system("cls"); // Limpiar la consola después de seleccionar una opción
 
         switch (opcion) {
             case 1: {
@@ -120,7 +127,7 @@ int main() {
                 break;
 
             default:
-                cout << "Opción inválida. Intente nuevamente.\n";
+                wcout << L"Opción inválida. Intente nuevamente.\n";
         }
 
     } while (opcion != 6);

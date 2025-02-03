@@ -62,7 +62,7 @@ void LibroManager::limpiarLista() {
 
 // Imprimir todos los libros
 void LibroManager::imprimirLibros() {
-    vector<Libro*> libros = trie.collectAllBooks();
+    list<Libro*> libros = trie.collectAllBooks();
     
     if (libros.empty()) {
         cout << "No hay libros para mostrar.\n";
@@ -94,7 +94,7 @@ Libro* LibroManager::buscarLibro(const string& titulo) {
 
 // Buscar libro por ISBN
 Libro* LibroManager::buscarLibroPorIsbn(const string& isbn) {
-    vector<Libro*> libros = trie.collectAllBooks();
+    list<Libro*> libros = trie.collectAllBooks();
     for (Libro* libro : libros) {
         if (libro->getIsbn() == isbn) {
             return libro;
@@ -105,7 +105,7 @@ Libro* LibroManager::buscarLibroPorIsbn(const string& isbn) {
 
 // Buscar autor por ISNI
 Persona LibroManager::buscarAutorPorIsni(const string& isni) {
-    vector<Libro*> libros = trie.collectAllBooks();
+    list<Libro*> libros = trie.collectAllBooks();
     for (Libro* libro : libros) {
         if (libro->getAutor().getIsni() == isni) {
             return libro->getAutor();
@@ -265,7 +265,7 @@ void LibroManager::restaurarBackup(const string& nombreArchivo) {
 
 // Buscar libro por título
 Libro* LibroManager::buscarLibroPorTitulo(const string& titulo) {
-    vector<Libro*> libros = trie.collectAllBooks();
+    list<Libro*> libros = trie.collectAllBooks();
     for (Libro* libro : libros) {
         if (libro->getTitulo() == titulo) {
             return libro;
@@ -326,8 +326,8 @@ vector<string> LibroManager::buscarLibroConAutocompletado(const string& prefijo)
 // Buscar libro con autocompletado y sugerencias basadas en errores tipográficos
 vector<string> LibroManager::buscarLibroConErroresTipograficos(const string& prefijo) {
     vector<string> sugerencias = trie.getTypoSuggestions(prefijo, 2);
-    map<string, vector<Libro*>> librosPorAutor;
-    vector<Libro*> todosLosLibros = trie.collectAllBooks();
+    map<string, list<Libro*>> librosPorAutor;
+    list<Libro*> todosLosLibros = trie.collectAllBooks();
     
     // Group books by author
     for (Libro* libro : todosLosLibros) {
@@ -380,7 +380,7 @@ vector<string> LibroManager::buscarLibroConErroresTipograficos(const string& pre
 }
 //Listar libros por primer letra del título
 void LibroManager::listarLibrosPorLetra(const char letra) {
-    vector<Libro*> libros = trie.collectAllBooks();
+    list<Libro*> libros = trie.collectAllBooks();
     bool encontrado = false;
     for (Libro* libro : libros) {
         if (libro->getTitulo()[0] == letra) {
@@ -401,7 +401,7 @@ void LibroManager::listarLibrosPorLetra(const char letra) {
 
 //Buscar libros que contengan una subcadena
 void LibroManager::buscarLibroPorSubcadena(const string& subcadena) {
-    vector<Libro*> libros = trie.collectAllBooks();
+    list<Libro*> libros = trie.collectAllBooks();
     bool encontrado = false;
     for (Libro* libro : libros) {
         if (libro->getTitulo().find(subcadena) != string::npos) {

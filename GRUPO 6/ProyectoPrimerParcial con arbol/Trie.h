@@ -3,7 +3,7 @@
 
 #include <unordered_map>
 #include <string>
-#include <vector>
+#include <list>
 #include <fstream>
 #include "Libro.h"
 
@@ -19,8 +19,8 @@ public:
 class Trie {
 private:
     TrieNode* root;
-    void collectAllBooks(TrieNode* node, vector<Libro*>& libros);
-    void collectSuggestions(TrieNode* node, const string& prefix, vector<string>& suggestions);
+    void collectAllBooks(TrieNode* node, list<Libro*>& libros);
+    void collectSuggestions(TrieNode* node, const string& prefix, list<string>& suggestions);
     
 public:
     Trie();
@@ -30,9 +30,9 @@ public:
     bool removeHelper(TrieNode* node, const string& key, int depth);
     void printAll(TrieNode* node, string prefix, ofstream& archivo);
     void printAll(ofstream& archivo);
-    vector<Libro*> collectAllBooks();
-    vector<string> getSuggestions(const string& prefix);
-    vector<string> getTypoSuggestions(const string& prefix, int maxDistance);
+    list<Libro*> collectAllBooks();
+    list<string> getSuggestions(const string& prefix);
+    list<string> getTypoSuggestions(const string& prefix, int maxDistance);
     int levenshteinDistance(const string& s1, const string& s2);
 };
 
