@@ -13,7 +13,7 @@ private:
     bool isLeaf;
     std::map<char, Trie*> children;
     void drawSubtree(Trie* node, int x, int y, int level, int spacing);
-    void drawNode(int x, int y, char c);
+    void drawNode(int x, int y, char c, bool isLastLetter = false);
     void drawConnection(int x1, int y1, int x2, int y2);
 public:
     Trie();

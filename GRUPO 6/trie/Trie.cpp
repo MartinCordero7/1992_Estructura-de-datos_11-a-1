@@ -38,7 +38,7 @@ bool Trie::deletion(std::string key) {
     return false;
 }
 
-void Trie::printInOrder(std::string prefix) { // Argumento por defecto eliminado
+void Trie::printInOrder(std::string prefix) {
     if (isLeaf) {
         std::cout << prefix << std::endl;
     }
@@ -56,24 +56,31 @@ int Trie::getHeight() {
 }
 
 int Trie::getDepth() {
-    return getHeight(); // En un Trie, la profundidad es igual a la altura
+    return getHeight();
 }
 
 int Trie::getLevel() {
-    return getHeight() - 1; // Nivel máximo es altura - 1
+    return getHeight() - 1;
 }
 
-void Trie::drawNode(int x, int y, char c) {
-    // Dibujar círculo base
-    circle(x, y, 20);
+void Trie::drawNode(int x, int y, char c, bool isLastLetter) {
+    // Si es la última letra de una palabra, usar color verde
+    if (isLastLetter) {
+        setcolor(GREEN);
+    } else {
+        setcolor(WHITE);
+    }
     
-    // Si es nodo hoja, dibujar círculo exterior
+    circle(x, y, 20);
+    setcolor(WHITE); // Reset color
+    
+    // Si es nodo hoja, dibujar círculo exterior en rojo
     if (isLeaf) {
         setcolor(RED);
         circle(x, y, 23);
         setcolor(WHITE);
     }
-    
+
     // Dibujar carácter
     char str[2] = {c, '\0'};
     outtextxy(x - 6, y - 7, str);
@@ -86,7 +93,6 @@ void Trie::drawConnection(int x1, int y1, int x2, int y2) {
 void Trie::drawSubtree(Trie* node, int x, int y, int level, int spacing) {
     if (!node) return;
 
-    // Espaciado vertical ajustado al alto de la pantalla
     const int LEVEL_SPACING = getmaxy() / (getHeight() + 1);
     const int MIN_NODE_SPACING = 80;
 
@@ -100,13 +106,13 @@ void Trie::drawSubtree(Trie* node, int x, int y, int level, int spacing) {
     for (auto& pair : node->children) {
         int childX = startX + childSpacing * i;
         
-        // Dibujar conexión
         drawConnection(x, y, childX, childY);
         
-        // Dibujar nodo hijo
-        drawNode(childX, childY, pair.first);
+        // Determinar si es la última letra de una palabra
+        bool isLastLetter = pair.second->isLeaf;
         
-        // Recursión con espaciado ajustado
+        drawNode(childX, childY, pair.first, isLastLetter);
+        
         drawSubtree(pair.second, childX, childY, level + 1, childSpacing * 0.9);
         
         i++;
@@ -116,31 +122,23 @@ void Trie::drawSubtree(Trie* node, int x, int y, int level, int spacing) {
 void Trie::printTree() {
     int gd = DETECT, gm;
     
-    // Inicializar modo gráfico en pantalla completa
     initwindow(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), "");
     
-    // Obtener dimensiones de pantalla
     int maxX = getmaxx();
     int maxY = getmaxy();
     
-    // Fondo negro
     setbkcolor(BLACK);
     cleardevice();
     
-    // Color blanco para dibujo
     setcolor(WHITE);
     
-    // Calcular altura del árbol
     int treeHeight = getHeight();
     
-    // Calcular espaciado inicial
-    int initialSpacing = maxX * 0.9; // 90% del ancho
+    int initialSpacing = maxX * 0.9;
     
-    // Ajustar posición inicial del nodo raíz
     int rootX = maxX / 2;
-    int rootY = maxY * 0.1; // 10% desde arriba
+    int rootY = maxY * 0.1;
     
-    // Dibujar nodo raíz
     circle(rootX, rootY, 20);
     outtextxy(rootX - 15, rootY - 7, (char*)"root");
     
