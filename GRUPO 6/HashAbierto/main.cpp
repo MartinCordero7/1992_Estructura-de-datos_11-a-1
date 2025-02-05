@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdlib>    // Para system()
 #include <clocale>    // Para setlocale()
+#include <limits> 
 
 void menuString(HashString& hashString) {
     int opcion;
@@ -65,23 +66,40 @@ void menuInt(HashInt& hashInt) {
         std::cout << "5. Visualizar tabla\n"; // Nueva opción
         std::cout << "6. Regresar al menú principal\n";
         std::cout << "Opción: ";
-        std::cin >> opcion;
 
-        switch(opcion) {
+        while (!(std::cin >> opcion) || opcion < 1 || opcion > 6) {
+            std::cout << "Entrada inválida. Ingrese un número entre 1 y 6: ";
+            std::cin.clear();  // Limpia el estado de error
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Descarta la entrada incorrecta
+        }
+
+        switch (opcion) {
             case 1:
                 std::cout << "Ingrese el número: ";
-                std::cin >> clave;
+                while (!(std::cin >> clave)) {
+                    std::cout << "Entrada inválida. Ingrese un número entero: ";
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                }
                 hashInt.insertar(clave);
                 break;
             case 2:
                 std::cout << "Ingrese el número a buscar: ";
-                std::cin >> clave;
+                while (!(std::cin >> clave)) {
+                    std::cout << "Entrada inválida. Ingrese un número entero: ";
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                }
                 std::cout << (hashInt.buscar(clave) ? "Encontrado" : "No encontrado") << std::endl;
                 system("pause");
                 break;
             case 3:
                 std::cout << "Ingrese el número a eliminar: ";
-                std::cin >> clave;
+                while (!(std::cin >> clave)) {
+                    std::cout << "Entrada inválida. Ingrese un número entero: ";
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                }
                 hashInt.eliminar(clave);
                 break;
             case 4:
@@ -97,7 +115,7 @@ void menuInt(HashInt& hashInt) {
                 std::cout << "Opción no válida.\n";
                 system("pause");
         }
-    } while(opcion != 6);
+    } while (opcion != 6);
 }
 
 int main() {
