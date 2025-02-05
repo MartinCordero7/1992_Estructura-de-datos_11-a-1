@@ -1,3 +1,12 @@
+/********************************************************************************************
+ *            UNIVERSIDAD DE LAS FUERZAS ARMADAS ESPE                                       *
+ * Proposito:                      Arbol trie en modo grafico                               *
+ * Autor:                          Abner Arboleda, Christian Acuña, Christian Bonifaz       *
+ * Fecha de creacion:              01/05/2025                                               *
+ * Fecha de modificacion:          03/05/2025                                               *
+ * Materia:                        Estructura de datos                                      *
+ * NRC :                           1992                                                     *
+ ********************************************************************************************/
 #include "trie.h"
 #include <iostream>
 #include <algorithm>

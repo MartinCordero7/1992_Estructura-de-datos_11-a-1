@@ -1,3 +1,12 @@
+/********************************************************************************************
+ *            UNIVERSIDAD DE LAS FUERZAS ARMADAS ESPE                                       *
+ * Proposito:                      Arbol trie en modo grafico                               *
+ * Autor:                          Abner Arboleda, Christian Acuña, Christian Bonifaz       *
+ * Fecha de creacion:              01/05/2025                                               *
+ * Fecha de modificacion:          03/05/2025                                               *
+ * Materia:                        Estructura de datos                                      *
+ * NRC :                           1992                                                     *
+ ********************************************************************************************/
 #include "trie.cpp"
 #include <iostream>
 #include <limits>
@@ -19,7 +28,7 @@ void clearInputBuffer() {
 string leerPalabraSinNumeros() {
     string palabra;
     char c;
-    cout << "Ingrese una palabra (solo letras, los demás caracteres serán ignorados): ";
+    wcout << "Ingrese una palabra: ";
     while (true) {
         c = cin.get(); // Lee un carácter
         if (c == '\n') { // Termina la lectura al presionar Enter
