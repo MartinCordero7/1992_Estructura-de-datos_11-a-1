@@ -31,7 +31,7 @@ int HashString::hash2(const std::string& clave) {
     for(char c : clave) {
         hash += static_cast<int>(c);
     }
-    return 5 - (hash % 5); // Función hash secundaria para Double Hashing
+    return 7 - (hash % 7); // Función hash secundaria para Double Hashing
 }
 
 void HashString::insertar(const std::string& clave, int metodo) {
@@ -98,31 +98,56 @@ void HashString::mostrar() {
 }
 
 void HashString::visualizar() {
-    int marginLeft = 50;
-    int marginTop = 50;
+    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+    
     int cellWidth = 120;
-    int cellHeight = 15;
-    int labelWidth = 50;
-    int rowSpacing = 10;
-    int windowWidth = marginLeft + labelWidth + 10 + (cellWidth + 10) * 4;
-    int windowHeight = marginTop + TAMANO * (cellHeight + rowSpacing) + 50;
+    int cellHeight = 40;
+    int spacing = 10;
+    
+    // Calculate cells per row based on screen width
+    int cellsPerRow = (screenWidth - 100) / (cellWidth + spacing); // Leave some margin
+    int numRows = (TAMANO + cellsPerRow - 1) / cellsPerRow; // Ceiling division
+    
+    // Calculate total width and height of the table
+    int tableWidth = (std::min(cellsPerRow, TAMANO) * (cellWidth + spacing)) - spacing;
+    int tableHeight = (numRows * (cellHeight + spacing * 2));
+    
+    // Calculate margins to center the table
+    int marginLeft = (screenWidth - tableWidth) / 2;
+    int marginTop = (screenHeight - tableHeight) / 2;
 
-    initwindow(windowWidth, windowHeight, "Tabla HashString");
+    initwindow(screenWidth, screenHeight, "Tabla HashString", -3, -3); // -3, -3 for fullscreen
+    setbkcolor(WHITE);
+    setcolor(BLACK);
+    cleardevice();
 
     for (int i = 0; i < TAMANO; i++) {
-        int rowY = marginTop + i * (cellHeight + rowSpacing);
-        rectangle(marginLeft, rowY, marginLeft + labelWidth, rowY + cellHeight);
-        char bucketLabel[10];
-        sprintf(bucketLabel, "%d", i);
-        outtextxy(marginLeft + 15, rowY + 8, bucketLabel);
+        int row = i / cellsPerRow;
+        int col = i % cellsPerRow;
+        
+        int x = marginLeft + col * (cellWidth + spacing);
+        int y = marginTop + row * (cellHeight + spacing * 2);
+        
+        // Draw cell
+        rectangle(x, y, x + cellWidth, y + cellHeight);
+        
+        // Draw index number below cell
+        char indexStr[5];
+        sprintf(indexStr, "[%d]", i);
+        outtextxy(x + cellWidth/2 - textwidth(indexStr)/2, y + cellHeight + 5, indexStr);
 
         if (tabla[i] != nullptr) {
-            int cellX = marginLeft + labelWidth + 10;
-            rectangle(cellX, rowY, cellX + cellWidth, rowY + cellHeight);
             char displayStr[21];
             strncpy(displayStr, tabla[i]->dato.c_str(), 20);
             displayStr[20] = '\0';
-            outtextxy(cellX + 5, rowY + 8, displayStr);
+            
+            int textWidth = textwidth(displayStr);
+            int textHeight = textheight(displayStr);
+            int textX = x + (cellWidth - textWidth)/2;
+            int textY = y + (cellHeight - textHeight)/2;
+            
+            outtextxy(textX, textY, displayStr);
         }
     }
 

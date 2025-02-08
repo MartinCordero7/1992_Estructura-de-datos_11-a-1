@@ -89,30 +89,54 @@ void HashInt::mostrar() {
 }
 
 void HashInt::visualizar() {
-    int marginLeft = 50;
-    int marginTop = 50;
-    int cellWidth = 70;
-    int cellHeight = 30;
-    int labelWidth = 50;
-    int rowSpacing = 10;
-    int windowWidth = marginLeft + labelWidth + 10 + (cellWidth + 10) * 4;
-    int windowHeight = marginTop + TAMANO * (cellHeight + rowSpacing) + 50;
+    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+    
+    int cellSize = 60; // Square cells
+    int spacing = 10;
+    
+    // Calculate cells per row based on screen width
+    int cellsPerRow = (screenWidth - 100) / (cellSize + spacing); // Leave some margin
+    int numRows = (TAMANO + cellsPerRow - 1) / cellsPerRow; // Ceiling division
+    
+    // Calculate total width and height of the table
+    int tableWidth = (std::min(cellsPerRow, TAMANO) * (cellSize + spacing)) - spacing;
+    int tableHeight = (numRows * (cellSize + spacing * 2));
+    
+    // Calculate margins to center the table
+    int marginLeft = (screenWidth - tableWidth) / 2;
+    int marginTop = (screenHeight - tableHeight) / 2;
 
-    initwindow(windowWidth, windowHeight, "Tabla HashInt");
+    initwindow(screenWidth, screenHeight, "Tabla HashInt", -3, -3); // -3, -3 for fullscreen
+    setbkcolor(WHITE);
+    setcolor(BLACK);
+    cleardevice();
 
     for (int i = 0; i < TAMANO; i++) {
-        int rowY = marginTop + i * (cellHeight + rowSpacing);
-        rectangle(marginLeft, rowY, marginLeft + labelWidth, rowY + cellHeight);
-        char bucketLabel[10];
-        sprintf(bucketLabel, "%d", i);
-        outtextxy(marginLeft + 15, rowY + 8, bucketLabel);
+        int row = i / cellsPerRow;
+        int col = i % cellsPerRow;
+        
+        int x = marginLeft + col * (cellSize + spacing);
+        int y = marginTop + row * (cellSize + spacing * 2);
+        
+        // Draw cell
+        rectangle(x, y, x + cellSize, y + cellSize);
+        
+        // Draw index number below cell
+        char indexStr[5];
+        sprintf(indexStr, "[%d]", i);
+        outtextxy(x + cellSize/2 - textwidth(indexStr)/2, y + cellSize + 5, indexStr);
 
         if (tabla[i] != nullptr) {
-            int cellX = marginLeft + labelWidth + 10;
-            rectangle(cellX, rowY, cellX + cellWidth, rowY + cellHeight);
-            char datoStr[10];
-            sprintf(datoStr, "%d", tabla[i]->dato);
-            outtextxy(cellX + 5, rowY + 8, datoStr);
+            char valueStr[10];
+            sprintf(valueStr, "%d", tabla[i]->dato);
+            
+            int textWidth = textwidth(valueStr);
+            int textHeight = textheight(valueStr);
+            int textX = x + (cellSize - textWidth)/2;
+            int textY = y + (cellSize - textHeight)/2;
+            
+            outtextxy(textX, textY, valueStr);
         }
     }
 

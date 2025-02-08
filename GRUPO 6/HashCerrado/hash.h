@@ -4,9 +4,10 @@
 #include <string>
 #include <graphics.h> // Incluir graphics.h
 
+const int TAMANO = 29; // Move it here, outside the classes
+
 class HashString {
 private:
-    static const int TAMANO = 29;
     struct Nodo {
         std::string dato;
         Nodo* siguiente;
@@ -29,7 +30,6 @@ public:
 
 class HashInt {
 private:
-    static const int TAMANO = 29;
     struct Nodo {
         int dato;
         Nodo* siguiente;

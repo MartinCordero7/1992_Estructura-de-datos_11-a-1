@@ -3,31 +3,23 @@
 #include <iostream>
 #include <cstdlib>
 #include <clocale>
+#include <windows.h>
 
-void menuString(HashString& hashString) {
-    int opcion, metodo;
+void menuString(HashString& hashString, int metodo) {
+    int opcion;
     std::string clave;
     do {
         system("cls");
-        std::cout << "\n--- Menú para Strings ---\n";
+        std::cout << "\n--- Menu para Strings ---\n";
         std::cout << "1. Insertar\n";
         std::cout << "2. Buscar\n";
         std::cout << "3. Eliminar\n";
         std::cout << "4. Mostrar tabla\n";
         std::cout << "5. Visualizar tabla\n";
-        std::cout << "6. Regresar al menú principal\n";
-        std::cout << "Opción: ";
+        std::cout << "6. Regresar al menu principal\n";
+        std::cout << "Opcion: ";
         std::cin >> opcion;
         std::cin.ignore();
-
-        if (opcion >= 1 && opcion <= 3) {
-            std::cout << "Seleccione el método de sondeo:\n";
-            std::cout << "1. Linear Probing\n";
-            std::cout << "2. Quadratic Probing\n";
-            std::cout << "3. Double Hashing\n";
-            std::cin >> metodo;
-            std::cin.ignore();
-        }
 
         switch(opcion) {
             case 1:
@@ -56,33 +48,25 @@ void menuString(HashString& hashString) {
             case 6:
                 break;
             default:
-                std::cout << "Opción no válida.\n";
+                std::cout << "Opcion no valida.\n";
                 system("pause");
         }
     } while(opcion != 6);
 }
 
-void menuInt(HashInt& hashInt) {
-    int opcion, metodo, clave;
+void menuInt(HashInt& hashInt, int metodo) {
+    int opcion, clave;
     do {
         system("cls");
-        std::cout << "\n--- Menú para Enteros ---\n";
+        std::cout << "\n--- Menu para Enteros ---\n";
         std::cout << "1. Insertar\n";
         std::cout << "2. Buscar\n";
         std::cout << "3. Eliminar\n";
         std::cout << "4. Mostrar tabla\n";
         std::cout << "5. Visualizar tabla\n";
-        std::cout << "6. Regresar al menú principal\n";
-        std::cout << "Opción: ";
+        std::cout << "6. Regresar al menu principal\n";
+        std::cout << "Opcion: ";
         std::cin >> opcion;
-
-        if (opcion >= 1 && opcion <= 3) {
-            std::cout << "Seleccione el método de sondeo:\n";
-            std::cout << "1. Linear Probing\n";
-            std::cout << "2. Quadratic Probing\n";
-            std::cout << "3. Double Hashing\n";
-            std::cin >> metodo;
-        }
 
         switch(opcion) {
             case 1:
@@ -97,7 +81,7 @@ void menuInt(HashInt& hashInt) {
                 system("pause");
                 break;
             case 3:
-                std::cout << "Ingrese el número a eliminar: ";
+                std::cout << "Ingrese el numero a eliminar: ";
                 std::cin >> clave;
                 hashInt.eliminar(clave, metodo);
                 break;
@@ -111,43 +95,56 @@ void menuInt(HashInt& hashInt) {
             case 6:
                 break;
             default:
-                std::cout << "Opción no válida.\n";
+                std::cout << "Opcion no valida.\n";
                 system("pause");
         }
     } while(opcion != 6);
 }
 
+int seleccionarMetodo() {
+    int metodo;
+    system("cls");
+    std::cout << "\n--- Seleccione el metodo de sondeo ---\n";
+    std::cout << "1. Linear Probing\n";
+    std::cout << "2. Quadratic Probing\n";
+    std::cout << "3. Double Hashing\n";
+    std::cout << "Opción: ";
+    std::cin >> metodo;
+    std::cin.ignore();
+    return metodo;
+}
+
 int main() {
-    setlocale(LC_ALL, "");
-    HashString hashString;
-    HashInt hashInt;
-    int opcion;
+    SetConsoleCP(1252);
+    SetConsoleOutputCP(1252);
+    setlocale(LC_ALL, "spanish");
+    
+    int opcion, metodo;
 
     do {
+        HashString hashString;
+        HashInt hashInt;
+        
         system("cls");
-        std::cout << "\n--- Menú Principal ---\n";
+        std::cout << "\n--- Menu Principal ---\n";
         std::cout << "1. Trabajar con Strings\n";
         std::cout << "2. Trabajar con Enteros\n";
         std::cout << "3. Salir\n";
-        std::cout << "Opción: ";
+        std::cout << "Opcion: ";
         std::cin >> opcion;
 
-        switch(opcion) {
-            case 1:
-                menuString(hashString);
-                break;
-            case 2:
-                menuInt(hashInt);
-                break;
-            case 3:
-                system("cls");
-                std::cout << "Saliendo...\n";
-                break;
-            default:
-                std::cout << "Opción no válida.\n";
-                system("pause");
+        if (opcion >= 1 && opcion <= 2) {
+            metodo = seleccionarMetodo();
+            switch(opcion) {
+                case 1:
+                    menuString(hashString, metodo);
+                    break;
+                case 2:
+                    menuInt(hashInt, metodo);
+                    break;
+            }
         }
     } while(opcion != 3);
-
+    
     return 0;
 }
