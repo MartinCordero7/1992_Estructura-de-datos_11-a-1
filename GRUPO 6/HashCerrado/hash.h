@@ -15,13 +15,14 @@ private:
     Nodo** tabla;
 
     int calcularHash(const std::string& clave);
+    int hash2(const std::string& clave); // Función hash secundaria para Double Hashing
 
 public:
     HashString();
     ~HashString();
-    void insertar(const std::string& clave);
-    bool buscar(const std::string& clave);
-    void eliminar(const std::string& clave);
+    void insertar(const std::string& clave, int metodo);
+    bool buscar(const std::string& clave, int metodo);
+    void eliminar(const std::string& clave, int metodo);
     void mostrar();
     void visualizar(); // Nuevo método
 };
@@ -37,13 +38,14 @@ private:
     Nodo** tabla;
 
     int calcularHash(int clave);
+    int hash2(int clave); // Función hash secundaria para Double Hashing
 
 public:
     HashInt();
     ~HashInt();
-    void insertar(int clave);
-    bool buscar(int clave);
-    void eliminar(int clave);
+    void insertar(int clave, int metodo);
+    bool buscar(int clave, int metodo);
+    void eliminar(int clave, int metodo);
     void mostrar();
     void visualizar(); // Nuevo método
 };
