@@ -105,9 +105,9 @@ int seleccionarMetodo() {
     int metodo;
     system("cls");
     std::cout << "\n--- Seleccione el metodo de sondeo ---\n";
-    std::cout << "1. Linear Probing\n";
-    std::cout << "2. Quadratic Probing\n";
-    std::cout << "3. Double Hashing\n";
+    std::cout << "1. Linear Probing: f(i) = i\n";
+    std::cout << "2. Quadratic Probing: f(i) = i * i\n";
+    std::cout << "3. Double Hashing: f(i) = i * hash2(elem)\n";
     std::cout << "Opción: ";
     std::cin >> metodo;
     std::cin.ignore();
