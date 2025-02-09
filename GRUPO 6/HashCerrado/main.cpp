@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <clocale>
 #include <windows.h>
+#include <limits>
 
 void menuString(HashString& hashString, int metodo) {
     int opcion;
@@ -71,18 +72,30 @@ void menuInt(HashInt& hashInt, int metodo) {
         switch(opcion) {
             case 1:
                 std::cout << "Ingrese el número: ";
-                std::cin >> clave;
+                while (!(std::cin >> clave)) {
+                    std::cin.clear(); // clear the error flag
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // discard invalid input
+                    std::cout << "Entrada no válida. Ingrese un número: ";
+                }
                 hashInt.insertar(clave, metodo);
                 break;
             case 2:
                 std::cout << "Ingrese el número a buscar: ";
-                std::cin >> clave;
+                while (!(std::cin >> clave)) {
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    std::cout << "Entrada no válida. Ingrese un número: ";
+                }
                 std::cout << (hashInt.buscar(clave, metodo) ? "Encontrado" : "No encontrado") << std::endl;
                 system("pause");
                 break;
             case 3:
                 std::cout << "Ingrese el numero a eliminar: ";
-                std::cin >> clave;
+                while (!(std::cin >> clave)) {
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    std::cout << "Entrada no válida. Ingrese un número: ";
+                }
                 hashInt.eliminar(clave, metodo);
                 break;
             case 4:

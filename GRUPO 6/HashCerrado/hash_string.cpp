@@ -35,6 +35,13 @@ int HashString::hash2(const std::string& clave) {
 }
 
 void HashString::insertar(const std::string& clave, int metodo) {
+    // Check if the string contains any numbers
+    for (char c : clave) {
+        if (isdigit(c)) {
+            std::cout << "Error: La cadena no debe contener números." << std::endl;
+            return;
+        }
+    }
     int indice = calcularHash(clave);
     int i = 0;
     while (tabla[indice] != nullptr) {
