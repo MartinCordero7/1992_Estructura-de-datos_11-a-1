@@ -19,7 +19,11 @@ void menuString(HashString& hashString, int metodo) {
         std::cout << "5. Visualizar tabla\n";
         std::cout << "6. Regresar al menu principal\n";
         std::cout << "Opcion: ";
-        std::cin >> opcion;
+        while (!(std::cin >> opcion) || opcion < 1 || opcion > 6) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Opcion no valida. Ingrese un numero entre 1 y 6: ";
+        }
         std::cin.ignore();
 
         switch(opcion) {
@@ -67,7 +71,11 @@ void menuInt(HashInt& hashInt, int metodo) {
         std::cout << "5. Visualizar tabla\n";
         std::cout << "6. Regresar al menu principal\n";
         std::cout << "Opcion: ";
-        std::cin >> opcion;
+        while (!(std::cin >> opcion) || opcion < 1 || opcion > 6) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Opcion no valida. Ingrese un numero entre 1 y 6: ";
+        }
 
         switch(opcion) {
             case 1:
@@ -122,7 +130,11 @@ int seleccionarMetodo() {
     std::cout << "2. Quadratic Probing: f(i) = i * i\n";
     std::cout << "3. Double Hashing: f(i) = i * hash2(elem)\n";
     std::cout << "Opción: ";
-    std::cin >> metodo;
+    while (!(std::cin >> metodo) || metodo < 1 || metodo > 3) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Opcion no valida. Ingrese un numero entre 1 y 3: ";
+    }
     std::cin.ignore();
     return metodo;
 }
@@ -144,7 +156,11 @@ int main() {
         std::cout << "2. Trabajar con Enteros\n";
         std::cout << "3. Salir\n";
         std::cout << "Opcion: ";
-        std::cin >> opcion;
+        while (!(std::cin >> opcion) || opcion < 1 || opcion > 3) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Opcion no valida. Ingrese un numero entre 1 y 3: ";
+        }
 
         if (opcion >= 1 && opcion <= 2) {
             metodo = seleccionarMetodo();
