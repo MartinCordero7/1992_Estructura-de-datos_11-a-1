@@ -5,11 +5,8 @@
 #include <graphics.h>
 #include <math.h>
 #include <queue>
-#include <algorithm>
-using namespace std;
 
-const int ARROW_SIZE = 10;
-const int NODE_RADIUS = 20;
+using namespace std;
 
 class Graph {
 private:
@@ -17,68 +14,17 @@ private:
     vector<vector<int>> adjList;
     vector<vector<int>> adjMatrix;
     bool directed;
-    vector<int> x, y;
-    bool positionsGenerated;
-
-    void drawArrow(int x1, int y1, int x2, int y2) {
-        line(x1, y1, x2, y2);
-        if (!directed) return;
-
-        double angle = atan2(y2 - y1, x2 - x1);
-        int x3 = x2 - ARROW_SIZE * cos(angle - M_PI/6);
-        int y3 = y2 - ARROW_SIZE * sin(angle - M_PI/6);
-        int x4 = x2 - ARROW_SIZE * cos(angle + M_PI/6);
-        int y4 = y2 - ARROW_SIZE * sin(angle + M_PI/6);
-        
-        line(x2, y2, x3, y3);
-        line(x2, y2, x4, y4);
-    }
-
-    void generatePositionsIfNeeded() {
-        if (!positionsGenerated) {
-            int gd = DETECT, gm;
-            initgraph(&gd, &gm, "");
-            for (int i = 0; i < V; ++i) {
-                x[i] = rand() % (getmaxx() - 2 * NODE_RADIUS) + NODE_RADIUS;
-                y[i] = rand() % (getmaxy() - 2 * NODE_RADIUS) + NODE_RADIUS;
-            }
-            closegraph();
-            positionsGenerated = true;
-        }
-    }
-
-    vector<pair<int, int>> bfsTraversal(int startVertex, vector<int>& parent, vector<bool>& visited) {
-        vector<pair<int, int>> edges;
-        queue<int> q;
-        fill(parent.begin(), parent.end(), -1);
-        fill(visited.begin(), visited.end(), false);
-
-        visited[startVertex] = true;
-        q.push(startVertex);
-
-        while (!q.empty()) {
-            int u = q.front();
-            q.pop();
-
-            for (int v : adjList[u]) {
-                if (!visited[v]) {
-                    visited[v] = true;
-                    parent[v] = u;
-                    edges.push_back({u, v});
-                    q.push(v);
-                }
-            }
-        }
-        return edges;
-    }
+    vector<int> x; // Posiciones X de los vértices
+    vector<int> y; // Posiciones Y de los vértices
 
 public:
-    Graph(int vertices, bool isDirected) : V(vertices), directed(isDirected) {
+    Graph(int vertices, bool isDirected) {
+        V = vertices;
+        directed = isDirected;
         adjList.resize(V);
         adjMatrix.resize(V, vector<int>(V, 0));
         x.resize(V);
         y.resize(V);
-        positionsGenerated = false;
     }
 
     void addEdge(int u, int v) {
@@ -103,164 +49,210 @@ public:
         }
     }
 
-    void drawGraph() {
-        generatePositionsIfNeeded();
+    void drawGraph(int startVertex = -1, int repChoice = 1, bool highlightBFS = false) {
         int gd = DETECT, gm;
-        initgraph(&gd, &gm, "");
-        
-        // Draw edges with arrows for directed graphs
-        for (int u = 0; u < V; ++u) {
-            for (int v : adjList[u]) {
-                setcolor(WHITE);
-                drawArrow(x[u], y[u], x[v], y[v]);
+        char driver[] = "";
+        initgraph(&gd, &gm, driver);
+        int radius = 20;
+
+        // Generar posiciones de los vértices solo si no están definidas
+        if (x[0] == 0 && y[0] == 0) { // Verificar si las posiciones ya fueron generadas
+            for (int i = 0; i < V; ++i) {
+                x[i] = rand() % (getmaxx() - 2 * radius) + radius;
+                y[i] = rand() % (getmaxy() - 2 * radius) + radius;
             }
         }
 
-        // Draw nodes as circles
+        // Dibujar las conexiones
+        for (int u = 0; u < V; ++u) {
+            for (int v : adjList[u]) {
+                line(x[u], y[u], x[v], y[v]); // Fix the error by providing the correct number of arguments
+                if (directed) {
+                    drawArrow(x[u], y[u], x[v], y[v]);
+                }
+            }
+        }
+
+        // Dibujar los nodos
         for (int i = 0; i < V; ++i) {
-            circle(x[i], y[i], NODE_RADIUS);
+            circle(x[i], y[i], radius);
             char label[10];
             sprintf(label, "%d", i);
-            outtextxy(x[i] - 5, y[i] - 8, label);
+            outtextxy(x[i] - 5, y[i] - 5, label);
+        }
+
+        // Si se seleccionó BFS, resaltarlo
+        if (highlightBFS) {
+            bfs(startVertex, radius);
+        }
+
+        // Crear una nueva ventana para la representación
+        int gd2 = DETECT, gm2;
+        initgraph(&gd2, &gm2, driver);
+
+        // Mostrar representación elegida
+        if (repChoice == 2) {
+            setcolor(GREEN);
+            drawAdjacencyList();
+        } else if (repChoice == 3) {
+            setcolor(YELLOW);
+            drawAdjacencyMatrix();
         }
 
         getch();
         closegraph();
     }
 
-    void drawStarVertex(int startVertex) {
-        generatePositionsIfNeeded();
-        int gd = DETECT, gm;
-        initgraph(&gd, &gm, "");
-        
-        vector<int> parent(V);
-        vector<bool> visited(V);
-        auto traversalEdges = bfsTraversal(startVertex, parent, visited);
+    void drawArrow(int x1, int y1, int x2, int y2) {
+        int arrowSize = 10;
+        double angle = atan2(y2 - y1, x2 - x1);
+        int arrowX1 = x2 - arrowSize * cos(angle - M_PI / 6);
+        int arrowY1 = y2 - arrowSize * sin(angle - M_PI / 6);
+        int arrowX2 = x2 - arrowSize * cos(angle + M_PI / 6);
+        int arrowY2 = y2 - arrowSize * sin(angle + M_PI / 6);
+        line(x2, y2, arrowX1, arrowY1);
+        line(x2, y2, arrowX2, arrowY2);
+    }
 
-        // Draw original graph in gray
-        setcolor(DARKGRAY);
-        for (int u = 0; u < V; ++u) {
-            for (int v : adjList[u]) {
-                drawArrow(x[u], y[u], x[v], y[v]);
+    void bfs(int start, int radius) {
+        vector<bool> visited(V, false);
+        queue<int> q;
+        q.push(start);
+        visited[start] = true;
+        setcolor(RED); // Color para resaltar el recorrido
+
+        while (!q.empty()) {
+            int node = q.front();
+            q.pop();
+            for (int neighbor : adjList[node]) {
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    q.push(neighbor);
+                    line(x[node], y[node], x[neighbor], y[neighbor]);
+                    if (directed) {
+                        drawArrow(x[node], y[node], x[neighbor], y[neighbor]);
+                    }
+                    circle(x[neighbor], y[neighbor], radius);
+                    char label[10];
+                    sprintf(label, "%d", neighbor);
+                    outtextxy(x[neighbor] - 5, y[neighbor] - 5, label);
+                    delay(500); // Delay to visualize the traversal step-by-step
+                }
             }
         }
-
-        // Draw BFS traversal in green
-        setcolor(GREEN);
-        setlinestyle(SOLID_LINE, 0, 3);
-        for (auto& edge : traversalEdges) {
-            drawArrow(x[edge.first], y[edge.first], x[edge.second], y[edge.second]);
-        }
-        setlinestyle(SOLID_LINE, 0, 1);
-
-        // Draw nodes
-        for (int i = 0; i < V; ++i) {
-            circle(x[i], y[i], NODE_RADIUS);
-            char label[10];
-            sprintf(label, "%d", i);
-            outtextxy(x[i] - 5, y[i] - 8, label);
-        }
-
-        // Draw BFS table
-        int tableX = getmaxx() - 150;
-        int tableY = 50;
-        setcolor(WHITE);
-        outtextxy(tableX, tableY, "Parent  Visited");
-        for (int i = 0; i < V; ++i) {
-            char row[20];
-            sprintf(row, "%d\t%s", parent[i], visited[i] ? "T" : "F");
-            outtextxy(tableX, tableY + 30 + i*20, row);
-        }
-
-        getch();
-        closegraph();
     }
 
     void drawAdjacencyList() {
-        int gd = DETECT, gm;
-        initgraph(&gd, &gm, "");
-        int startX = 50, startY = 50;
-        
-        for (int u = 0; u < V; ++u) {
-            // Draw node box
-            rectangle(startX - 10, startY + u*30 - 10, 
-                     startX + 30, startY + u*30 + 20);
-            
-            char label[10];
-            sprintf(label, "%d", u);
-            outtextxy(startX, startY + u*30, label);
-            
-            // Draw arrow
-            outtextxy(startX + 25, startY + u*30, "->");
-            
-            int xOffset = 80;
-            for (int v : adjList[u]) {
-                // Draw adjacent nodes in boxes
-                rectangle(startX + xOffset - 10, startY + u*30 - 10,
-                         startX + xOffset + 20, startY + u*30 + 20);
-                sprintf(label, "%d", v);
-                outtextxy(startX + xOffset, startY + u*30, label);
-                xOffset += 40;
+        int xOffset = 50;
+        int yOffset = 50;
+        int lineHeight = 20;
+
+        for (int i = 0; i < V; ++i) {
+            char label[100];
+            sprintf(label, "%d -> ", i);
+            outtextxy(xOffset, yOffset + i * lineHeight, label);
+
+            int xPos = xOffset + 40;
+            for (int j : adjList[i]) {
+                sprintf(label, "%d ", j);
+                outtextxy(xPos, yOffset + i * lineHeight, label);
+                xPos += 20;
             }
         }
-        getch();
-        closegraph();
     }
 
     void drawAdjacencyMatrix() {
-        int gd = DETECT, gm;
-        initgraph(&gd, &gm, "");
-        int cellSize = 30;
+        int xOffset = 50;
+        int yOffset = 50;
+        int cellSize = 20;
+
         for (int i = 0; i < V; ++i) {
             for (int j = 0; j < V; ++j) {
-                char value[2];
-                sprintf(value, "%d", adjMatrix[i][j]);
-                rectangle(50 + j * cellSize, 50 + i * cellSize, 
-                        80 + j * cellSize, 80 + i * cellSize);
-                outtextxy(60 + j * cellSize, 60 + i * cellSize, value);
+                char label[2];
+                sprintf(label, "%d", adjMatrix[i][j]);
+                outtextxy(xOffset + j * cellSize, yOffset + i * cellSize, label);
             }
         }
-        getch();
-        closegraph();
+    }
+
+    // Método para imprimir la lista de adyacencia
+    void printAdjacencyList() {
+        cout << "Adjacency List Representation:" << endl;
+        for (int i = 0; i < V; ++i) {
+            cout << i << " -> ";
+            for (int j : adjList[i]) {
+                cout << j << " ";
+            }
+            cout << endl;
+        }
+    }
+
+    // Método para imprimir la matriz de adyacencia
+    void printAdjacencyMatrix() {
+        cout << "Adjacency Matrix Representation:" << endl;
+        for (int i = 0; i < V; ++i) {
+            for (int j = 0; j < V; ++j) {
+                cout << adjMatrix[i][j] << " ";
+            }
+            cout << endl;
+        }
     }
 };
 
 int main() {
-    int choice, sizeChoice, repChoice;
-    bool directed;
+    int choice, sizeChoice, repChoice, startVertex;
+    bool directed = false;
     int vertices;
 
-    cout << "1. Directed Graph\n2. Undirected Graph\nEnter your choice: ";
-    cin >> choice;
-    directed = (choice == 1);
+    while (true) {
+        cout << "1. Directed Graph" << endl;
+        cout << "2. Undirected Graph" << endl;
+        cout << "3. Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
 
-    cout << "1. Small Graph (5 vertices)\n2. Large Graph (10 vertices)\nEnter your choice: ";
-    cin >> sizeChoice;
-    vertices = (sizeChoice == 1) ? 5 : 10;
+        if (choice == 3) break;
+        directed = (choice == 1);
 
-    Graph g(vertices, directed);
-    g.generateRandomEdges();
+        cout << "1. Small Graph (5 vertices)" << endl;
+        cout << "2. Large Graph (10 vertices)" << endl;
+        cout << "3. Back" << endl;
+        cout << "Enter your choice: ";
+        cin >> sizeChoice;
 
-    do {
-        cout << "Select Representation:\n1. Graph\n2. Adjacency List\n3. Adjacency Matrix\n4. Star Vertex\n5. Exit\nEnter your choice: ";
+        if (sizeChoice == 3) continue;
+        vertices = (sizeChoice == 1) ? 5 : 10;
+
+        Graph g(vertices, directed);
+        g.generateRandomEdges();
+
+        cout << "Select Representation:" << endl;
+        cout << "1. Logical Representation" << endl;
+        cout << "2. Adjacency List" << endl;
+        cout << "3. Adjacency Matrix" << endl;
+        cout << "Enter your choice: ";
         cin >> repChoice;
 
-        switch (repChoice) {
-            case 1: g.drawGraph(); break;
-            case 2: g.drawAdjacencyList(); break;
-            case 3: g.drawAdjacencyMatrix(); break;
-            case 4: {
-                int startVertex;
-                cout << "Enter starting vertex (0-" << vertices-1 << "): ";
-                cin >> startVertex;
-                if (startVertex >= 0 && startVertex < vertices) g.drawStarVertex(startVertex);
-                else cout << "Invalid vertex!\n";
-                break;
-            }
-            case 5: cout << "Exiting...\n"; break;
-            default: cout << "Invalid choice!\n";
+        // Mostrar el grafo antes de ingresar el Start Vertex
+        g.drawGraph(-1, repChoice, false);
+
+        // Mostrar la representación seleccionada
+        if (repChoice == 2) {
+            g.printAdjacencyList();
+        } else if (repChoice == 3) {
+            g.printAdjacencyMatrix();
         }
-    } while (repChoice != 5);
+
+        // Pedir el vértice de inicio
+        cout << "Enter Start Vertex for BFS: ";
+        cin >> startVertex;
+        if (startVertex >= 0 && startVertex < vertices) {
+            // Mostrar el grafo con BFS resaltado
+            g.drawGraph(startVertex, repChoice, true);
+        } else {
+            cout << "Invalid Start Vertex!" << endl;
+        }
+    }
 
     return 0;
 }
