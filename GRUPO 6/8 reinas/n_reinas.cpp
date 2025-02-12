@@ -66,8 +66,13 @@ void dibujarTablero(int tablero[MAX_N][MAX_N], int N) {
             }
         }
     }
+    cout << "\nPresione cualquier tecla para cerrar el tablero...";
     getch();  // Esperar hasta que el usuario presione una tecla
     closegraph(); // Cerrar la ventana gráfica
+    
+    cout << "\nPresione Enter para volver al menu principal...";
+    cin.ignore();
+    cin.get();
 }
 
 // Obtiene un número válido para N con validación de entrada
