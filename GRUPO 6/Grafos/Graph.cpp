@@ -205,19 +205,19 @@ int main() {
     int vertices;
 
     while (true) {
-        cout << "1. Directed Graph" << endl;
-        cout << "2. Undirected Graph" << endl;
-        cout << "3. Exit" << endl;
-        cout << "Enter your choice: ";
+        cout << "1. Grafo Dirigido" << endl;
+        cout << "2. Grafo No Dirigido" << endl;
+        cout << "3. Salir" << endl;
+        cout << "Ingrese su eleccion: ";
         cin >> choice;
 
         if (choice == 3) break;
         directed = (choice == 1);
 
-        cout << "1. Small Graph (5 vertices)" << endl;
-        cout << "2. Large Graph (10 vertices)" << endl;
-        cout << "3. Back" << endl;
-        cout << "Enter your choice: ";
+        cout << "1. Grafo Pequeno (5 vertices)" << endl;
+        cout << "2. Grafo Grande (10 vertices)" << endl;
+        cout << "3. Atras" << endl;
+        cout << "Ingrese su eleccion: ";
         cin >> sizeChoice;
 
         if (sizeChoice == 3) continue;
@@ -226,31 +226,31 @@ int main() {
         Graph g(vertices, directed);
         g.generateRandomEdges();
 
-        cout << "Select Representation:" << endl;
-        cout << "1. Logical Representation" << endl;
-        cout << "2. Adjacency List" << endl;
-        cout << "3. Adjacency Matrix" << endl;
-        cout << "Enter your choice: ";
+        cout << "Seleccione Representacion:" << endl;
+        cout << "1. Representacion Logica" << endl;
+        cout << "2. Lista de Adyacencia" << endl;
+        cout << "3. Matriz de Adyacencia" << endl;
+        cout << "Ingrese su eleccion: ";
         cin >> repChoice;
 
         // Mostrar el grafo antes de ingresar el Start Vertex
         g.drawGraph(-1, repChoice, false);
 
-        // Mostrar la representación seleccionada
+        // Mostrar la representacion seleccionada
         if (repChoice == 2) {
             g.printAdjacencyList();
         } else if (repChoice == 3) {
             g.printAdjacencyMatrix();
         }
 
-        // Pedir el vértice de inicio
-        cout << "Enter Start Vertex for BFS: ";
+        // Pedir el vertice de inicio
+        cout << "Ingrese el Vertice de Inicio para BFS: ";
         cin >> startVertex;
         if (startVertex >= 0 && startVertex < vertices) {
             // Mostrar el grafo con BFS resaltado
             g.drawGraph(startVertex, repChoice, true);
         } else {
-            cout << "Invalid Start Vertex!" << endl;
+            cout << "Vertice de Inicio Invalido!" << endl;
         }
     }
 
