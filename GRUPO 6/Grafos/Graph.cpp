@@ -120,10 +120,14 @@ public:
         q.push(start);
         visited[start] = true;
         setcolor(RED); // Color para resaltar el recorrido
-
+    
+        cout << "Recorrido BFS: ";
+    
         while (!q.empty()) {
             int node = q.front();
             q.pop();
+            cout << node << " "; // Imprimir el nodo visitado
+    
             for (int neighbor : adjList[node]) {
                 if (!visited[neighbor]) {
                     visited[neighbor] = true;
@@ -136,11 +140,13 @@ public:
                     char label[10];
                     sprintf(label, "%d", neighbor);
                     outtextxy(x[neighbor] - 5, y[neighbor] - 5, label);
-                    delay(500); // Delay to visualize the traversal step-by-step
+                    delay(500); // Delay para visualizar paso a paso
                 }
             }
         }
+        cout << endl;
     }
+    
 
     void drawAdjacencyList() {
         int xOffset = 50;
