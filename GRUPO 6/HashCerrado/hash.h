@@ -16,6 +16,7 @@ private:
     Nodo** tabla;
 
     int calcularHash(const std::string& clave);
+    int calcularNumeroClave(const std::string& clave);
     int hash2(const std::string& clave); // Función hash secundaria para Double Hashing
 
 public:

@@ -129,7 +129,7 @@ int seleccionarMetodo() {
     std::cout << "1. Linear Probing: f(i) = i\n";
     std::cout << "2. Quadratic Probing: f(i) = i * i\n";
     std::cout << "3. Double Hashing: f(i) = i * hash2(elem)\n";
-    std::cout << "Opción: ";
+    std::cout << "Opcion: ";
     while (!(std::cin >> metodo) || metodo < 1 || metodo > 3) {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');

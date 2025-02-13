@@ -17,25 +17,26 @@ HashString::~HashString() {
     delete[] tabla;
 }
 
-int HashString::calcularHash(const std::string& clave) {
+// Nueva función para calcular el número entero basado en la clave
+int HashString::calcularNumeroClave(const std::string& clave) {
     int hash = 0;
-    for(int i = clave.size() - 1; i >= 0; --i) {
+    for (int i = clave.size() - 1; i >= 0; --i) {
         hash += static_cast<int>(clave[i]);
-        if(i != 0) hash <<= 4;
+        if (i != 0) hash <<= 4; // Desplazamiento de 4 bits a la izquierda
     }
-    return hash % TAMANO;
+    return hash;
+}
+
+int HashString::calcularHash(const std::string& clave) {
+    return calcularNumeroClave(clave) % TAMANO;
 }
 
 int HashString::hash2(const std::string& clave) {
-    int hash = 0;
-    for(char c : clave) {
-        hash += static_cast<int>(c);
-    }
-    return 7 - (hash % 7); // Función hash secundaria para Double Hashing
+    int numeroClave = calcularNumeroClave(clave); // Ahora se calcula dinámicamente
+    return 7 - (numeroClave % 7);
 }
 
 void HashString::insertar(const std::string& clave, int metodo) {
-    // Check if the string contains any numbers
     for (char c : clave) {
         if (isdigit(c)) {
             std::cout << "Error: La cadena no debe contener números." << std::endl;
