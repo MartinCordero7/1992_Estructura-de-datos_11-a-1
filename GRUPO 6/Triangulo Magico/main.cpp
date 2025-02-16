@@ -7,7 +7,7 @@ using namespace std;
  * Estructura para almacenar la solución completa de un triángulo:
  *  - corners: las 3 esquinas
  *  - side1, side2, side3: los nodos intermedios de cada lado
- *  - found: indica si se logró encontrar una solución
+ *  - found: indica si se encontró una solución
  * ------------------------------------------------------------------- */
 struct TrianguloSolution {
     vector<int> corners; // tamaño = 3
@@ -18,30 +18,12 @@ struct TrianguloSolution {
 };
 
 /* -------------------------------------------------------------------
- * Calcula la "suma de esquinas" (sumaEsquinas) para un orden dado.
- * La fórmula se basa en la suma total de los dígitos disponibles.
- * Para:
- *   - Orden 3: se usan dígitos 1..6 (suma total = 21)
- *   - Orden 4: se usan dígitos 1..9 (suma total = 45)
- *   - Orden 5: se usan dígitos 1..12 (suma total = 78)
- * ------------------------------------------------------------------- */
-int calcularSumaEsquinas(int orden, int sumaObjetivo) {
-    // Fórmulas derivadas: sumaEsquinas = 3 * sumaObjetivo - (suma total de dígitos)
-    switch (orden) {
-        case 3: return 3 * sumaObjetivo - 21;
-        case 4: return 3 * sumaObjetivo - 45;
-        case 5: return 3 * sumaObjetivo - 78;
-        // Puedes extender para otros órdenes si amplías el rango de dígitos
-        default: return -1; // Orden no soportado en esta versión
-    }
-}
-
-/* -------------------------------------------------------------------
- * Backtracking para elegir 'count' dígitos (sin repetir) de [1..maxDigit]
- * que sumen 'needed'. Se usa un vector<bool> 'used' para marcar los dígitos ya ocupados.
+ * Función de backtracking para elegir 'count' dígitos (sin repetir) 
+ * del 1 hasta maxDigit que sumen 'needed'. 
+ * Se utiliza el vector<bool> 'used' para marcar los dígitos ya usados.
  *
- * Devuelve true si encuentra una combinación válida (y la deja en 'resultado'),
- * o false si no la hay.
+ * Devuelve true si se encuentra una combinación válida (dejándola en 'resultado'),
+ * o false en caso contrario.
  * ------------------------------------------------------------------- */
 bool backtrackSide(int needed, int count, int start, vector<bool>& used,
                    vector<int>& resultado, int maxDigit) {
@@ -63,67 +45,66 @@ bool backtrackSide(int needed, int count, int start, vector<bool>& used,
 }
 
 /* -------------------------------------------------------------------
- * Intenta resolver el triángulo completo sin repetir dígitos.
- *  - orden, sumaObjetivo
- *  - Retorna un TrianguloSolution con found=true si hay solución.
+ * Intenta resolver el triángulo mágico completo sin repetir dígitos.
+ * Parámetros:
+ *   - orden: grado del triángulo (entre 3 y 10)
+ *   - sumaObjetivo: suma que debe tener cada lado
  *
- * Lógica:
- *  1) Calcula la suma de esquinas.
- *  2) Recorre todas las combinaciones (a,b,c) de [1..maxDigit] (con a<b<c)
- *     cuya suma sea 'sumaEsquinas'.
- *  3) Con esos dígitos marcados como usados, busca para cada lado la combinación
- *     de nodos intermedios que complete la sumaObjetivo.
+ * Retorna una TrianguloSolution con found=true si se encontró solución.
+ *
+ * La función calcula:
+ *   - maxDigit = 3*(orden-1) (los dígitos usados serán del 1 a maxDigit)
+ *   - T: suma total de los dígitos del 1 a maxDigit
+ *   - sumaEsquinas = 3*sumaObjetivo - T, que debe ser la suma de las 3 esquinas.
+ *
+ * Luego recorre todas las combinaciones posibles de 3 esquinas (a, b, c)
+ * que cumplan a + b + c = sumaEsquinas, y para cada una intenta asignar
+ * los dígitos intermedios en cada lado (respetando la condición de no repetición).
  * ------------------------------------------------------------------- */
 TrianguloSolution resolverTrianguloMagicoNoRepetir(int orden, int sumaObjetivo) {
     TrianguloSolution sol;
     sol.found = false;
-    
-    // Determinamos el rango de dígitos según el orden:
-    // Orden 3: se usan dígitos 1..6, Orden 4: 1..9, Orden 5: 1..12.
-    int maxDigit;
-    if (orden == 3)
-        maxDigit = 6;
-    else if (orden == 4)
-        maxDigit = 9;
-    else if (orden == 5)
-        maxDigit = 12;
-    else {
-        cout << "Orden no soportado en esta versión." << endl;
-        return sol;
-    }
-    
-    int totalNumeros = 3 * (orden - 1); // Debe coincidir con maxDigit
-    if (maxDigit != totalNumeros) {
-        // Verificamos consistencia; si no coinciden, abortamos.
-        return sol;
-    }
-    
-    // Calcular la suma que deben tener las 3 esquinas
-    int sumaEsquinas = calcularSumaEsquinas(orden, sumaObjetivo);
-    if (sumaEsquinas == -1)
-        return sol; // Orden no soportado
 
-    // Probar todas las combinaciones de esquinas (a, b, c) con 1 <= a < b < c <= maxDigit
+    if(orden < 3 || orden > 10) {
+        cout << "Orden no soportado. Debe estar entre 3 y 10." << endl;
+        return sol;
+    }
+
+    // Determinamos el rango de dígitos:
+    int maxDigit = 3 * (orden - 1);
+    // Suma total de los dígitos del 1 a maxDigit:
+    int T = maxDigit * (maxDigit + 1) / 2;
+    // La suma de las 3 esquinas debe ser:
+    int sumaEsquinas = 3 * sumaObjetivo - T;
+    
+    // Verificamos que la suma de esquinas esté en el rango posible:
+    int minEsquinas = 1 + 2 + 3;  // 6
+    int maxEsquinas = (maxDigit) + (maxDigit - 1) + (maxDigit - 2); // los 3 mayores
+    if (sumaEsquinas < minEsquinas || sumaEsquinas > maxEsquinas) {
+        return sol;
+    }
+    
+    // Recorrer combinaciones para las esquinas (a, b, c) de 1 a maxDigit:
     for (int a = 1; a <= maxDigit; a++) {
         for (int b = a + 1; b <= maxDigit; b++) {
             for (int c = b + 1; c <= maxDigit; c++) {
                 if (a + b + c == sumaEsquinas) {
-                    // Preparar vector<bool> para controlar dígitos usados
+                    // Usamos un vector<bool> para llevar el control de los dígitos ya usados.
                     vector<bool> used(maxDigit + 1, false);
                     used[a] = used[b] = used[c] = true;
                     
-                    // Calcular el "resto" que deben sumar los nodos intermedios en cada lado:
-                    // Lado 1: a + (side1) + b = sumaObjetivo  => side1 = sumaObjetivo - a - b
-                    // Lado 2: b + (side2) + c = sumaObjetivo  => side2 = sumaObjetivo - b - c
-                    // Lado 3: c + (side3) + a = sumaObjetivo  => side3 = sumaObjetivo - c - a
+                    // Para cada lado, se deben llenar (orden - 2) nodos intermedios.
+                    int cant = orden - 2;
+                    // Lado 1: entre esquinas a y b
                     int resto1 = sumaObjetivo - (a + b);
+                    // Lado 2: entre esquinas b y c
                     int resto2 = sumaObjetivo - (b + c);
+                    // Lado 3: entre esquinas c y a
                     int resto3 = sumaObjetivo - (c + a);
                     
-                    // Cada lado tiene (orden - 2) nodos intermedios
-                    int cant = orden - 2;
                     vector<int> lado1, lado2, lado3;
                     
+                    // Se busca una combinación para cada lado sin reutilizar dígitos.
                     if (!backtrackSide(resto1, cant, 1, used, lado1, maxDigit))
                         continue;
                     if (!backtrackSide(resto2, cant, 1, used, lado2, maxDigit))
@@ -131,7 +112,6 @@ TrianguloSolution resolverTrianguloMagicoNoRepetir(int orden, int sumaObjetivo) 
                     if (!backtrackSide(resto3, cant, 1, used, lado3, maxDigit))
                         continue;
                     
-                    // Solución encontrada
                     sol.corners = {a, b, c};
                     sol.side1 = lado1;
                     sol.side2 = lado2;
@@ -142,7 +122,6 @@ TrianguloSolution resolverTrianguloMagicoNoRepetir(int orden, int sumaObjetivo) 
             }
         }
     }
-    // Si se recorrieron todas las opciones sin éxito, no hay solución.
     return sol;
 }
 
@@ -167,7 +146,7 @@ void dibujarTrianguloMagico(const TrianguloSolution &sol, int orden, int sumaObj
     setbkcolor(BLACK);
     cleardevice();
     
-    // Coordenadas de los vértices (ajústalas a tu gusto)
+    // Coordenadas de los vértices (puedes ajustarlas según tu preferencia)
     int x1 = 300, y1 = 100; // Vértice superior
     int x2 = 100, y2 = 400; // Vértice inferior izquierdo
     int x3 = 500, y3 = 400; // Vértice inferior derecho
@@ -214,10 +193,34 @@ void dibujarTrianguloMagico(const TrianguloSolution &sol, int orden, int sumaObj
  * ------------------------------------------------------------------- */
 int main() {
     int orden, sumaObjetivo;
-    cout << "Ingrese el orden del triangulo magico (3, 4 o 5): ";
+    cout << "Ingrese el orden del triangulo magico (3 a 10): ";
     cin >> orden;
+    
+    if (orden < 3 || orden > 10) {
+        cout << "Orden no soportado. Debe ser entre 3 y 10." << endl;
+        return 1;
+    }
+    
+    // Determinamos el rango de dígitos y la suma total de esos dígitos:
+    int maxDigit = 3 * (orden - 1);
+    int T = maxDigit * (maxDigit + 1) / 2;
+    
+    // La suma mínima de esquinas es 6 (1+2+3), y la suma de esquinas es: 3*S - T.
+    // Por ello, el valor mínimo de S es:
+    int minS = (T + 6) / 3;
+    // La suma máxima de las 3 esquinas es: (maxDigit) + (maxDigit-1) + (maxDigit-2)
+    int maxEsquinas = maxDigit + (maxDigit - 1) + (maxDigit - 2);
+    int maxS = (T + maxEsquinas) / 3;
+    
+    cout << "Para un triangulo de orden " << orden << ", la suma por lado debe estar entre "
+         << minS << " y " << maxS << "." << endl;
     cout << "Ingrese la suma objetivo para cada lado del triangulo magico: ";
     cin >> sumaObjetivo;
+    
+    if (sumaObjetivo < minS || sumaObjetivo > maxS) {
+        cout << "La suma ingresada no esta en el rango permitido." << endl;
+        return 1;
+    }
     
     TrianguloSolution sol = resolverTrianguloMagicoNoRepetir(orden, sumaObjetivo);
     if (!sol.found) {
