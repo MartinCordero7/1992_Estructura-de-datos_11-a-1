@@ -1,4 +1,4 @@
-#include "n_reinas.h"
+#include "n_caballito.h"
 #include <cctype> // Para validar entrada del usuario
 
 using namespace std;

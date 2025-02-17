@@ -1,5 +1,5 @@
-#ifndef N_REINAS_H
-#define N_REINAS_H
+#ifndef N_CABALLITO_H
+#define N_CABALLITO_H
 
 #include <iostream>
 #include <graphics.h>

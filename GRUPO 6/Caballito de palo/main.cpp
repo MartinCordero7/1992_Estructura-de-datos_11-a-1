@@ -1,4 +1,4 @@
-#include "n_reinas.cpp"
+#include "n_caballito.cpp"
 #include <stdlib.h>
 
 using namespace std;
