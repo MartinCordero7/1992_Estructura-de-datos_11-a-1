@@ -8,7 +8,8 @@
 
 // Declaraciones de funciones
 bool esSeguro(int x, int y, int N);
-void dibujarTablero(int x, int y, int N);
-int obtenerN();
+void dibujarTablero(int &x, int &y, int N);
+void exportarTablero(int x, int y, int N);
+void manejarClick(int &x, int &y, int N);
 
 #endif

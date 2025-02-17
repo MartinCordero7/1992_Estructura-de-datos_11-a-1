@@ -54,7 +54,7 @@ int main()
         case 1:
         {
             limpiarPantalla();
-            int N = obtenerN();
+            int N = 8; // Tamaño fijo del tablero
             int x, y;
 
             cout << "Ingrese la posicion inicial del caballo (x y): ";
@@ -62,7 +62,9 @@ int main()
 
             if (esSeguro(x, y, N))
             {
-                dibujarTablero(x, y, N);
+                dibujarTablero(x, y, N);  // Ensure this matches the correct function signature
+                closegraph();             // Cerrar la ventana gráfica
+                exportarTablero(x, y, N); // Exportar el tablero a un archivo .txt
             }
             else
             {
