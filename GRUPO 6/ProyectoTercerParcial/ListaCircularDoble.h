@@ -34,6 +34,7 @@ public:
     bool evitarGuardar;  // Para evitar guardado automático en procesos como backup
 
     ListaCircularDoble();
+    bool estaVacia() const;
 
     // Métodos para entregas
     void agregarEntrega(const Entrega& entrega);

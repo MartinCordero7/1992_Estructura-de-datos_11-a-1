@@ -22,6 +22,11 @@ using namespace std;
 ListaCircularDoble::ListaCircularDoble() : cabeza(nullptr), evitarGuardar(false) {}
 
 // Agregar entrega
+
+bool ListaCircularDoble::estaVacia() const {
+    return cabeza == nullptr;
+}
+
 void ListaCircularDoble::agregarEntrega(const Entrega& entrega) {
     NodoEntrega* nuevo = new NodoEntrega{ entrega, nullptr, nullptr };
     if (!cabeza) {

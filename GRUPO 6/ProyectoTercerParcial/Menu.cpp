@@ -22,6 +22,7 @@
 #include "funciones.h"
 #include "Entrega.h"
 #include "Cliente.h"
+#include "Mapa.cpp"
 
 using namespace std;
 
@@ -63,6 +64,7 @@ void mostrarMenu(ListaCircularDoble& lista) {
     menuOpciones.insertar("Buscar entrega");
     menuOpciones.insertar("Eliminar entrega");
     menuOpciones.insertar("Ver todas las entregas");
+    menuOpciones.insertar("Realizar entregas");
     menuOpciones.insertar("Exportar entregas a PDF");
     menuOpciones.insertar("Crear backup");
     menuOpciones.insertar("Restaurar backup");
@@ -105,9 +107,19 @@ void mostrarMenu(ListaCircularDoble& lista) {
                 getline(cin, cedula);
                 if (cedula.empty()) { cout << "Regresando al menú principal...\n"; continue; }
                 
-                cout << "Ingrese zona de entrega (o presione Enter para regresar al menú): ";
+                cout << "Ingrese zona de entrega (NORTE, NORESTE, ESTE, SUR, OESTE) (o presione Enter para regresar al menú): ";
                 getline(cin, zona);
-                if (zona.empty()) { cout << "Regresando al menú principal...\n"; continue; }
+                if (zona.empty()) { 
+                    cout << "Regresando al menú principal...\n"; 
+                    continue; 
+                }
+                
+                Mapa mapa;
+                if (!mapa.existeZona(zona)) {
+                    cout << "Error: La zona ingresada no existe en el mapa.\n";
+                    cout << "Zonas disponibles: NORTE, NORESTE, ESTE, SUR, OESTE\n";
+                    continue;
+                }
                 
                 cout << "Ingrese la prioridad (número, menor valor indica mayor prioridad) (o presione Enter para regresar): ";
                 getline(cin, prioridadInput);
@@ -212,6 +224,26 @@ void mostrarMenu(ListaCircularDoble& lista) {
                     }
                 }
             }
+            else if (opcionSeleccionada == "Realizar entregas") {
+                if (lista.estaVacia()) {
+                    cout << "No hay entregas pendientes para realizar.\n";
+                    continue;
+                }
+                
+                // Recopilar todas las zonas de entrega
+                vector<string> zonasEntrega;
+                NodoEntrega* actual = lista.cabeza;
+                do {
+                    zonasEntrega.push_back(actual->entrega.zona);
+                    actual = actual->siguiente;
+                } while (actual != lista.cabeza);
+                
+                // Calcular y mostrar la ruta óptima
+                Mapa mapa;
+                cout << "Calculando ruta óptima para las entregas...\n\n";
+                vector<string> rutaOptima = mapa.calcularRutaOptima(zonasEntrega);
+                mapa.mostrarRuta(rutaOptima);
+            }            
             else if (opcionSeleccionada == "Salir") {
                 break;
             }
