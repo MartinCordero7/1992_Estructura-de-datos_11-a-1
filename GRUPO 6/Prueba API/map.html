@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Cliente y Zona de Entrega</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; }
+    .container { display: flex; justify-content: center; gap: 20px; }
+    #map { height: 500px; width: 60%; }
+    .search-container { margin-bottom: 10px; }
+    input, button { padding: 8px; margin: 5px; }
+    #confirmButton { background-color: green; color: white; border: none; padding: 10px; cursor: pointer; }
+    #confirmButton:hover { background-color: darkgreen; }
+  </style>
+</head>
+<body>
+  <h2>Registro de Cliente y Selección de Zona de Entrega</h2>
+  
+  <!-- Datos del cliente -->
+  <div class="search-container">
+    <input type="text" id="cedula" placeholder="Ingrese cédula">
+    <input type="text" id="nombre" placeholder="Ingrese nombre">
+  </div>
+  
+  <!-- Búsqueda de zona de entrega -->
+  <div class="search-container">
+    <input type="text" id="address" placeholder="Ingresa una dirección en Ecuador">
+    <button onclick="searchAddress()">Buscar zona de entrega</button>
+  </div>
+  
+  <button id="confirmButton" onclick="confirmSelection()">Confirmar Registro</button>
+  
+  <div class="container">
+    <div id="map"></div>
+  </div>
+  
+  <script>
+    var map = L.map('map').setView([-0.180653, -78.467834], 13);
+  
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+  
+    var marker = L.marker([-0.180653, -78.467834]).addTo(map)
+      .bindPopup("Quito, Ecuador")
+      .openPopup();
+  
+    var lastSearchedAddress = "";
+  
+    function searchAddress() {
+      var address = document.getElementById("address").value;
+      if (address === "") {
+        alert("Por favor, ingresa una dirección.");
+        return;
+      }
+  
+      var url = "https://nominatim.openstreetmap.org/search?format=json&countrycodes=EC&q=" + encodeURIComponent(address);
+  
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data.length === 0) {
+            alert("No se encontró la dirección en Ecuador.");
+            return;
+          }
+          var lat = data[0].lat;
+          var lon = data[0].lon;
+  
+          map.setView([lat, lon], 13);
+          marker.setLatLng([lat, lon])
+            .bindPopup(address)
+            .openPopup();
+  
+          lastSearchedAddress = address; // Se guarda la dirección seleccionada como zona de entrega
+        })
+        .catch(error => console.error("Error en la búsqueda:", error));
+    }
+  
+    function confirmSelection() {
+      var cedula = document.getElementById("cedula").value;
+      var nombre = document.getElementById("nombre").value;
+  
+      if (cedula === "" || nombre === "") {
+        alert("Por favor, ingrese cédula y nombre.");
+        return;
+      }
+      if (lastSearchedAddress === "") {
+        alert("Por favor, seleccione una zona de entrega.");
+        return;
+      }
+  
+      var clientData = {
+        cedula: cedula,
+        nombre: nombre,
+        zona: lastSearchedAddress
+      };
+  
+      // Enviar los datos del cliente al servidor Flask
+      fetch("http://localhost:5000/save_client", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(clientData)
+      })
+      .then(response => response.text())
+      .then(data => {
+        alert(data);
+        // Reiniciar los campos
+        document.getElementById("cedula").value = "";
+        document.getElementById("nombre").value = "";
+        document.getElementById("address").value = "";
+        lastSearchedAddress = "";
+        marker.setLatLng([-0.180653, -78.467834])
+              .bindPopup("Quito, Ecuador")
+              .openPopup();
+      })
+      .catch(error => console.error("Error al guardar cliente:", error));
+    }
+  </script>
+</body>
+</html>

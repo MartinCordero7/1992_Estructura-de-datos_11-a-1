@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Selecciona la ubicación del local</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    #map { height: 500px; }
+    body { text-align: center; font-family: Arial, sans-serif; }
+    input { padding: 5px; margin: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Selecciona la ubicación del local</h2>
+  <div id="map"></div>
+  <div>
+    <label>Latitud: </label>
+    <input type="text" id="lat" readonly>
+    <label>Longitud: </label>
+    <input type="text" id="lon" readonly>
+  </div>
+  <button onclick="confirmLocal()">Confirmar Local</button>
+  <script>
+    var map = L.map('map').setView([-0.180653, -78.467834], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    
+    var marker;
+    function onMapClick(e) {
+      if(marker) {
+        marker.setLatLng(e.latlng);
+      } else {
+        marker = L.marker(e.latlng).addTo(map);
+      }
+      document.getElementById("lat").value = e.latlng.lat;
+      document.getElementById("lon").value = e.latlng.lng;
+    }
+    map.on('click', onMapClick);
+    
+    function confirmLocal() {
+      var lat = document.getElementById("lat").value;
+      var lon = document.getElementById("lon").value;
+      if(lat === "" || lon === "") {
+        alert("Por favor, selecciona la ubicación del local en el mapa.");
+        return;
+      }
+      alert("Local confirmado:\nLatitud: " + lat + "\nLongitud: " + lon + "\n\nCopia estos valores y pégalos en la consola de la aplicación.");
+    }
+  </script>
+</body>
+</html>

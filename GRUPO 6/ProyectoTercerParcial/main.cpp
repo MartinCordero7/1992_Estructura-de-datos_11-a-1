@@ -11,6 +11,7 @@
 
 #include "ListaCircularDoble.cpp"
 #include "Menu.cpp"
+#include <graphics.h>
 
 int main() {
     // Configurar la consola para usar UTF-8

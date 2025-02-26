@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Ruta Óptima de Entregas</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>#map { height: 600px; } body { text-align: center; font-family: Arial, sans-serif; }</style>
+</head>
+<body>
+<h2>Ruta Óptima de Entregas</h2>
+<p>Distancia total: 15.9305 km</p>
+<div id="map"></div>
+<script>
+var map = L.map('map').setView([-0.189853, -78.4628], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OpenStreetMap contributors'}).addTo(map);
+var routeCoords = [
+[-0.189853, -78.4628],
+[-0.292032, -78.4778],
+[-0.314484, -78.4447],
+];
+L.marker([-0.189853, -78.4628]).addTo(map).bindPopup('Local');
+L.marker([-0.292032, -78.4778]).addTo(map).bindPopup('Cliente: Alberto');
+L.marker([-0.314484, -78.4447]).addTo(map).bindPopup('Cliente: Abner');
+var polyline = L.polyline(routeCoords, {color: 'blue'}).addTo(map);
+map.fitBounds(polyline.getBounds());
+</script>
+</body>
+</html>

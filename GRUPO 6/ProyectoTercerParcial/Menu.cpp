@@ -8,7 +8,6 @@
  * NRC :                           1992                                                     *
  ********************************************************************************************/
 
-
 #include "Menu.h"
 #include "BackupManager.cpp"
 #include <iostream>
@@ -68,7 +67,6 @@ void mostrarMenu(ListaCircularDoble& lista) {
     menuOpciones.insertar("Exportar entregas a PDF");
     menuOpciones.insertar("Crear backup");
     menuOpciones.insertar("Restaurar backup");
-    menuOpciones.insertar("Buscar por rango");
     menuOpciones.insertar("Salir");
 
     int seleccion = 0;
@@ -182,47 +180,6 @@ void mostrarMenu(ListaCircularDoble& lista) {
             }
             else if (opcionSeleccionada == "Restaurar backup") {
                 BackupManager::restaurarBackup(lista);
-            }
-            else if (opcionSeleccionada == "Buscar por rango") {
-                while (true) {
-                    string inputAnioInicio, inputAnioFin;
-        
-                    cout << "Ingrese el año de fin (0001 a 2025) (o presione Enter para regresar al menú): ";
-                    getline(cin, inputAnioFin);
-                    if (inputAnioFin.empty()) {
-                        cout << "Regresando al menú principal...\n";
-                        break;
-                    }
-        
-                    cout << "Ingrese el año de inicio (0001 a 2025) (o presione Enter para regresar al menú): ";
-                    getline(cin, inputAnioInicio);
-                    if (inputAnioInicio.empty()) {
-                        cout << "Regresando al menú principal...\n";
-                        break;
-                    }
-        
-                    try {
-                        anioFin = stoi(inputAnioFin);
-                        anioInicio = stoi(inputAnioInicio);
-        
-                        if (anioInicio < 1 || anioInicio > 2025 || anioFin < 1 || anioFin > 2025) {
-                            cout << "Error: Los años deben estar en el rango de 0001 a 2025.\n";
-                            continue;
-                        }
-        
-                        if (anioFin > anioInicio) {
-                            cout << "Registros de entregas encontrados entre " << anioInicio << " y " << anioFin << ":\n";
-                            buscarPorRango(ruta, anioInicio, anioFin); // Se asume método para entregas
-                            break;
-                        } else {
-                            cout << "Error: El año de fin debe ser mayor al año de inicio y no pueden ser iguales.\n";
-                        }
-                    } catch (const invalid_argument&) {
-                        cout << "Error: Entrada inválida. Por favor, ingrese un año válido.\n";
-                    } catch (const out_of_range&) {
-                        cout << "Error: El año ingresado está fuera del rango permitido.\n";
-                    }
-                }
             }
             else if (opcionSeleccionada == "Realizar entregas") {
                 if (lista.estaVacia()) {
