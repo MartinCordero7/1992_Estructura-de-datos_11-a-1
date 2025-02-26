@@ -1,29 +1,59 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Ruta Óptima de Entregas</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<style>#map { height: 600px; } body { text-align: center; font-family: Arial, sans-serif; }</style>
+  <meta charset="UTF-8">
+  <title>Ruta Óptima de Entregas</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>#map { height: 600px; } body { text-align: center; font-family: Arial, sans-serif; }</style>
 </head>
 <body>
-<h2>Ruta Óptima de Entregas</h2>
-<p>Distancia total: 15.9305 km</p>
-<div id="map"></div>
-<script>
-var map = L.map('map').setView([-0.189853, -78.4628], 13);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OpenStreetMap contributors'}).addTo(map);
-var routeCoords = [
-[-0.189853, -78.4628],
-[-0.292032, -78.4778],
-[-0.314484, -78.4447],
-];
-L.marker([-0.189853, -78.4628]).addTo(map).bindPopup('Local');
-L.marker([-0.292032, -78.4778]).addTo(map).bindPopup('Cliente: Alberto');
-L.marker([-0.314484, -78.4447]).addTo(map).bindPopup('Cliente: Abner');
-var polyline = L.polyline(routeCoords, {color: 'blue'}).addTo(map);
-map.fitBounds(polyline.getBounds());
-</script>
+  <h2>Ruta Óptima de Entregas</h2>
+  <p>Distancia total: 10.0628 km</p>
+  <div id="map"></div>
+  <script>
+    // Función para decodificar una cadena polyline (algoritmo de Google)
+    function decodePolyline(encoded) {
+      var points = [];
+      var index = 0, len = encoded.length;
+      var lat = 0, lng = 0;
+      while (index < len) {
+        var b, shift = 0, result = 0;
+        do {
+          b = encoded.charCodeAt(index++) - 63;
+          result |= (b & 0x1f) << shift;
+          shift += 5;
+        } while (b >= 0x20);
+        var dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+        lat += dlat;
+        shift = 0;
+        result = 0;
+        do {
+          b = encoded.charCodeAt(index++) - 63;
+          result |= (b & 0x1f) << shift;
+          shift += 5;
+        } while (b >= 0x20);
+        var dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
+        lng += dlng;
+        points.push([lat / 1e5, lng / 1e5]);
+      }
+      return points;
+    }
+
+    var map = L.map('map').setView([-0.309324, -78.4156], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OpenStreetMap contributors'}).addTo(map);
+    L.marker([-0.309324, -78.4156]).addTo(map).bindPopup('Local');
+    L.marker([-0.314484, -78.4447]).addTo(map).bindPopup('Cliente: Abner');
+    L.marker([-0.292032, -78.4778]).addTo(map).bindPopup('Cliente: Alberto');
+    fetch('http://router.project-osrm.org/route/v1/driving/-78.415604,-0.309324;-78.444701,-0.314484;-78.477799,-0.292032?overview=full&geometries=polyline')
+      .then(response => response.json())
+      .then(data => {
+         var encoded = data.routes[0].geometry;
+         var routeCoords = decodePolyline(encoded);
+         var polyline = L.polyline(routeCoords, {color: 'blue'}).addTo(map);
+         map.fitBounds(polyline.getBounds());
+      })
+      .catch(error => console.error('Error obteniendo la ruta:', error));
+  </script>
 </body>
 </html>

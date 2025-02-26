@@ -28,7 +28,8 @@ bool getCoordinates(const string &address, double &lat, double &lon) {
         }
     }
     // Se usa curl para obtener la respuesta JSON
-    string command = "curl -s \"https://nominatim.openstreetmap.org/search?format=json&countrycodes=EC&q=" + encoded + "\" > temp.json";
+    string command = "curl -s \"https://nominatim.openstreetmap.org/search?format=json&countrycodes=EC&q=" 
+                     + encoded + "\" > temp.json";
     system(command.c_str());
     
     ifstream inFile("temp.json");
@@ -63,7 +64,7 @@ bool getCoordinates(const string &address, double &lat, double &lon) {
     return true;
 }
 
-// Calcula la distancia entre dos puntos (en km) usando la fórmula de Haversine
+// Función para calcular la distancia en línea recta usando la fórmula de Haversine (como fallback)
 double haversine(double lat1, double lon1, double lat2, double lon2) {
     const double R = 6371.0; // Radio de la Tierra en km
     double dLat = (lat2 - lat1) * M_PI / 180.0;
@@ -73,6 +74,36 @@ double haversine(double lat1, double lon1, double lat2, double lon2) {
                sin(dLon / 2) * sin(dLon / 2);
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
     return R * c;
+}
+
+// Función para obtener la distancia de ruta real (por calles) entre dos puntos usando el API de OSRM
+double getRoadDistance(double lat1, double lon1, double lat2, double lon2) {
+    // Construir la URL para OSRM (nota: OSRM usa el formato lon,lat)
+    string url = "http://router.project-osrm.org/route/v1/driving/";
+    url += to_string(lon1) + "," + to_string(lat1) + ";" + to_string(lon2) + "," + to_string(lat2) + "?overview=false";
+    string command = "curl -s \"" + url + "\" > route.json";
+    system(command.c_str());
+    
+    ifstream inFile("route.json");
+    if (!inFile) return haversine(lat1, lon1, lat2, lon2); // fallback a Haversine si falla
+    string content((istreambuf_iterator<char>(inFile)), istreambuf_iterator<char>());
+    inFile.close();
+    remove("route.json");
+    
+    // Buscar el campo "distance" en el JSON devuelto (en metros)
+    size_t pos = content.find("\"distance\":");
+    if (pos == string::npos) return haversine(lat1, lon1, lat2, lon2);
+    pos += 11; // Moverse después de "distance":
+    size_t endPos = content.find(",", pos);
+    if (endPos == string::npos) return haversine(lat1, lon1, lat2, lon2);
+    string distStr = content.substr(pos, endPos - pos);
+    double distance;
+    try {
+        distance = stod(distStr);
+    } catch (...) {
+        return haversine(lat1, lon1, lat2, lon2);
+    }
+    return distance / 1000.0; // Convertir de metros a km
 }
 
 // Muestra los clientes registrados leyendo "clientes.txt"
@@ -131,7 +162,7 @@ vector<Client> leerClientes() {
 double bestDistance = 1e9;
 vector<int> bestRoute;
 
-// Algoritmo de backtracking para encontrar la ruta con menor distancia total
+// Algoritmo de backtracking para encontrar la ruta con menor distancia total usando distancias por carretera
 void backtrack(vector<int>& route, vector<bool>& used, double currentDistance,
                double startLat, double startLon, const vector<Client>& clients) {
     int n = clients.size();
@@ -153,7 +184,8 @@ void backtrack(vector<int>& route, vector<bool>& used, double currentDistance,
                 fromLat = clients[lastIndex].lat;
                 fromLon = clients[lastIndex].lon;
             }
-            double d = haversine(fromLat, fromLon, clients[i].lat, clients[i].lon);
+            // Usamos getRoadDistance en lugar de haversine
+            double d = getRoadDistance(fromLat, fromLon, clients[i].lat, clients[i].lon);
             if(currentDistance + d < bestDistance) { // poda
                 used[i] = true;
                 route.push_back(i);
@@ -167,43 +199,85 @@ void backtrack(vector<int>& route, vector<bool>& used, double currentDistance,
 
 // Función para generar el archivo HTML que muestra la ruta en el mapa usando Leaflet
 void generarHTMLRuta(const double localLat, const double localLon,
-                     const vector<Client>& clients, const vector<int>& route,
-                     double totalDistance) {
+        const vector<Client>& clients, const vector<int>& route,
+        double totalDistance) {
     ofstream out("route_result.html");
     if (!out) {
-       cout << "No se pudo generar el archivo de resultado.\n";
-       return;
+    cout << "No se pudo generar el archivo de resultado.\n";
+    return;
     }
+    // Generamos la URL de OSRM con todos los puntos (en formato lon,lat)
+    string osrmURL = "http://router.project-osrm.org/route/v1/driving/";
+    // Primer punto: local (recordar: OSRM usa lon,lat)
+    osrmURL += to_string(localLon) + "," + to_string(localLat);
+    // Luego, cada cliente en el orden de la ruta
+    for (int idx : route) {
+    osrmURL += ";" + to_string(clients[idx].lon) + "," + to_string(clients[idx].lat);
+    }
+    osrmURL += "?overview=full&geometries=polyline";
+
     out << "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n";
-    out << "<meta charset=\"UTF-8\">\n";
-    out << "<title>Ruta Óptima de Entregas</title>\n";
-    out << "<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\"/>\n";
-    out << "<script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\"></script>\n";
-    out << "<style>#map { height: 600px; } body { text-align: center; font-family: Arial, sans-serif; }</style>\n";
+    out << "  <meta charset=\"UTF-8\">\n";
+    out << "  <title>Ruta Óptima de Entregas</title>\n";
+    out << "  <link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\"/>\n";
+    out << "  <script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\"></script>\n";
+    out << "  <style>#map { height: 600px; } body { text-align: center; font-family: Arial, sans-serif; }</style>\n";
     out << "</head>\n<body>\n";
-    out << "<h2>Ruta Óptima de Entregas</h2>\n";
-    out << "<p>Distancia total: " << totalDistance << " km</p>\n";
-    out << "<div id=\"map\"></div>\n";
-    out << "<script>\n";
-    out << "var map = L.map('map').setView([" << localLat << ", " << localLon << "], 13);\n";
-    out << "L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OpenStreetMap contributors'}).addTo(map);\n";
-    // Definir arreglo de coordenadas: primer punto es el local y luego las coordenadas de los clientes en orden
-    out << "var routeCoords = [\n";
-    out << "[" << localLat << ", " << localLon << "],\n";
+    out << "  <h2>Ruta Óptima de Entregas</h2>\n";
+    out << "  <p>Distancia total: " << totalDistance << " km</p>\n";
+    out << "  <div id=\"map\"></div>\n";
+    out << "  <script>\n";
+    out << "    // Función para decodificar una cadena polyline (algoritmo de Google)\n";
+    out << "    function decodePolyline(encoded) {\n";
+    out << "      var points = [];\n";
+    out << "      var index = 0, len = encoded.length;\n";
+    out << "      var lat = 0, lng = 0;\n";
+    out << "      while (index < len) {\n";
+    out << "        var b, shift = 0, result = 0;\n";
+    out << "        do {\n";
+    out << "          b = encoded.charCodeAt(index++) - 63;\n";
+    out << "          result |= (b & 0x1f) << shift;\n";
+    out << "          shift += 5;\n";
+    out << "        } while (b >= 0x20);\n";
+    out << "        var dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));\n";
+    out << "        lat += dlat;\n";
+    out << "        shift = 0;\n";
+    out << "        result = 0;\n";
+    out << "        do {\n";
+    out << "          b = encoded.charCodeAt(index++) - 63;\n";
+    out << "          result |= (b & 0x1f) << shift;\n";
+    out << "          shift += 5;\n";
+    out << "        } while (b >= 0x20);\n";
+    out << "        var dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));\n";
+    out << "        lng += dlng;\n";
+    out << "        points.push([lat / 1e5, lng / 1e5]);\n";
+    out << "      }\n";
+    out << "      return points;\n";
+    out << "    }\n\n";
+
+    // Inicializar el mapa en la ubicación del local
+    out << "    var map = L.map('map').setView([" << localLat << ", " << localLon << "], 13);\n";
+    out << "    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OpenStreetMap contributors'}).addTo(map);\n";
+    // Marcador para el local
+    out << "    L.marker([" << localLat << ", " << localLon << "]).addTo(map).bindPopup('Local');\n";
+
+    // Agregar marcadores para los clientes en la ruta
     for (int idx : route) {
-        out << "[" << clients[idx].lat << ", " << clients[idx].lon << "],\n";
+    out << "    L.marker([" << clients[idx].lat << ", " << clients[idx].lon << "]).addTo(map).bindPopup('Cliente: " << clients[idx].nombre << "');\n";
     }
-    out << "];\n";
-    // Agregar marcador para el local
-    out << "L.marker([" << localLat << ", " << localLon << "]).addTo(map).bindPopup('Local');\n";
-    // Agregar marcadores para los clientes
-    for (int idx : route) {
-        out << "L.marker([" << clients[idx].lat << ", " << clients[idx].lon << "]).addTo(map).bindPopup('Cliente: " << clients[idx].nombre << "');\n";
-    }
-    // Dibujar polyline con la ruta
-    out << "var polyline = L.polyline(routeCoords, {color: 'blue'}).addTo(map);\n";
-    out << "map.fitBounds(polyline.getBounds());\n";
-    out << "</script>\n";
+
+    // Obtener la ruta real (geométricamente) de OSRM
+    out << "    fetch('" << osrmURL << "')\n";
+    out << "      .then(response => response.json())\n";
+    out << "      .then(data => {\n";
+    out << "         var encoded = data.routes[0].geometry;\n";
+    out << "         var routeCoords = decodePolyline(encoded);\n";
+    out << "         var polyline = L.polyline(routeCoords, {color: 'blue'}).addTo(map);\n";
+    out << "         map.fitBounds(polyline.getBounds());\n";
+    out << "      })\n";
+    out << "      .catch(error => console.error('Error obteniendo la ruta:', error));\n";
+
+    out << "  </script>\n";
     out << "</body>\n</html>\n";
     out.close();
 }
@@ -235,7 +309,7 @@ void calcularRutaEntregas() {
             return;
         }
     }
-    // Ejecutar backtracking para hallar la ruta óptima
+    // Ejecutar backtracking para hallar la ruta óptima usando distancias reales por carretera
     bestDistance = 1e9;
     bestRoute.clear();
     vector<int> route;
