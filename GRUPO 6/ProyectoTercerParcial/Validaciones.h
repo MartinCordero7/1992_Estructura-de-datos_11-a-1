@@ -15,16 +15,13 @@
 #include <regex>
 #include <iostream>
 #include <cctype>
-#include "Fecha.h"
 
 using namespace std;
 
 class Validaciones {
 public:
-    static bool validarFechaPublicacion(const string& fechaPub, const string& fechaNacAutor);
     static bool validarTituloNombre(const string& texto, const string& campo);
     static bool validarTitulo(const string& texto, const string& campo);
-    static bool validarFecha(const string& fecha);
     static bool validarIsbn(const string& isbn);
     static bool validarIsni(const string& isni);
     static bool validarTextoNoVacio(const string& texto, const string& campo);
