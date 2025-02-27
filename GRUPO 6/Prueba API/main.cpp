@@ -1,3 +1,4 @@
+#include <windows.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -6,6 +7,9 @@
 #include <cstdlib>
 #include <cmath>
 #include <algorithm>
+#include <chrono>
+#include <thread>
+#define _USE_MATH_DEFINES
 
 using namespace std;
 
@@ -16,6 +20,47 @@ struct Client {
     double lat;
     double lon;
 };
+// Función para registrar un nuevo cliente
+void registrarCliente() {
+    string cedula, nombre;
+    
+    cout << "Ingrese la cédula del cliente: ";
+    getline(cin, cedula);
+    
+    cout << "Ingrese el nombre del cliente: ";
+    getline(cin, nombre);
+    
+    cout << "A continuación se abrirá el mapa para seleccionar la zona de entrega...\n";
+    system("start select_zone.html");
+    
+    cout << "Por favor, seleccione la ubicación en el mapa y presione 'Confirmar'.\n";
+    cout << "Presione ENTER cuando haya confirmado la ubicación...";
+    cin.get();
+    
+    // Leer la zona seleccionada del archivo temporal
+    ifstream zoneFile("selected_zone.txt");
+    string zona;
+    if (zoneFile.is_open()) {
+        getline(zoneFile, zona);
+        zoneFile.close();
+        
+        // Guardar el cliente en el archivo
+        ofstream clientFile("clientes.txt", ios::app);
+        if (clientFile.is_open()) {
+            clientFile << "Cédula: " << cedula << ", Nombre: " << nombre 
+                    << ", Zona de entrega: " << zona << endl;
+            clientFile.close();
+            cout << "\nCliente registrado exitosamente!\n";
+            
+            // Limpiar el archivo temporal
+            remove("selected_zone.txt");
+        } else {
+            cout << "Error al guardar el cliente.\n";
+        }
+    } else {
+        cout << "Error: No se pudo obtener la zona seleccionada.\n";
+    }
+}
 
 // Función para consultar la API de Nominatim y obtener coordenadas a partir de una dirección
 bool getCoordinates(const string &address, double &lat, double &lon) {
@@ -29,7 +74,7 @@ bool getCoordinates(const string &address, double &lat, double &lon) {
     }
     // Se usa curl para obtener la respuesta JSON
     string command = "curl -s \"https://nominatim.openstreetmap.org/search?format=json&countrycodes=EC&q=" 
-                     + encoded + "\" > temp.json";
+                    + encoded + "\" > temp.json";
     system(command.c_str());
     
     ifstream inFile("temp.json");
@@ -164,7 +209,7 @@ vector<int> bestRoute;
 
 // Algoritmo de backtracking para encontrar la ruta con menor distancia total usando distancias por carretera
 void backtrack(vector<int>& route, vector<bool>& used, double currentDistance,
-               double startLat, double startLon, const vector<Client>& clients) {
+            double startLat, double startLon, const vector<Client>& clients) {
     int n = clients.size();
     if(route.size() == n) {
         if(currentDistance < bestDistance) {
@@ -285,17 +330,42 @@ void generarHTMLRuta(const double localLat, const double localLon,
 // Función que realiza todo el proceso para calcular la ruta de entregas
 void calcularRutaEntregas() {
     cout << "Se abrirá una ventana para seleccionar la ubicación del local.\n";
-    // Abre la página para seleccionar la ubicación del local
-    system("start select_local.html");  // Para Windows; en Linux/Mac usar "xdg-open" o "open"
-    cout << "Seleccione la ubicación del local en el mapa y haga clic en 'Confirmar Local'.\n";
-    cout << "Cuando se muestren los valores (latitud y longitud), cópielos y péguelo aquí.\n";
+    system("start select_local.html");
+    cout << "Por favor, seleccione la ubicación del local en el mapa y presione 'Confirmar Local'.\n";
+    cout << "Esperando confirmación...\n";
     
     double localLat, localLon;
-    cout << "Ingrese la latitud del local: ";
-    cin >> localLat;
-    cout << "Ingrese la longitud del local: ";
-    cin >> localLon;
-    cin.ignore();
+    bool coordsRead = false;
+    
+    for(int i = 0; i < 30 && !coordsRead; i++) {
+        ifstream coordsFile("local_coords.txt");
+        if(coordsFile.is_open()) {
+            string coords;
+            getline(coordsFile, coords);
+            coordsFile.close();
+            remove("local_coords.txt");
+            
+            size_t comma = coords.find(',');
+            if(comma != string::npos) {
+                try {
+                    localLat = stod(coords.substr(0, comma));
+                    localLon = stod(coords.substr(comma + 1));
+                    coordsRead = true;
+                } catch(...) {
+                    cout << "Error al leer las coordenadas.\n";
+                    return;
+                }
+            }
+        }
+        if(!coordsRead) {
+            Sleep(1000); // Using Windows.h Sleep instead of chrono
+        }
+    }
+    
+    if(!coordsRead) {
+        cout << "No se pudo obtener la ubicación del local.\n";
+        return;
+    }
     
     vector<Client> clients = leerClientes();
     if (clients.empty()) {
@@ -334,22 +404,30 @@ void calcularRutaEntregas() {
 }
 
 int main() {
+    // Verificar que el servidor Flask esté corriendo
+    cout << "Verificando conexión con el servidor...\n";
+    string check_command = "curl -s http://localhost:5000/get_clients > nul 2>&1";
+    if (system(check_command.c_str()) != 0) {
+        cout << "Error: El servidor no está en ejecución.\n";
+        cout << "Por favor, ejecute 'python server.py' en una terminal separada.\n";
+        return 1;
+    }
+
     int opcion;
     do {
-        cout << "\n===== MENU =====\n";
-        cout << "1. Registrar cliente (abrir mapa)\n";
+        cout << "\n===== SISTEMA DE GESTIÓN DE ENTREGAS =====\n";
+        cout << "1. Registrar nuevo cliente\n";
         cout << "2. Mostrar clientes registrados\n";
-        cout << "3. Calcular ruta de entregas\n";
+        cout << "3. Calcular ruta óptima de entregas\n";
         cout << "4. Salir\n";
-        cout << "Seleccione una opción: ";
+        cout << "Ingrese su opción: ";
+        
         cin >> opcion;
-        cin.ignore(); // Limpiar buffer
+        cin.ignore();
+
         switch(opcion) {
             case 1:
-                cout << "Abriendo registro de cliente en el navegador...\n";
-                system("start map.html");  // Asegúrate de tener tu map.html para registrar clientes
-                cout << "Presione ENTER cuando cierre la ventana...\n";
-                cin.get();
+                registrarCliente();
                 break;
             case 2:
                 mostrarClientes();
@@ -358,11 +436,14 @@ int main() {
                 calcularRutaEntregas();
                 break;
             case 4:
-                cout << "Saliendo...\n";
+                cout << "Gracias por usar el sistema.\n";
                 break;
             default:
-                cout << "Opción no válida. Intente de nuevo.\n";
+                cout << "Opción no válida. Por favor intente de nuevo.\n";
         }
     } while(opcion != 4);
+
     return 0;
 }
+
+

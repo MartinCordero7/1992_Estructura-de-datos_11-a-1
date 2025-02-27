@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Selección de Zona de Entrega</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #map { height: 500px; width: 80%; margin: 20px auto; }
+        .controls { margin: 20px; }
+        input, button { padding: 8px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h2>Seleccione la Zona de Entrega</h2>
+    
+    <div class="controls">
+        <input type="text" id="searchInput" placeholder="Buscar ubicación...">
+        <button onclick="searchLocation()">Buscar</button>
+    </div>
+    
+    <div id="map"></div>
+    
+    <button onclick="confirmarZona()">Confirmar Zona de Entrega</button>
+
+    <script>
+        var map = L.map('map').setView([-0.180653, -78.467834], 13);
+        var marker = null;
+        var selectedAddress = "";
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        function searchLocation() {
+            var query = document.getElementById('searchInput').value;
+            if (!query) return;
+            selectedAddress = query;  // Guardamos el texto de búsqueda
+
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=EC`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        const location = data[0];
+                        map.setView([location.lat, location.lon], 15);
+                        if (marker) {
+                            marker.setLatLng([location.lat, location.lon]);
+                        } else {
+                            marker = L.marker([location.lat, location.lon]).addTo(map);
+                        }
+                    }
+                });
+        }
+
+        map.on('click', function(e) {
+            if (marker) {
+                marker.setLatLng(e.latlng);
+            } else {
+                marker = L.marker(e.latlng).addTo(map);
+            }
+            
+            // Al hacer clic, obtenemos la dirección pero guardamos solo el nombre simple
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+                .then(response => response.json())
+                .then(data => {
+                    selectedAddress = data.name || data.display_name.split(',')[0];
+                });
+        });
+
+        function confirmarZona() {
+            if (!selectedAddress) {
+                alert("Por favor, seleccione una ubicación primero");
+                return;
+            }
+
+            fetch("http://localhost:5000/save_zone", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ zona: selectedAddress })
+            })
+            .then(response => response.text())
+            .then(() => {
+                alert("Zona confirmada. Puede cerrar esta ventana.");
+                window.close();
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Error al guardar la zona. Por favor, intente nuevamente.");
+            });
+        }
+    </script>
+</body>
+</html>

@@ -46,7 +46,22 @@
         alert("Por favor, selecciona la ubicación del local en el mapa.");
         return;
       }
-      alert("Local confirmado:\nLatitud: " + lat + "\nLongitud: " + lon + "\n\nCopia estos valores y pégalos en la consola de la aplicación.");
+
+      // Guardar coordenadas usando el servidor
+      fetch("http://localhost:5000/save_local", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat: lat, lon: lon })
+      })
+      .then(response => response.text())
+      .then(() => {
+        alert("Ubicación del local guardada. Puede cerrar esta ventana.");
+        window.close();
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("Error al guardar la ubicación. Por favor, intente nuevamente.");
+      });
     }
   </script>
 </body>
