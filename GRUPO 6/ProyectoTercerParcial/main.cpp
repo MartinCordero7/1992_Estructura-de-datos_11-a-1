@@ -11,12 +11,32 @@
 
 #include "ListaCircularDoble.cpp"
 #include "Menu.cpp"
-#include <graphics.h>
+#include <windows.h>
+#include <iostream>
+#include <cstdlib>
+#include <chrono>
+#include <thread>
+
+// Función para verificar si el servidor Flask está corriendo
+bool verificarServidor() {
+    string check_command = "curl -s http://localhost:5000/get_clients > nul 2>&1";
+    return system(check_command.c_str()) == 0;
+}
+
 
 int main() {
     // Configurar la consola para usar UTF-8
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
+
+    // Verificar el servidor Flask
+    if (!verificarServidor()) {
+        std::cerr << "Error: El servidor Flask no está en ejecución.\n";
+        std::cerr << "Por favor, ejecute 'python server.py' en una terminal separada.\n";
+        system("pause");
+        return 1;
+    }
+
      // Verifica y crea la carpeta de backups si no existe
     BackupManager::crearCarpetaSiNoExiste("backup");
 

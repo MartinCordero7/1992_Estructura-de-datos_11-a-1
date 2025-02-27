@@ -10,16 +10,14 @@ class Entrega {
 public:
     Cliente cliente;
     string zona;
-    int prioridad;
-    
-    Entrega(const Cliente& cliente, const string& zona, int prioridad)
-        : cliente(cliente), zona(zona), prioridad(prioridad) {}
 
-    // Función para mostrar información de la entrega
+    Entrega(const Cliente& cliente, const string& zona)
+        : cliente(cliente), zona(zona) {}
+
     void mostrar() const {
         cout << "Cliente: ";
         cliente.mostrar();
-        cout << ", Zona: " << zona << ", Prioridad: " << prioridad << endl;
+        cout << ", Zona: " << zona << endl;
     }
 };
 
