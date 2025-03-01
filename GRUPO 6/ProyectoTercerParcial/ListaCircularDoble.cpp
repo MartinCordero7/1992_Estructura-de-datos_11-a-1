@@ -78,17 +78,19 @@ void ListaCircularDoble::imprimirEntregas() {
     cout << "\n=== LISTA DE ENTREGAS ===\n";
     cout << left << setw(30) << "Cliente"
          << setw(15) << "Cédula"
+         << setw(15) << "Celular"    // Añadida columna para celular
          << setw(30) << "Zona" << endl;
-    cout << string(75, '-') << endl;
+    cout << string(90, '-') << endl;  // Aumentado el ancho de la línea
 
     NodoEntrega* actual = cabeza;
     do {
         cout << left << setw(30) << actual->entrega.cliente.nombre
              << setw(15) << actual->entrega.cliente.cedula
+             << setw(15) << actual->entrega.cliente.celular  // Añadido el celular
              << setw(30) << actual->entrega.zona << endl;
         actual = actual->siguiente;
     } while(actual != cabeza);
-    cout << string(75, '-') << endl;
+    cout << string(90, '-') << endl;  // Aumentado el ancho de la línea
 }
 
 
@@ -142,12 +144,12 @@ void ListaCircularDoble::guardarEntregasEnArchivo() {
         do {
             archivo << actual->entrega.cliente.nombre << ";"
                    << actual->entrega.cliente.cedula << ";"
+                   << actual->entrega.cliente.celular << ";"
                    << actual->entrega.zona << "\n";
             actual = actual->siguiente;
         } while (actual != cabeza);
     }
     archivo.close();
-    cout << "Entregas guardadas en archivo correctamente.\n";
 }
 
 void ListaCircularDoble::cargarEntregasDesdeArchivo() {
@@ -165,14 +167,15 @@ void ListaCircularDoble::cargarEntregasDesdeArchivo() {
         if(linea.empty()) continue;
         
         stringstream ss(linea);
-        string nombre, cedula, zona;
+        string nombre, cedula, celular, zona;
         
         getline(ss, nombre, ';');
         getline(ss, cedula, ';');
+        getline(ss, celular, ';');
         getline(ss, zona);
 
-        if(!nombre.empty() && !cedula.empty() && !zona.empty()) {
-            Cliente cliente(nombre, cedula);
+        if(!nombre.empty() && !cedula.empty() && !celular.empty() && !zona.empty()) {
+            Cliente cliente(nombre, cedula, celular);
             Entrega entrega(cliente, zona);
             agregarEntrega(entrega);
         }
@@ -201,8 +204,9 @@ void ListaCircularDoble::crearBackup(const string& nombreArchivo) {
             const Cliente& cliente = entrega.cliente;
 
             archivo << cliente.nombre << ";"
-                << cliente.cedula << ";"
-                << entrega.zona << "\n";
+                   << cliente.cedula << ";"
+                   << cliente.celular << ";"  // Añadido el celular
+                   << entrega.zona << "\n";
             actual = actual->siguiente;
         } while (actual != cabeza);
     }
@@ -210,7 +214,6 @@ void ListaCircularDoble::crearBackup(const string& nombreArchivo) {
     archivo.close();
     cout << "Backup creado correctamente en: " << rutaCompleta << endl;
 }
-
 
 // Restaurar backup y sobreescribir archivo
 void ListaCircularDoble::restaurarBackup(const string& nombreArchivo) {
@@ -228,13 +231,14 @@ void ListaCircularDoble::restaurarBackup(const string& nombreArchivo) {
     string linea;
     while (getline(archivo, linea)) {
         stringstream ss(linea);
-        string nombre, cedula, zona;
+        string nombre, cedula, celular, zona;
 
         getline(ss, nombre, ';');
         getline(ss, cedula, ';');
-        getline(ss, zona, ';');
+        getline(ss, celular, ';');  // Añadido el celular
+        getline(ss, zona);
 
-        Cliente cliente(nombre, cedula);
+        Cliente cliente(nombre, cedula, celular);  // Actualizado el constructor
         Entrega entrega(cliente, zona);
         agregarEntrega(entrega);
     }

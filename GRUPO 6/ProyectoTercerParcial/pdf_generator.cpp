@@ -28,24 +28,18 @@ vector<string> split(const string &line, char delimiter) {
     return tokens;
 }
 
-// Función para crear el PDF de entregas
 void createPDF(const std::string& inputFile) {
-    // Crear el objeto de documento PDF
     HPDF_Doc pdf = HPDF_New(NULL, NULL);
     if (!pdf) {
         cerr << "Error al crear el PDF" << endl;
         return;
     } 
 
-    // Crear una página
     HPDF_Page page = HPDF_AddPage(pdf);
     HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
-
-    // Establecer la fuente
     HPDF_Font font = HPDF_GetFont(pdf, "Helvetica", NULL);
     HPDF_Page_SetFontAndSize(page, font, 10);
 
-    // Leer el archivo .txt de entregas
     ifstream file(inputFile);
     if (!file.is_open()) {
         cerr << "Error al abrir el archivo" << endl;
@@ -53,25 +47,22 @@ void createPDF(const std::string& inputFile) {
         return;
     }
 
-    // Posición inicial en la página
     float yPosition = 750;
     float xPosition = 50;
 
-    // Títulos de las columnas para entregas
+    // Actualizar títulos de columnas para incluir celular
     HPDF_Page_BeginText(page);
     HPDF_Page_TextOut(page, xPosition, yPosition, "Cliente");
-    HPDF_Page_TextOut(page, xPosition + 150, yPosition, "Cédula");
+    HPDF_Page_TextOut(page, xPosition + 120, yPosition, "Cedula");
+    HPDF_Page_TextOut(page, xPosition + 200, yPosition, "Celular");  // Nueva columna
     HPDF_Page_TextOut(page, xPosition + 300, yPosition, "Zona");
-    HPDF_Page_TextOut(page, xPosition + 450, yPosition, "Prioridad");
     HPDF_Page_EndText(page);
 
-    // Línea separadora de títulos
     yPosition -= 20;
     HPDF_Page_MoveTo(page, xPosition, yPosition);
     HPDF_Page_LineTo(page, xPosition + 500, yPosition);
     HPDF_Page_Stroke(page);
 
-    // Leer cada línea del archivo y escribir en el PDF
     while (!file.eof()) {
         string line;
         getline(file, line);
@@ -79,16 +70,15 @@ void createPDF(const std::string& inputFile) {
 
         vector<string> fields = split(line, ';');
 
-        // Escribir cada campo (se espera: cliente, cédula, zona, prioridad)
+        // Escribir campos incluyendo el celular
         yPosition -= 20;
         HPDF_Page_BeginText(page);
         HPDF_Page_TextOut(page, xPosition, yPosition, fields.size() > 0 ? fields[0].c_str() : "");
-        HPDF_Page_TextOut(page, xPosition + 150, yPosition, fields.size() > 1 ? fields[1].c_str() : "");
-        HPDF_Page_TextOut(page, xPosition + 300, yPosition, fields.size() > 2 ? fields[2].c_str() : "");
-        HPDF_Page_TextOut(page, xPosition + 450, yPosition, fields.size() > 3 ? fields[3].c_str() : "");
+        HPDF_Page_TextOut(page, xPosition + 120, yPosition, fields.size() > 1 ? fields[1].c_str() : "");
+        HPDF_Page_TextOut(page, xPosition + 200, yPosition, fields.size() > 2 ? fields[2].c_str() : ""); // Celular
+        HPDF_Page_TextOut(page, xPosition + 300, yPosition, fields.size() > 3 ? fields[3].c_str() : ""); // Zona
         HPDF_Page_EndText(page);
 
-        // Si la página se llena, añadir una nueva página
         if (yPosition < 100) {
             page = HPDF_AddPage(pdf);
             HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
@@ -98,10 +88,8 @@ void createPDF(const std::string& inputFile) {
     }
 
     file.close();
-
-    // Guardar el PDF
-    HPDF_SaveToFile(pdf, "output.pdf");
-
-    // Liberar el objeto PDF
+    HPDF_SaveToFile(pdf, "entregas.pdf");
     HPDF_Free(pdf);
+    
+    cout << "PDF generado correctamente como 'entregas.pdf'" << endl;
 }

@@ -9,13 +9,13 @@ class Cliente {
 public:
     string nombre;
     string cedula;
+    string celular;  // Nuevo campo
     
-    Cliente(const string& nombre, const string& cedula)
-        : nombre(nombre), cedula(cedula) {}
+    Cliente(const string& nombre, const string& cedula, const string& celular)
+        : nombre(nombre), cedula(cedula), celular(celular) {}
 
-    // Función para mostrar información del cliente
     void mostrar() const {
-        cout << "Nombre: " << nombre << ", Cédula: " << cedula;
+        cout << "Nombre: " << nombre << ", Cédula: " << cedula << ", Celular: " << celular;
     }
 };
 
