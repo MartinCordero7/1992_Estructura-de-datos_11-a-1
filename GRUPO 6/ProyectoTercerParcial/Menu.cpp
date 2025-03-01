@@ -21,10 +21,10 @@
 #include <ctime>
 #include "pdf_generator.h"
 #include <windows.h>
-#include "funciones.h"
 #include "Entrega.h"
 #include "Cliente.h"
 #include <fstream>
+#include <iomanip>
 #include <functional>
 
 using namespace std;
@@ -216,27 +216,85 @@ void mostrarMenu(ListaCircularDoble& lista) {
                 cout << "Presione ENTER cuando haya confirmado la ubicación...";
                 cin.get();
                 
-                ifstream zoneFile("api_mapa/selected_zone.txt");
-                if (zoneFile.is_open()) {
-                    getline(zoneFile, zona);
-                    zoneFile.close();
-                    remove("api_mapa/selected_zone.txt");
-                    
-                    Cliente cliente(nombreCliente, cedula);
-                    Entrega entrega(cliente, zona);
-                    lista.agregarEntrega(entrega);
-                    cout << "\nEntrega registrada exitosamente!\n";
-                } else {
+                // Esperar hasta que el archivo exista o timeout
+                bool zoneFound = false;
+                for(int i = 0; i < 30 && !zoneFound; i++) {
+                    ifstream zoneFile("selected_zone.txt");
+                    if (zoneFile.is_open()) {
+                        getline(zoneFile, zona);
+                        zoneFile.close();
+                        remove("selected_zone.txt");
+                        zoneFound = true;
+                        
+                        Cliente cliente(nombreCliente, cedula);
+                        Entrega entrega(cliente, zona);
+                        lista.agregarEntrega(entrega);
+                        cout << "\nEntrega registrada exitosamente!\n";
+                    } else {
+                        Sleep(1000); // Esperar 1 segundo antes de intentar de nuevo
+                    }
+                }
+                
+                if (!zoneFound) {
                     cout << "Error: No se pudo obtener la zona seleccionada.\n";
                 }
             }
+            else if (opcionSeleccionada == "Buscar entrega") {
+                string cedula;
+                cout << "Ingrese la cédula del cliente a buscar: ";
+                getline(cin, cedula);
+                if (cedula.empty()) continue;
+                
+                NodoEntrega* encontrado = lista.buscarEntregaPorCedula(cedula);
+                if (encontrado) {
+                    cout << "\nEntrega encontrada:\n";
+                    cout << "Nombre: " << encontrado->entrega.cliente.nombre << "\n";
+                    cout << "Cédula: " << encontrado->entrega.cliente.cedula << "\n";
+                    cout << "Zona: " << encontrado->entrega.zona << "\n";
+                } else {
+                    cout << "No se encontró ninguna entrega con esa cédula.\n";
+                }
+            }
+            else if (opcionSeleccionada == "Eliminar entrega") {
+                string cedula;
+                cout << "Ingrese la cédula del cliente cuya entrega desea eliminar: ";
+                getline(cin, cedula);
+                if (cedula.empty()) continue;
+                
+                if (lista.eliminarEntrega(cedula)) {
+                    cout << "Entrega eliminada exitosamente.\n";
+                } else {
+                    cout << "No se encontró ninguna entrega con esa cédula.\n";
+                }
+            }
+            else if (opcionSeleccionada == "Ver todas las entregas") {
+                if (lista.estaVacia()) {
+                    cout << "\nNo hay entregas registradas.\n";
+                } else {
+                    cout << "\n=== LISTA DE ENTREGAS ===\n";
+                    cout << left << setw(30) << "Cliente"
+                         << setw(15) << "Cédula"
+                         << setw(30) << "Zona" << endl;
+                    cout << string(75, '-') << endl;
+            
+                    NodoEntrega* actual = lista.cabeza;
+                    do {
+                        cout << left << setw(30) << actual->entrega.cliente.nombre
+                             << setw(15) << actual->entrega.cliente.cedula
+                             << setw(30) << actual->entrega.zona << endl;
+                        actual = actual->siguiente;
+                    } while (actual != lista.cabeza);
+                    cout << string(75, '-') << endl;
+                }
+            }
+            // En Menu.cpp, reemplaza la sección de "Realizar entregas" con esto:
             else if (opcionSeleccionada == "Realizar entregas") {
                 if (lista.estaVacia()) {
                     cout << "No hay entregas pendientes.\n";
                     continue;
                 }
             
-                cout << "Seleccionando ubicación del local...\n";
+                cout << "Se abrirá una ventana para seleccionar la ubicación del local.\n";
                 system("start api_mapa/select_local.html");
                 cout << "Por favor, seleccione la ubicación del local en el mapa y presione 'Confirmar Local'.\n";
                 cout << "Esperando confirmación...\n";
@@ -246,12 +304,12 @@ void mostrarMenu(ListaCircularDoble& lista) {
                 
                 // Leer coordenadas del local
                 for(int i = 0; i < 30 && !coordsRead; i++) {
-                    ifstream coordsFile("api_mapa/local_coords.txt");
+                    ifstream coordsFile("local_coords.txt");
                     if(coordsFile.is_open()) {
                         string coords;
                         getline(coordsFile, coords);
                         coordsFile.close();
-                        remove("api_mapa/local_coords.txt");
+                        remove("local_coords.txt");
                         
                         size_t comma = coords.find(',');
                         if(comma != string::npos) {
@@ -264,7 +322,7 @@ void mostrarMenu(ListaCircularDoble& lista) {
                             }
                         }
                     }
-                    if (!coordsRead) Sleep(1000);
+                    if(!coordsRead) Sleep(1000);
                 }
                 
                 if(!coordsRead) {
@@ -272,9 +330,9 @@ void mostrarMenu(ListaCircularDoble& lista) {
                     continue;
                 }
             
-                // Obtener coordenadas de todas las entregas
+                // Obtener coordenadas de todas las entregas usando la lista circular
                 vector<pair<double, double>> coordenadas;
-                vector<NodoEntrega*> nodos; // Para mantener referencia a los nodos originales
+                vector<NodoEntrega*> nodos;
                 NodoEntrega* actual = lista.cabeza;
                 
                 do {
@@ -286,41 +344,42 @@ void mostrarMenu(ListaCircularDoble& lista) {
                         cout << "No se pudieron obtener coordenadas para: " << actual->entrega.zona << "\n";
                     }
                     actual = actual->siguiente;
-                } while (actual != lista.cabeza);
+                } while(actual != lista.cabeza);
             
-                if (coordenadas.empty()) {
+                if(coordenadas.empty()) {
                     cout << "No se pudieron obtener coordenadas para ninguna entrega.\n";
                     continue;
                 }
             
-                // Calcular ruta óptima usando backtracking
+                // Calcular ruta óptima usando backtracking con distancias reales por carretera
                 vector<int> bestRoute;
-                double bestDistance = numeric_limits<double>::max();
+                double bestDistance = 1e9;
                 vector<int> currentRoute;
-                vector<bool> visited(coordenadas.size(), false);
+                vector<bool> used(coordenadas.size(), false);
             
-                // Función de backtracking
                 function<void(double)> backtrack = [&](double currentDist) {
-                    if (currentRoute.size() == coordenadas.size()) {
-                        if (currentDist < bestDistance) {
+                    if(currentRoute.size() == coordenadas.size()) {
+                        if(currentDist < bestDistance) {
                             bestDistance = currentDist;
                             bestRoute = currentRoute;
                         }
                         return;
                     }
             
-                    for (size_t i = 0; i < coordenadas.size(); i++) {
-                        if (!visited[i]) {
+                    for(size_t i = 0; i < coordenadas.size(); i++) {
+                        if(!used[i]) {
                             double fromLat = currentRoute.empty() ? localLat : coordenadas[currentRoute.back()].first;
                             double fromLon = currentRoute.empty() ? localLon : coordenadas[currentRoute.back()].second;
+                            
+                            // Usar getRoadDistance para obtener la distancia real por carreteras
                             double dist = getRoadDistance(fromLat, fromLon, coordenadas[i].first, coordenadas[i].second);
-            
-                            if (currentDist + dist < bestDistance) {
-                                visited[i] = true;
+                            
+                            if(currentDist + dist < bestDistance) {
+                                used[i] = true;
                                 currentRoute.push_back(i);
                                 backtrack(currentDist + dist);
                                 currentRoute.pop_back();
-                                visited[i] = false;
+                                used[i] = false;
                             }
                         }
                     }
@@ -328,19 +387,12 @@ void mostrarMenu(ListaCircularDoble& lista) {
             
                 backtrack(0);
             
-                if (!bestRoute.empty()) {
+                if(!bestRoute.empty()) {
                     cout << "\nRuta óptima de entregas:\n";
                     cout << "Punto de inicio (Local): (" << localLat << ", " << localLon << ")\n";
                     
-                    for (int idx : bestRoute) {
-                        cout << "-> Cliente: " << nodos[idx]->entrega.cliente.nombre 
-                             << " (" << nodos[idx]->entrega.zona << ")\n";
-                    }
-                    cout << "\nDistancia total: " << bestDistance << " km\n";
-            
-                    // Generar visualización HTML de la ruta
                     ofstream out("api_mapa/route_result.html");
-                    if (out.is_open()) {
+                    if(out.is_open()) {
                         out << "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n";
                         out << "  <meta charset=\"UTF-8\">\n";
                         out << "  <title>Ruta Óptima de Entregas</title>\n";
@@ -352,26 +404,69 @@ void mostrarMenu(ListaCircularDoble& lista) {
                         out << "  <p>Distancia total: " << bestDistance << " km</p>\n";
                         out << "  <div id=\"map\"></div>\n";
                         out << "  <script>\n";
+            
+                        // Función para decodificar polyline
+                        out << "    function decodePolyline(str) {\n";
+                        out << "        var points = [], lat = 0, lon = 0;\n";
+                        out << "        for(var i = 0; i < str.length;) {\n";
+                        out << "            var shift = 0, result = 0;\n";
+                        out << "            do {\n";
+                        out << "                var b = str.charCodeAt(i++) - 63;\n";
+                        out << "                result |= (b & 0x1f) << shift;\n";
+                        out << "                shift += 5;\n";
+                        out << "            } while(b >= 0x20);\n";
+                        out << "            lat += ((result & 1) ? ~(result >> 1) : (result >> 1));\n";
+                        out << "            shift = 0; result = 0;\n";
+                        out << "            do {\n";
+                        out << "                var b = str.charCodeAt(i++) - 63;\n";
+                        out << "                result |= (b & 0x1f) << shift;\n";
+                        out << "                shift += 5;\n";
+                        out << "            } while(b >= 0x20);\n";
+                        out << "            lon += ((result & 1) ? ~(result >> 1) : (result >> 1));\n";
+                        out << "            points.push([lat * 1e-5, lon * 1e-5]);\n";
+                        out << "        }\n";
+                        out << "        return points;\n";
+                        out << "    }\n\n";
                         
+                        // Inicializar mapa
                         out << "    var map = L.map('map').setView([" << localLat << ", " << localLon << "], 13);\n";
                         out << "    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', "
                             << "{attribution: '&copy; OpenStreetMap contributors'}).addTo(map);\n";
+            
+                        // Generar URL de OSRM para la ruta completa
+                        string osrmURL = "http://router.project-osrm.org/route/v1/driving/";
+                        osrmURL += to_string(localLon) + "," + to_string(localLat);
                         
-                        // Agregar marcador del local
-                        out << "    L.marker([" << localLat << ", " << localLon 
-                            << "]).addTo(map).bindPopup('Local');\n";
+                        // Agregar marcadores
+                        out << "    L.marker([" << localLat << ", " << localLon << "]).addTo(map).bindPopup('Local');\n";
                         
-                        // Agregar marcadores y líneas de la ruta
-                        for (int idx : bestRoute) {
+                        for(int idx : bestRoute) {
+                            osrmURL += ";" + to_string(coordenadas[idx].second) + "," + to_string(coordenadas[idx].first);
                             out << "    L.marker([" << coordenadas[idx].first << ", " << coordenadas[idx].second 
                                 << "]).addTo(map).bindPopup('Cliente: " << nodos[idx]->entrega.cliente.nombre << "');\n";
+                            
+                            cout << "-> Cliente: " << nodos[idx]->entrega.cliente.nombre 
+                                 << " (" << nodos[idx]->entrega.zona << ")\n";
                         }
+                        
+                        osrmURL += "?overview=full&geometries=polyline";
+                        
+                        // Obtener y dibujar la ruta real por carreteras
+                        out << "    fetch('" << osrmURL << "')\n";
+                        out << "      .then(response => response.json())\n";
+                        out << "      .then(data => {\n";
+                        out << "         var routeCoords = decodePolyline(data.routes[0].geometry);\n";
+                        out << "         var polyline = L.polyline(routeCoords, {color: 'blue', weight: 4}).addTo(map);\n";
+                        out << "         map.fitBounds(polyline.getBounds());\n";
+                        out << "      })\n";
+                        out << "      .catch(error => console.error('Error:', error));\n";
                         
                         out << "  </script>\n</body>\n</html>\n";
                         out.close();
                         
                         system("start api_mapa/route_result.html");
                     }
+                    cout << "\nDistancia total: " << bestDistance << " km\n";
                 } else {
                     cout << "No se pudo calcular una ruta óptima.\n";
                 }

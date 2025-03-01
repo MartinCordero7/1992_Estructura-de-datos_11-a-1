@@ -19,7 +19,15 @@
 
 using namespace std;
 
-ListaCircularDoble::ListaCircularDoble() : cabeza(nullptr), evitarGuardar(false) {}
+ListaCircularDoble::ListaCircularDoble() : cabeza(nullptr), evitarGuardar(false) {
+    ifstream archivo("entregas.txt");
+    if (!archivo.is_open()) {
+        ofstream nuevoArchivo("entregas.txt");
+        nuevoArchivo.close();
+    } else {
+        archivo.close();
+    }
+}
 
 // Agregar entrega
 
@@ -66,17 +74,21 @@ void ListaCircularDoble::imprimirEntregas() {
         cout << "No hay entregas registradas.\n";
         return;
     }
-    NodoEntrega* actual = cabeza;
+
+    cout << "\n=== LISTA DE ENTREGAS ===\n";
     cout << left << setw(30) << "Cliente"
-         << setw(20) << "Cédula"
-         << setw(20) << "Zona" << endl;
-    cout << string(70, '-') << endl;
+         << setw(15) << "Cédula"
+         << setw(30) << "Zona" << endl;
+    cout << string(75, '-') << endl;
+
+    NodoEntrega* actual = cabeza;
     do {
         cout << left << setw(30) << actual->entrega.cliente.nombre
-             << setw(20) << actual->entrega.cliente.cedula
-             << setw(20) << actual->entrega.zona << endl;
+             << setw(15) << actual->entrega.cliente.cedula
+             << setw(30) << actual->entrega.zona << endl;
         actual = actual->siguiente;
     } while(actual != cabeza);
+    cout << string(75, '-') << endl;
 }
 
 
@@ -119,27 +131,23 @@ bool ListaCircularDoble::eliminarEntrega(const string& cedula) {
 
 // Guardar entregas en archivo
 void ListaCircularDoble::guardarEntregasEnArchivo() {
-    ofstream archivo("entregas_temp.txt");
+    ofstream archivo("entregas.txt");
     if (!archivo.is_open()) {
-        cout << "Error al abrir el archivo temporal para guardar.\n";
+        cout << "Error al abrir el archivo entregas.txt\n";
         return;
     }
     
-    NodoEntrega* actual = cabeza;
-    if (actual) {
+    if (cabeza) {
+        NodoEntrega* actual = cabeza;
         do {
             archivo << actual->entrega.cliente.nombre << ";"
-                << actual->entrega.cliente.cedula << ";"
-                << actual->entrega.zona << "\n";
+                   << actual->entrega.cliente.cedula << ";"
+                   << actual->entrega.zona << "\n";
             actual = actual->siguiente;
         } while (actual != cabeza);
     }
     archivo.close();
-
-    remove("entregas.txt");
-    if (rename("entregas_temp.txt", "entregas.txt") != 0) {
-        perror("Error al renombrar el archivo temporal");
-    }
+    cout << "Entregas guardadas en archivo correctamente.\n";
 }
 
 void ListaCircularDoble::cargarEntregasDesdeArchivo() {
@@ -149,20 +157,28 @@ void ListaCircularDoble::cargarEntregasDesdeArchivo() {
         return;
     }
 
+    limpiarLista();
+    evitarGuardar = true;
+
     string linea;
     while (getline(archivo, linea)) {
         if(linea.empty()) continue;
+        
         stringstream ss(linea);
         string nombre, cedula, zona;
         
         getline(ss, nombre, ';');
         getline(ss, cedula, ';');
-        getline(ss, zona, ';');
+        getline(ss, zona);
 
-        Cliente cliente(nombre, cedula);
-        Entrega entrega(cliente, zona);
-        agregarEntrega(entrega);
+        if(!nombre.empty() && !cedula.empty() && !zona.empty()) {
+            Cliente cliente(nombre, cedula);
+            Entrega entrega(cliente, zona);
+            agregarEntrega(entrega);
+        }
     }
+    
+    evitarGuardar = false;
     archivo.close();
 }
 
