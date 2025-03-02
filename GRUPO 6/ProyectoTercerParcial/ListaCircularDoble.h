@@ -53,7 +53,11 @@ public:
     void crearBackup(const string& nombreArchivo);
     void restaurarBackup(const string& nombreArchivo);
 
-    // ...otros métodos existentes si fuere necesario...
+    bool existeCedula(const string& cedula) const;
+    bool existeCelular(const string& celular) const;
+    Cliente* obtenerClientePorCedula(const string& cedula);
+    NodoEntrega* buscarTodasLasEntregasPorCedula(const string& cedula, int& cantidad);
+    bool eliminarEntrega(const string& cedula, NodoEntrega* nodoAEliminar);
 };
 
 #endif

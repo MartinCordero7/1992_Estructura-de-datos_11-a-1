@@ -20,20 +20,11 @@ using namespace std;
 
 class Validaciones {
 public:
-    static bool validarTituloNombre(const string& texto, const string& campo);
-    static bool validarTitulo(const string& texto, const string& campo);
-    static bool validarIsbn(const string& isbn);
-    static bool validarIsni(const string& isni);
-    static bool validarTextoNoVacio(const string& texto, const string& campo);
-    static bool validarTexto(const string& texto, const string& campo);
-    static bool validarIsbn10(const string& isbn);
-    static bool validarIsbn13(const string& isbn);
-    static int calcularDigitoControlIsbn10(const string& isbn);
-    static int calcularDigitoControlIsbn13(const string& isbn);
-
+    static bool validarNombreCliente(const string& nombre);
+    static bool validarCedulaEcuatoriana(const string& cedula);
+    static bool validarNumeroCelular(const string& celular);
 private:
-    static int diasEnMes(int mes, int anio);
-    static bool esBisiesto(int anio);
+    static bool verificarDigitoVerificadorCedula(const string& cedula);
 };
 
 #endif // VALIDACIONES_H

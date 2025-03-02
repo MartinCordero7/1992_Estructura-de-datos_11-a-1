@@ -143,9 +143,9 @@ void ListaCircularDoble::guardarEntregasEnArchivo() {
         NodoEntrega* actual = cabeza;
         do {
             archivo << actual->entrega.cliente.nombre << ";"
-                   << actual->entrega.cliente.cedula << ";"
-                   << actual->entrega.cliente.celular << ";"
-                   << actual->entrega.zona << "\n";
+                << actual->entrega.cliente.cedula << ";"
+                << actual->entrega.cliente.celular << ";"
+                << actual->entrega.zona << "\n";
             actual = actual->siguiente;
         } while (actual != cabeza);
     }
@@ -204,9 +204,9 @@ void ListaCircularDoble::crearBackup(const string& nombreArchivo) {
             const Cliente& cliente = entrega.cliente;
 
             archivo << cliente.nombre << ";"
-                   << cliente.cedula << ";"
-                   << cliente.celular << ";"  // Añadido el celular
-                   << entrega.zona << "\n";
+                << cliente.cedula << ";"
+                << cliente.celular << ";"  // Añadido el celular
+                << entrega.zona << "\n";
             actual = actual->siguiente;
         } while (actual != cabeza);
     }
@@ -248,4 +248,72 @@ void ListaCircularDoble::restaurarBackup(const string& nombreArchivo) {
 
     guardarEntregasEnArchivo();
     cout << "Backup restaurado: " << nombreArchivo << endl;
+}
+
+bool ListaCircularDoble::existeCedula(const string& cedula) const {
+    if (!cabeza) return false;
+    NodoEntrega* actual = cabeza;
+    do {
+        if (actual->entrega.cliente.cedula == cedula)
+            return true;
+        actual = actual->siguiente;
+    } while (actual != cabeza);
+    return false;
+}
+
+bool ListaCircularDoble::existeCelular(const string& celular) const {
+    if (!cabeza) return false;
+    NodoEntrega* actual = cabeza;
+    do {
+        if (actual->entrega.cliente.celular == celular)
+            return true;
+        actual = actual->siguiente;
+    } while (actual != cabeza);
+    return false;
+}
+
+Cliente* ListaCircularDoble::obtenerClientePorCedula(const string& cedula) {
+    if (!cabeza) return nullptr;
+    NodoEntrega* actual = cabeza;
+    do {
+        if (actual->entrega.cliente.cedula == cedula)
+            return &(actual->entrega.cliente);
+        actual = actual->siguiente;
+    } while (actual != cabeza);
+    return nullptr;
+}
+
+NodoEntrega* ListaCircularDoble::buscarTodasLasEntregasPorCedula(const string& cedula, int& cantidad) {
+    cantidad = 0;
+    NodoEntrega* primerNodo = nullptr;
+    
+    if (!cabeza) return nullptr;
+    
+    NodoEntrega* actual = cabeza;
+    do {
+        if (actual->entrega.cliente.cedula == cedula) {
+            if (!primerNodo) primerNodo = actual;
+            cantidad++;
+        }
+        actual = actual->siguiente;
+    } while (actual != cabeza);
+    
+    return primerNodo;
+}
+
+bool ListaCircularDoble::eliminarEntrega(const string& cedula, NodoEntrega* nodoAEliminar) {
+    if (!cabeza || !nodoAEliminar) return false;
+    
+    if (nodoAEliminar->siguiente == nodoAEliminar) { // Única entrega
+        cabeza = nullptr;
+    } else {
+        NodoEntrega* anterior = nodoAEliminar->anterior;
+        NodoEntrega* siguiente = nodoAEliminar->siguiente;
+        anterior->siguiente = siguiente;
+        siguiente->anterior = anterior;
+        if (nodoAEliminar == cabeza) cabeza = siguiente;
+    }
+    delete nodoAEliminar;
+    guardarEntregasEnArchivo();
+    return true;
 }

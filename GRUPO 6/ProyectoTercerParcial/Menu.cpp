@@ -73,19 +73,60 @@ void mostrarMenu(ListaCircularDoble& lista) {
 
             if (opcionSeleccionada == "Registrar entrega") {
                 string nombreCliente, cedula, celular, zona;
-                
-                cout << "Ingrese nombre del cliente: ";
-                getline(cin, nombreCliente);
-                if (nombreCliente.empty()) continue;
-                
-                cout << "Ingrese cédula del cliente: ";
-                getline(cin, cedula);
-                if (cedula.empty()) continue;
-                
-                cout << "Ingrese número de celular del cliente: ";
-                getline(cin, celular);
-                if (celular.empty()) continue;
-                
+                bool usarClienteExistente = false;
+                Cliente* clienteExistente = nullptr;
+
+                do {
+                    cout << "Ingrese cédula del cliente: ";
+                    getline(cin, cedula);
+                    if (!Validaciones::validarCedulaEcuatoriana(cedula)) continue;
+
+                    if (lista.existeCedula(cedula)) {
+                        char opcion;
+                        bool opcionValida = false;
+                        do {
+                            cout << "Esta cédula ya está registrada. ¿Desea agregar otra entrega para este cliente? (s/n): ";
+                            string entrada;
+                            getline(cin, entrada);
+                            
+                            if (entrada.length() == 1 && (tolower(entrada[0]) == 's' || tolower(entrada[0]) == 'n')) {
+                                opcion = tolower(entrada[0]);
+                                opcionValida = true;
+                            } else {
+                                cout << "Error: Por favor ingrese solo 's' o 'n'\n";
+                            }
+                        } while (!opcionValida);
+                        
+                        if (opcion == 's') {
+                            clienteExistente = lista.obtenerClientePorCedula(cedula);
+                            usarClienteExistente = true;
+                            break;
+                        }
+                        cout << "Por favor, ingrese otra cédula.\n";
+                        continue;
+                    }
+                    break;
+                } while (true);
+
+                if (!usarClienteExistente) {
+                    do {
+                        cout << "Ingrese nombre del cliente: ";
+                        getline(cin, nombreCliente);
+                    } while (!Validaciones::validarNombreCliente(nombreCliente));
+
+                    do {
+                        cout << "Ingrese número de celular del cliente: ";
+                        getline(cin, celular);
+                        if (!Validaciones::validarNumeroCelular(celular)) continue;
+                        
+                        if (lista.existeCelular(celular)) {
+                            cout << "Este número de celular ya está registrado. Por favor, ingrese otro.\n";
+                            continue;
+                        }
+                        break;
+                    } while (true);
+                }
+
                 cout << "Seleccionando zona de entrega...\n";
                 system("start api_mapa/select_zone.html");
                 
@@ -102,10 +143,17 @@ void mostrarMenu(ListaCircularDoble& lista) {
                         remove("selected_zone.txt");
                         zoneFound = true;
                         
-                        Cliente cliente(nombreCliente, cedula, celular);
-                        Entrega entrega(cliente, zona);
-                        lista.agregarEntrega(entrega);
-                        cout << "\nEntrega registrada exitosamente!\n";
+                        if (usarClienteExistente) {
+                            Cliente cliente(clienteExistente->nombre, cedula, clienteExistente->celular);
+                            Entrega entrega(cliente, zona);
+                            lista.agregarEntrega(entrega);
+                            cout << "\nEntrega adicional registrada para el cliente existente!\n";
+                        } else {
+                            Cliente cliente(nombreCliente, cedula, celular);
+                            Entrega entrega(cliente, zona);
+                            lista.agregarEntrega(entrega);
+                            cout << "\nEntrega registrada exitosamente!\n";
+                        }
                     } else {
                         Sleep(1000);
                     }
@@ -117,10 +165,15 @@ void mostrarMenu(ListaCircularDoble& lista) {
             }
             else if (opcionSeleccionada == "Buscar entrega") {
                 string cedula;
-                cout << "Ingrese la cédula del cliente a buscar: ";
-                getline(cin, cedula);
-                if (cedula.empty()) continue;
-                
+                do {
+                    cout << "Ingrese la cédula del cliente a buscar: ";
+                    getline(cin, cedula);
+                    if (!Validaciones::validarCedulaEcuatoriana(cedula)) {
+                        continue;
+                    }
+                    break;
+                } while (true);
+    
                 NodoEntrega* encontrado = lista.buscarEntregaPorCedula(cedula);
                 if (encontrado) {
                     cout << "\nEntrega encontrada:\n";
@@ -133,14 +186,76 @@ void mostrarMenu(ListaCircularDoble& lista) {
             }
             else if (opcionSeleccionada == "Eliminar entrega") {
                 string cedula;
-                cout << "Ingrese la cédula del cliente cuya entrega desea eliminar: ";
-                getline(cin, cedula);
-                if (cedula.empty()) continue;
+                do {
+                    cout << "Ingrese la cédula del cliente cuya entrega desea eliminar: ";
+                    getline(cin, cedula);
+                    if (!Validaciones::validarCedulaEcuatoriana(cedula)) {
+                        continue;
+                    }
+                    break;
+                } while (true);
                 
-                if (lista.eliminarEntrega(cedula)) {
-                    cout << "Entrega eliminada exitosamente.\n";
-                } else {
+                int cantidadEntregas = 0;
+                NodoEntrega* primeraEntrega = lista.buscarTodasLasEntregasPorCedula(cedula, cantidadEntregas);
+                
+                if (!primeraEntrega) {
                     cout << "No se encontró ninguna entrega con esa cédula.\n";
+                    continue;
+                }
+                
+                if (cantidadEntregas == 1) {
+                    if (lista.eliminarEntrega(cedula, primeraEntrega)) {
+                        cout << "Entrega eliminada exitosamente.\n";
+                    }
+                } else {
+                    cout << "\nSe encontraron " << cantidadEntregas << " entregas para esta cédula:\n";
+                    NodoEntrega* actual = primeraEntrega;
+                    int contador = 1;
+                    
+                    do {
+                        if (actual->entrega.cliente.cedula == cedula) {
+                            cout << contador << ". Zona: " << actual->entrega.zona << "\n";
+                            contador++;
+                        }
+                        actual = actual->siguiente;
+                    } while (actual != lista.cabeza); // Cambiado a lista.cabeza
+                    
+                    int seleccion;
+                    bool seleccionValida = false;
+                    NodoEntrega* entregaAEliminar = nullptr;
+                    
+                    do {
+                        cout << "\nSeleccione el número de la entrega que desea eliminar (1-" << cantidadEntregas << "): ";
+                        string entrada;
+                        getline(cin, entrada);
+                        
+                        try {
+                            seleccion = stoi(entrada);
+                            if (seleccion >= 1 && seleccion <= cantidadEntregas) {
+                                contador = 1;
+                                actual = primeraEntrega;
+                                do {
+                                    if (actual->entrega.cliente.cedula == cedula) {
+                                        if (contador == seleccion) {
+                                            entregaAEliminar = actual;
+                                            seleccionValida = true;
+                                            break;
+                                        }
+                                        contador++;
+                                    }
+                                    actual = actual->siguiente;
+                                } while (actual != lista.cabeza); // Cambiado a lista.cabeza
+                            } else {
+                                cout << "Error: Seleccione un número válido.\n";
+                            }
+                        } catch (...) {
+                            cout << "Error: Ingrese un número válido.\n";
+                        }
+                    } while (!seleccionValida);
+                    
+                    if (lista.eliminarEntrega(cedula, entregaAEliminar)) {
+                        cout << "Entrega eliminada exitosamente.\n";
+                    }
                 }
             }
             else if (opcionSeleccionada == "Ver todas las entregas") {
@@ -149,17 +264,17 @@ void mostrarMenu(ListaCircularDoble& lista) {
                 } else {
                     cout << "\n=== LISTA DE ENTREGAS ===\n";
                     cout << left << setw(30) << "Cliente"
-                         << setw(15) << "Cédula"
-                         << setw(15) << "Celular"
-                         << setw(30) << "Zona" << endl;
+                        << setw(15) << "Cédula"
+                        << setw(15) << "Celular"
+                        << setw(30) << "Zona" << endl;
                     cout << string(90, '-') << endl;
             
                     NodoEntrega* actual = lista.cabeza;
                     do {
                         cout << left << setw(30) << actual->entrega.cliente.nombre
-                             << setw(15) << actual->entrega.cliente.cedula
-                             << setw(15) << actual->entrega.cliente.celular
-                             << setw(30) << actual->entrega.zona << endl;
+                            << setw(15) << actual->entrega.cliente.cedula
+                            << setw(15) << actual->entrega.cliente.celular
+                            << setw(30) << actual->entrega.zona << endl;
                         actual = actual->siguiente;
                     } while (actual != lista.cabeza);
                     cout << string(90, '-') << endl;
@@ -191,9 +306,9 @@ void mostrarMenu(ListaCircularDoble& lista) {
                     NodoEntrega* actual = lista.cabeza;
                     do {
                         archivo << actual->entrega.cliente.nombre << ";"
-                               << actual->entrega.cliente.cedula << ";"
-                               << actual->entrega.cliente.celular << ";"
-                               << actual->entrega.zona << "\n";
+                            << actual->entrega.cliente.cedula << ";"
+                            << actual->entrega.cliente.celular << ";"
+                            << actual->entrega.zona << "\n";
                         actual = actual->siguiente;
                     } while (actual != lista.cabeza);
                     archivo.close();

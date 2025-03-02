@@ -9,7 +9,7 @@
 </head>
 <body>
   <h2>Ruta Óptima de Entregas</h2>
-  <p>Distancia total: 44.483 km</p>
+  <p>Distancia total: 223.947 km</p>
   <div id="map"></div>
   <script>
     function decodePolyline(str) {
@@ -34,12 +34,13 @@
         return points;
     }
 
-    var map = L.map('map').setView([-0.182986, -78.4855], 13);
+    var map = L.map('map').setView([-0.187793, -78.4431], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OpenStreetMap contributors'}).addTo(map);
-    L.marker([-0.182986, -78.4855]).addTo(map).bindPopup('Local');
-    L.marker([-0.285159, -78.4962]).addTo(map).bindPopup('Cliente: Abner');
-    L.marker([-0.187583, -78.4444]).addTo(map).bindPopup('Cliente: Alba');
-    fetch('http://router.project-osrm.org/route/v1/driving/-78.485470,-0.182986;-78.496185,-0.285159;-78.444378,-0.187583?overview=full&geometries=polyline')
+    L.marker([-0.187793, -78.4431]).addTo(map).bindPopup('Local');
+    L.marker([-0.180637, -78.4382]).addTo(map).bindPopup('Cliente: Abner');
+    L.marker([-0.938667, -78.695]).addTo(map).bindPopup('Cliente: Alberto');
+    L.marker([-0.297325, -78.4462]).addTo(map).bindPopup('Cliente: Abner');
+    fetch('http://router.project-osrm.org/route/v1/driving/-78.443069,-0.187793;-78.438155,-0.180637;-78.694961,-0.938667;-78.446175,-0.297325?overview=full&geometries=polyline')
       .then(response => response.json())
       .then(data => {
          var routeCoords = decodePolyline(data.routes[0].geometry);
