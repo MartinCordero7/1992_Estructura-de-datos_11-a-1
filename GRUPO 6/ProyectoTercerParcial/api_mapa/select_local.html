@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Selecciona la ubicación del local</title>
+  <title>Selecciona la ubicacion del local</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
@@ -24,7 +24,7 @@
 </head>
 
 <body>
-  <h2>Selecciona la ubicación del local</h2>
+  <h2>Selecciona la ubicacion del local</h2>
   <div id="map"></div>
   <div>
     <label>Latitud: </label>
@@ -34,7 +34,7 @@
   </div>
   <button onclick="confirmLocal()">Confirmar Local</button>
   <script>
-    var map = L.map('map').setView([-0.180653, -78.467834], 13);
+    var map = L.map('map').setView([-1.831239, -78.183406], 7); // Centrar el mapa en Ecuador
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
@@ -55,7 +55,7 @@
       var lat = document.getElementById("lat").value;
       var lon = document.getElementById("lon").value;
       if (lat === "" || lon === "") {
-        alert("Por favor, selecciona una ubicación válida en el mapa.");
+        alert("Por favor, selecciona una ubicacion valida en el mapa.");
         return;
       }
 
@@ -67,12 +67,12 @@
       })
         .then(response => response.text())
         .then(() => {
-          alert("Ubicación del local guardada. Puede cerrar esta ventana.");
+          alert("Ubicacion del local guardada. Puede cerrar esta ventana.");
           window.close();
         })
         .catch(error => {
           console.error("Error:", error);
-          alert("Error al guardar la ubicación. Por favor, intente nuevamente.");
+          alert("Error al guardar la ubicacion. Por favor, intente nuevamente.");
         });
     }
   </script>

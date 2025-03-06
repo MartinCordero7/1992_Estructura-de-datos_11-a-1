@@ -13,7 +13,7 @@ LOCAL_COORDS_FILE = "local_coords.txt"
 def save_local():
     data = request.get_json()
     if not data or 'lat' not in data or 'lon' not in data:
-        return "Datos inválidos", 400
+        return "Datos invalidos", 400
     
     with open(LOCAL_COORDS_FILE, 'w', encoding='utf-8') as f:
         f.write(f"{data['lat']},{data['lon']}")
@@ -32,18 +32,20 @@ def save_client():
 
     # Guardar los datos del cliente en modo append
     with open(DATA_FILE, "a", encoding="utf-8") as f:
-        f.write(f"Cédula: {data['cedula']}, Nombre: {data['nombre']}, Zona de entrega: {data['zona']}\n")
+        f.write(f"Cedula: {data['cedula']}, Nombre: {data['nombre']}, Zona de entrega: {data['zona']}\n")
     
     return "Cliente registrado correctamente."
 
 @app.route('/save_zone', methods=['POST'])
 def save_zone():
     data = request.get_json()
-    if not data or 'zona' not in data:
-        return "Datos de zona inválidos", 400
+    if not data or 'zona' not in data or not data['zona'].strip():
+        return "Datos de zona invalidos", 400
     
+    # Guardar la zona limpiando espacios extra
+    zona = data['zona'].strip()
     with open(TEMP_ZONE_FILE, 'w', encoding='utf-8') as f:
-        f.write(data['zona'])
+        f.write(zona)
     return "Zona guardada correctamente"
 
 @app.route('/get_clients', methods=['GET'])
