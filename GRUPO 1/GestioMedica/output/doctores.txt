@@ -1,0 +1,9 @@
+Nombre: xavo
+Cédula: 1850677764
+Especialidad: General
+-------------------------
+Nombre: Isaac
+Cédula: 1723242374
+Especialidad: General
+Celular: 
+-------------------------

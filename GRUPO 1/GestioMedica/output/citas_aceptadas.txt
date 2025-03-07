@@ -1,0 +1,75 @@
+=== RESUMEN DE LA CITA ===
+Nombre Paciente: 27-05-2000
+Cedula: 1803101045
+Celular: ------------------------
+Genero: 0987409887
+Fecha de Nacimiento: M
+Tipo de atencion: Especialidad
+Especialidad: General
+Fecha de Cita: 6-3-2025
+Hora de Cita: 10:30
+Estado: Aceptada
+Doctor Asignado: Xavo
+Cédula Doctor: 1850677764
+Especialidad Doctor:  General
+-------------------------
+=== RESUMEN DE LA CITA ===
+Nombre Paciente: Mary
+Cedula: 1803101045
+Celular: 0995568334
+Genero: F
+Fecha de Nacimiento: 27-11-2002
+Tipo de atencion: Especialidad
+Especialidad: General
+Fecha de Cita: 6-3-2025
+Hora de Cita: 10:30
+Estado: Aceptada
+Doctor Asignado: General
+Cédula Doctor: 1850677764
+Especialidad Doctor:  General
+-------------------------
+=== RESUMEN DE LA CITA ===
+Nombre Paciente: Gonzalo
+Cedula: 1700406984
+Celular: 0996471400
+Genero: M
+Fecha de Nacimiento: 10-01-1934
+Tipo de atencion: Especialidad
+Especialidad: General
+Fecha de Cita: 7-3-2025
+Hora de Cita: 10:30
+Estado: Aceptada
+Doctor Asignado: 
+Cédula Doctor: 1850677764
+Especialidad Doctor:  General
+-------------------------
+=== RESUMEN DE LA CITA ===
+Nombre Paciente: Gonzalo
+Cedula: 1700406984
+Celular: 0996471400
+Genero: M
+Fecha de Nacimiento: 10-01-1934
+Tipo de atencion: Especialidad
+Especialidad: General
+Fecha de Cita: 2-5-2025
+Hora de Cita: 10:30
+Estado: Aceptada
+Doctor Asignado: Juanito
+Cédula Doctor: 1850677764
+Especialidad Doctor:  General
+-------------------------
+=== RESUMEN DE LA CITA ===
+Nombre Paciente: Gonzalo
+Cedula: 1700406984
+Celular: 0996471400
+Genero: M
+Fecha de Nacimiento: 10-01-1934
+Tipo de atencion: Especialidad
+Especialidad: General
+Fecha de Cita: 12-5-2026
+Hora de Cita: 10:30
+Estado: Aceptada
+Doctor Asignado: xavo
+Cédula Doctor: 1850677764
+Especialidad Doctor:  General
+-------------------------

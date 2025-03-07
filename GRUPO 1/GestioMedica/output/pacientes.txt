@@ -1,0 +1,18 @@
+Nombre: Xavo
+Cédula: 1803101045
+Fecha de Nacimiento: 28-06-2000
+Género: M
+Celular: 0995568331
+-------------------------
+Cédula: 1700406984
+Nombre: Gonzalo
+Fecha de Nacimiento: 10-01-1934
+Género: M
+Celular: 0996471400
+-------------------------
+Cédula: 1704446762
+Nombre: Leonidas
+Fecha de Nacimiento: 22-12-1957
+Género: M
+Celular: 0999669203
+-------------------------

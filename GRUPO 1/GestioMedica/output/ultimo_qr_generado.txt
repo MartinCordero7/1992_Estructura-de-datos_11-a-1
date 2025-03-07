@@ -1,0 +1,15 @@
+=== RESUMEN DE LA CITA ===
+Nombre Paciente: Mary
+Cedula: 1803101045
+Celular: 0995568334
+Genero: F
+Fecha de Nacimiento: 27-11-2000
+Tipo de atencion: Especialidad
+Especialidad: General
+Fecha de Cita: 6-3-2025
+Hora de Cita: 11:30
+Estado: Aceptada
+Doctor Asignado: xavo
+Cédula Doctor: 1850677764
+Especialidad Doctor:  General
+-------------------------

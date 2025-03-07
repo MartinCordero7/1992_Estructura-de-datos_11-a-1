@@ -1,0 +1,6 @@
+Cédula: 1803101045
+Nombre: Xavo
+Fecha de Nacimiento: 27-11-2002
+Género: M
+Celular: 0962937930
+-------------------------

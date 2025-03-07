@@ -1,0 +1,12 @@
+=== RESUMEN DE LA CITA ===
+Nombre Paciente: Leonidas
+Cedula: 1704446762
+Celular: 0999669203
+Genero: M
+Fecha de Nacimiento: 22-12-1957
+Tipo de atencion: Especialidad
+Especialidad: General
+Fecha de Cita: 7-3-2025
+Hora de Cita: 10:30
+Estado: Pendiente
+-------------------------
