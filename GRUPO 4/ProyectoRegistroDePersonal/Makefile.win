@@ -1,0 +1,67 @@
+# Project: Proyecto3
+# Makefile created by Embarcadero Dev-C++ 6.3
+
+CPP      = g++.exe -D__DEBUG__
+CC       = gcc.exe -D__DEBUG__
+WINDRES  = windres.exe
+OBJ      = main.o Fecha.o Menus.o Persona.o ListaCircularDoble.o GestorPersonas.o MenuEmpleado.o Empleado.o ArbolBinario.o Validaciones.o extras.o Bibliotecas/EasyBMP.o Imagen.o BigO.o
+LINKOBJ  = main.o Fecha.o Menus.o Persona.o ListaCircularDoble.o GestorPersonas.o MenuEmpleado.o Empleado.o ArbolBinario.o Validaciones.o extras.o Bibliotecas/EasyBMP.o Imagen.o BigO.o
+LIBS     = -L"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib" -L"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/lib" -static-libgcc -g3
+INCS     = -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include"
+CXXINCS  = -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/c++"
+BIN      = Prueba.exe
+CXXFLAGS = $(CXXINCS) -g3
+CFLAGS   = $(INCS) -g3
+DEL      = C:\Program Files (x86)\Embarcadero\Dev-Cpp\DevCpp.exe INTERNAL_DEL
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${DEL} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CPP) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+main.o: main.cpp
+	$(CPP) -c main.cpp -o main.o $(CXXFLAGS)
+
+Fecha.o: Fecha.cpp
+	$(CPP) -c Fecha.cpp -o Fecha.o $(CXXFLAGS)
+
+Menus.o: Menus.cpp
+	$(CPP) -c Menus.cpp -o Menus.o $(CXXFLAGS)
+
+Persona.o: Persona.cpp
+	$(CPP) -c Persona.cpp -o Persona.o $(CXXFLAGS)
+
+ListaCircularDoble.o: ListaCircularDoble.cpp
+	$(CPP) -c ListaCircularDoble.cpp -o ListaCircularDoble.o $(CXXFLAGS)
+
+GestorPersonas.o: GestorPersonas.cpp
+	$(CPP) -c GestorPersonas.cpp -o GestorPersonas.o $(CXXFLAGS)
+
+MenuEmpleado.o: MenuEmpleado.cpp
+	$(CPP) -c MenuEmpleado.cpp -o MenuEmpleado.o $(CXXFLAGS)
+
+Empleado.o: Empleado.cpp
+	$(CPP) -c Empleado.cpp -o Empleado.o $(CXXFLAGS)
+
+ArbolBinario.o: ArbolBinario.cpp
+	$(CPP) -c ArbolBinario.cpp -o ArbolBinario.o $(CXXFLAGS)
+
+Validaciones.o: Validaciones.cpp
+	$(CPP) -c Validaciones.cpp -o Validaciones.o $(CXXFLAGS)
+
+extras.o: extras.cpp
+	$(CPP) -c extras.cpp -o extras.o $(CXXFLAGS)
+
+Bibliotecas/EasyBMP.o: Bibliotecas/EasyBMP.cpp
+	$(CPP) -c Bibliotecas/EasyBMP.cpp -o Bibliotecas/EasyBMP.o $(CXXFLAGS)
+
+Imagen.o: Imagen.cpp
+	$(CPP) -c Imagen.cpp -o Imagen.o $(CXXFLAGS)
+
+BigO.o: BigO.cpp
+	$(CPP) -c BigO.cpp -o BigO.o $(CXXFLAGS)
